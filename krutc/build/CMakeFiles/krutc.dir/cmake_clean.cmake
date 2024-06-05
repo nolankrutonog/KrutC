@@ -3,8 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/krutc.dir/frontend/lexer.cpp.o.d"
   "CMakeFiles/krutc.dir/frontend/parser.cpp.o"
   "CMakeFiles/krutc.dir/frontend/parser.cpp.o.d"
-  "CMakeFiles/krutc.dir/include/tree.cpp.o"
-  "CMakeFiles/krutc.dir/include/tree.cpp.o.d"
+  "CMakeFiles/krutc.dir/frontend/tree.cpp.o"
+  "CMakeFiles/krutc.dir/frontend/tree.cpp.o.d"
   "krutc"
   "krutc.pdb"
 )

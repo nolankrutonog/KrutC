@@ -97,32 +97,32 @@ CMakeFiles/krutc.dir/frontend/parser.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/krutc.dir/frontend/parser.cpp.s"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.cpp -o CMakeFiles/krutc.dir/frontend/parser.cpp.s
 
-CMakeFiles/krutc.dir/include/tree.cpp.o: CMakeFiles/krutc.dir/flags.make
-CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.cpp
-CMakeFiles/krutc.dir/include/tree.cpp.o: CMakeFiles/krutc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/krutc.dir/include/tree.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/krutc.dir/include/tree.cpp.o -MF CMakeFiles/krutc.dir/include/tree.cpp.o.d -o CMakeFiles/krutc.dir/include/tree.cpp.o -c /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.cpp
+CMakeFiles/krutc.dir/frontend/tree.cpp.o: CMakeFiles/krutc.dir/flags.make
+CMakeFiles/krutc.dir/frontend/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp
+CMakeFiles/krutc.dir/frontend/tree.cpp.o: CMakeFiles/krutc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/krutc.dir/frontend/tree.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/krutc.dir/frontend/tree.cpp.o -MF CMakeFiles/krutc.dir/frontend/tree.cpp.o.d -o CMakeFiles/krutc.dir/frontend/tree.cpp.o -c /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp
 
-CMakeFiles/krutc.dir/include/tree.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/krutc.dir/include/tree.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.cpp > CMakeFiles/krutc.dir/include/tree.cpp.i
+CMakeFiles/krutc.dir/frontend/tree.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/krutc.dir/frontend/tree.cpp.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp > CMakeFiles/krutc.dir/frontend/tree.cpp.i
 
-CMakeFiles/krutc.dir/include/tree.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/krutc.dir/include/tree.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.cpp -o CMakeFiles/krutc.dir/include/tree.cpp.s
+CMakeFiles/krutc.dir/frontend/tree.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/krutc.dir/frontend/tree.cpp.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp -o CMakeFiles/krutc.dir/frontend/tree.cpp.s
 
 # Object files for target krutc
 krutc_OBJECTS = \
 "CMakeFiles/krutc.dir/frontend/lexer.cpp.o" \
 "CMakeFiles/krutc.dir/frontend/parser.cpp.o" \
-"CMakeFiles/krutc.dir/include/tree.cpp.o"
+"CMakeFiles/krutc.dir/frontend/tree.cpp.o"
 
 # External object files for target krutc
 krutc_EXTERNAL_OBJECTS =
 
 krutc: CMakeFiles/krutc.dir/frontend/lexer.cpp.o
 krutc: CMakeFiles/krutc.dir/frontend/parser.cpp.o
-krutc: CMakeFiles/krutc.dir/include/tree.cpp.o
+krutc: CMakeFiles/krutc.dir/frontend/tree.cpp.o
 krutc: CMakeFiles/krutc.dir/build.make
 krutc: /opt/homebrew/Cellar/llvm/18.1.5/lib/libLLVMSupport.a
 krutc: /opt/homebrew/Cellar/llvm/18.1.5/lib/libLLVMCore.a

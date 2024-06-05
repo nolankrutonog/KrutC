@@ -816,9 +816,9 @@ CMakeFiles/krutc.dir/frontend/lexer.cpp.o: /Users/nolankrutonog/Desktop/workspac
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdarg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/filestreambuffer.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/token.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/lexer.h
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h
 
 CMakeFiles/krutc.dir/frontend/parser.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/Availability.h \
@@ -1634,14 +1634,14 @@ CMakeFiles/krutc.dir/frontend/parser.cpp.o: /Users/nolankrutonog/Desktop/workspa
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdarg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/lexer.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/filestreambuffer.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/token.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tokenbuffer.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.h
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tokenbuffer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tree.h
 
-CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.cpp \
+CMakeFiles/krutc.dir/frontend/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/Availability.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/AvailabilityInternal.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/AvailabilityInternalLegacy.h \
@@ -2433,16 +2433,18 @@ CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdarg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.h
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tree.h
 
 
-/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.cpp:
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp:
 
-/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tokenbuffer.h:
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tokenbuffer.h:
+
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h:
 
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.cpp:
 
-/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/lexer.h:
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h:
 
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h:
 
@@ -2677,6 +2679,8 @@ CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cwctype:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/climits:
+
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/chrono:
 
@@ -2937,8 +2941,6 @@ CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/stdio.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__type_traits/alignment_of.h:
-
-/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__type_traits/aligned_union.h:
 
@@ -3223,6 +3225,8 @@ CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__fwd/array.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/runetype.h:
+
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/_types/_uint8_t.h:
 
@@ -3534,8 +3538,6 @@ CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/sys/_types/_fd_clr.h:
 
-/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/filestreambuffer.h:
-
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__algorithm/sort_heap.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__iterator/front_insert_iterator.h:
@@ -3603,8 +3605,6 @@ CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__algorithm/count.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__type_traits/is_signed.h:
-
-/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__type_traits/is_core_convertible.h:
 
@@ -3814,6 +3814,8 @@ CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__algorithm/ranges_is_sorted_until.h:
 
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tree.h:
+
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__algorithm/ranges_equal.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__tuple_dir/tuple_element.h:
@@ -3839,8 +3841,6 @@ CMakeFiles/krutc.dir/include/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__bit/byteswap.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__ios/fpos.h:
-
-/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/token.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__algorithm/ranges_all_of.h:
 

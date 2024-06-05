@@ -10,7 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/lexer.cpp" "CMakeFiles/krutc.dir/frontend/lexer.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/lexer.cpp.o.d"
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.cpp" "CMakeFiles/krutc.dir/frontend/parser.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/parser.cpp.o.d"
-  "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/include/tree.cpp" "CMakeFiles/krutc.dir/include/tree.cpp.o" "gcc" "CMakeFiles/krutc.dir/include/tree.cpp.o.d"
+  "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp" "CMakeFiles/krutc.dir/frontend/tree.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/tree.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

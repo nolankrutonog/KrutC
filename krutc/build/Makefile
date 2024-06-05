@@ -229,29 +229,29 @@ frontend/parser.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/parser.cpp.s
 .PHONY : frontend/parser.cpp.s
 
-include/tree.o: include/tree.cpp.o
-.PHONY : include/tree.o
+frontend/tree.o: frontend/tree.cpp.o
+.PHONY : frontend/tree.o
 
 # target to build an object file
-include/tree.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/include/tree.cpp.o
-.PHONY : include/tree.cpp.o
+frontend/tree.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/tree.cpp.o
+.PHONY : frontend/tree.cpp.o
 
-include/tree.i: include/tree.cpp.i
-.PHONY : include/tree.i
+frontend/tree.i: frontend/tree.cpp.i
+.PHONY : frontend/tree.i
 
 # target to preprocess a source file
-include/tree.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/include/tree.cpp.i
-.PHONY : include/tree.cpp.i
+frontend/tree.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/tree.cpp.i
+.PHONY : frontend/tree.cpp.i
 
-include/tree.s: include/tree.cpp.s
-.PHONY : include/tree.s
+frontend/tree.s: frontend/tree.cpp.s
+.PHONY : frontend/tree.s
 
 # target to generate assembly for a file
-include/tree.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/include/tree.cpp.s
-.PHONY : include/tree.cpp.s
+frontend/tree.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/tree.cpp.s
+.PHONY : frontend/tree.cpp.s
 
 # Help Target
 help:
@@ -272,9 +272,9 @@ help:
 	@echo "... frontend/parser.o"
 	@echo "... frontend/parser.i"
 	@echo "... frontend/parser.s"
-	@echo "... include/tree.o"
-	@echo "... include/tree.i"
-	@echo "... include/tree.s"
+	@echo "... frontend/tree.o"
+	@echo "... frontend/tree.i"
+	@echo "... frontend/tree.s"
 .PHONY : help
 
 
