@@ -1,4 +1,4 @@
-#include "tree.h"
+#include "include/tree.h"
 #include <iostream>
 
 using namespace std;
@@ -34,17 +34,19 @@ void BroStmt::dump(int n) {
 }
 
 void AttrStmt::dump(int n) {
-  indent(n); cout << type << endl;
-  indent(n + 1); cout << name << endl;
-  indent(n + 2); cout << "init" << endl;
-  if (init) init->dump(n + 3);
+  indent(n); cout << type + " " + name << endl;
+  // indent(n + 1); cout << name << endl;
+  if (init) {
+    indent(n + 1); cout << "init" << endl;
+    init->dump(n + 2);
+  }
 }
 
 void MethodStmt::dump(int n) {
   indent(n);
   cout << "method: " + ret_type + " " + name + "()" << endl;
   if (formal_list.size()) {
-    indent(n + 1); cout << "formals-> ";
+    indent(n + 1); cout << "formals -> ";
     for (FormalStmt *formal: formal_list) {
       formal->dump(n + 2);
     }
@@ -85,7 +87,8 @@ void VerseConstExpr::dump(int n) {
 void ReturnExpr::dump(int n) {
   indent(n);
   cout << "return " << endl;
-  expr->dump(n + 1);
+  if (expr)
+    expr->dump(n + 1);
 }
 void WhileStmt::dump(int n) {
   indent(n); cout << "while" << endl;
@@ -155,5 +158,16 @@ void BinopExpr::dump(int n) {
     rhs->dump(n + 1);
   }
   
+}
+
+void NoneExpr::dump(int n) {}
+void NewExpr::dump(int n) {
+  indent(n);
+  cout << "new" << endl;
+  expr->dump(n + 1);
+}
+void KillExpr::dump(int n) {
+  indent(n);
+  cout << "kill: " + error << endl;
 }
 

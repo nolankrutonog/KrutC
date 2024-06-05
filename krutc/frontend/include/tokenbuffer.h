@@ -1,7 +1,7 @@
 #include <iostream>
 #include <deque>
 
-#include "../frontend/lexer.h"
+#include "lexer.h"
 
 class TokenBuffer {
 public:

@@ -3,7 +3,7 @@
 #include <vector>
 #include <unordered_set>
 
-#include "lexer.h"
+#include "include/lexer.h"
 
 using namespace std;
 
@@ -11,9 +11,6 @@ static unordered_set<string> KEYWORDS_STR = {
   "BRO",
   "VIBESWITH",
   "FOR",
-  "START",
-  "END",
-  "STEP",
   "IF",
   "ELSE",
   "WHILE",
@@ -21,7 +18,9 @@ static unordered_set<string> KEYWORDS_STR = {
   "THIS",
   "CONTINUE",
   "BREAK",
-  "None"
+  "NEW",
+  "NONE",
+  "KILL"
 };
 
 unordered_set<string> BASIC_TYPES = {

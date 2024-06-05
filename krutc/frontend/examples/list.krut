@@ -4,7 +4,7 @@ bro Node {
   Node prev;
   Node next;
 
-  Node init(object o) {
+  Node(object o) {
     val = o;
     return this;
   }
@@ -20,9 +20,10 @@ bro List {
   Node head;
   Node tail;
 
-  List init() {
+  List() {
     head.set_next(tail);
     tail.set_prev(head);
+    return this;
   }
 
   void set_head(Node n) { head = n; }
@@ -33,7 +34,7 @@ bro List {
   int size() { return len; }
 
   void push_back(object o) {
-    Node n = Node.init(o);
+    Node n = new Node(o);
     n.set_prev(tail);
     tail.set_next(n);
     len += 1;
@@ -49,7 +50,7 @@ bro List {
 
   Node get_index(int i) {
     if (i > len - 1;) {
-      throw error("List index out of range");
+      kill "List index out of range";
     }
 
     while (i < 0;) {
@@ -65,7 +66,7 @@ bro List {
 
   List take_piece(int start, int end) {
     if (end > len - 1;) {
-      throw error("List index out of range");
+      kill "List index out of range";
     }
 
     while (start < 0;) {
@@ -73,18 +74,18 @@ bro List {
     }
 
     if (start > end;) {
-      throw error("Start index is greater than end index");
+      kill "Start index is greater than end index";
     }
 
-    List new_list;
+    List new_list = new List();
     
     Node start_node = head;
-    for (int x; x = 0; x != start; x += 1) {
+    for (int x; x = 0; x != start; x += 1;) {
       start_node = start_node.get_next();
     }
 
     Node end_node = head;
-    for (int x; x = 0; x != end; x += 1) {
+    for (int x; x = 0; x != end; x += 1;) {
       end_node = end_node.get_next();
     }
 

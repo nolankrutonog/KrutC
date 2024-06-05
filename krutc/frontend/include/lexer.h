@@ -1,7 +1,6 @@
 #include <iostream>
-// #include "include/filestreambuffer.h"
-#include "../include/filestreambuffer.h"
-#include "../include/token.h"
+#include "filestreambuffer.h"
+#include "token.h"
 
 #define MAX_VERSE_LEN 1024
 

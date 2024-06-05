@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "parser.h"
+#include "include/parser.h"
 
 
 
@@ -8,13 +8,13 @@ using namespace std;
 
 
 void Parser::panic_recover() {
-  while (true) {
-    if (tbuff.lookahead(0).get_type() == EMPTY || tbuff.lookahead(0).get_str() == ";") {
-      // tbuff.get_next(); // pop ';'
-      break;
-    }
-    tbuff.get_next();
-  }
+  // while (true) {
+  //   if (tbuff.lookahead(0).get_type() == EMPTY || tbuff.lookahead(0).get_str() == ";") {
+  //     // tbuff.get_next(); // pop ';'
+  //     break;
+  //   }
+  //   tbuff.get_next();
+  // }
   
 }
 
@@ -27,6 +27,7 @@ void Parser::panic_recover() {
 //
 ////////////////////////////////////////////////////////////
 FormalStmt *Parser::parse_formalstmt() {
+  debug_msg("BEGIN parse_formal_stmt()");
   int formalstmt_lineno = tbuff.get_lineno();
   string type;
   string name;
@@ -51,17 +52,29 @@ FormalStmt *Parser::parse_formalstmt() {
 
   FormalStmt *formal = new FormalStmt(type, name);
   formal->lineno = formalstmt_lineno;
+  debug_msg("END parse_formal_stmt()");
   return formal;
 }
 
 /* type name(FormalList) {StmtList};*/
 MethodStmt *Parser::parse_methodstmt() {
+  debug_msg("BEGIN parse_method_stmt()");
   int methodstmt_lineno = tbuff.get_lineno();
-
-  string type = tbuff.get_next().get_str();
-  string name = tbuff.get_next().get_str();
+  string type;
+  string name;
   FormalList formal_list;  
   StmtList stmt_list;
+
+  type = tbuff.get_next().get_str();
+  if (tbuff.lookahead(0).get_str() == "(") {
+    name = "constructor";
+  } else {
+    Token next = tbuff.lookahead(0);
+    if (parse_check_and_pop_type(next, OBJECTID) == -1) {
+      return NULL;
+    }
+    name = next.get_str();
+  }
 
   tbuff.get_next(); // pop leading '('
   // doing_formals = true;
@@ -100,6 +113,7 @@ MethodStmt *Parser::parse_methodstmt() {
 
   MethodStmt *methodstmt = new MethodStmt(name, type, formal_list, stmt_list);
   methodstmt->lineno = methodstmt_lineno; 
+  debug_msg("END parse_method_stmt()");
 
   return methodstmt; 
 }
@@ -107,6 +121,7 @@ MethodStmt *Parser::parse_methodstmt() {
 
 
 AttrStmt *Parser::parse_attrstmt() {
+  debug_msg("BEGIN parse_attrstmt()");
   int attrstmt_lineno = tbuff.get_lineno();
 
   string type = tbuff.get_next().get_str();
@@ -131,22 +146,29 @@ AttrStmt *Parser::parse_attrstmt() {
 
   AttrStmt *attrstmt = new AttrStmt(name, type, init);
   attrstmt->lineno = attrstmt_lineno;
+  debug_msg("END parse_attrstmt()");
   return attrstmt;
 }
 
 
 Feature *Parser::parse_feature() {
+  // debug_msg("BEGIN parse_feature()");
   Token tdecider = tbuff.lookahead(2); // 0 - type, 1 - name, 2 - = or (
   if (tdecider.get_str() == "=" || tdecider.get_str() == ";") {
     return parse_attrstmt();
   } else if (tdecider.get_str() == "(") {
     return parse_methodstmt();
-  } else {
+  } else if (tbuff.lookahead(1).get_str() == "(") {
+    return parse_methodstmt();
+  }
+  
+  else {
     string err_msg = "Syntax error at token " + tdecider.get_str() + ". Expected one of ';', '=', '('";
     error_blank(tdecider.get_lineno(), err_msg);
     panic_recover();
     return NULL;
   }
+  // debug_msg("BEGIN parse_feature()");
 
 }
 
@@ -173,6 +195,7 @@ int Parser::parse_check_and_pop_type(Token t, TokenType type) {
 
 /* FOR (OBJECTID; START=EXPRSTMT; END=EXPRSTMT; STEP=EXPRSTMT) { STMTLIST }*/
 ForStmt *Parser::parse_for_stmt() {
+  debug_msg("BEGIN parse_for_stmt()");
   int forstmt_lineno = tbuff.get_lineno();
   FormalStmt *formal;
   ExprStmt *start;
@@ -241,6 +264,7 @@ ForStmt *Parser::parse_for_stmt() {
 
   ForStmt *for_stmt = new ForStmt(formal, start, end, step, stmt_list);
   for_stmt->lineno = forstmt_lineno;
+  debug_msg("END parse_for_stmt()");
   return for_stmt;
 }
 
@@ -276,6 +300,7 @@ vector<string> Parser::get_vibers() {
 
 /* BRO TYPEID [VIBESWITH [OBJECTID[, OBJECTID]*]]? { STMTLIST }; */
 BroStmt *Parser::parse_bro_stmt() {
+  debug_msg("BEGIN parse_bro_stmt()");
   int brostmt_lineno = tbuff.get_lineno();
   string name;
   vector<string> vibers;
@@ -316,10 +341,12 @@ BroStmt *Parser::parse_bro_stmt() {
 
   BroStmt *bro_stmt = new BroStmt(name, vibers, stmt_list);
   bro_stmt->lineno = brostmt_lineno;
+  debug_msg("END parse_bro_stmt()");
   return bro_stmt;
 }
 
 IfStmt *Parser::parse_if_stmt() {
+  debug_msg("BEGIN parse_if_stmt()");
   int lineno = tbuff.get_lineno();
   ExprStmt *pred;
   StmtList then_branch;
@@ -383,10 +410,12 @@ IfStmt *Parser::parse_if_stmt() {
   // IfStmt *ifstmt = new IfStmt(pred, then_list, else_list);
   IfStmt *if_stmt = new IfStmt(pred, then_branch, else_branch);
   if_stmt->lineno = lineno;
+  debug_msg("END parse_if_stmt()");
   return if_stmt;
 }
 
 WhileStmt *Parser::parse_while_stmt() {
+  debug_msg("BEGIN parse_while_stmt()");
   int lineno = tbuff.get_lineno();
   ExprStmt *pred;
   StmtList stmt_list;
@@ -428,6 +457,7 @@ WhileStmt *Parser::parse_while_stmt() {
 
   WhileStmt *whilestmt = new WhileStmt(pred, stmt_list);
   whilestmt->lineno = lineno;
+  debug_msg("END parse_while_stmt()");
   return whilestmt;
 }
 
@@ -450,7 +480,15 @@ ExprStmt *Parser::parse_exprstmt() {
   if (t.get_type() == RETURN) {
     final_expr = parse_returnexpr();
     final_expr->lineno = lineno;
-  } else {
+  } else if (t.get_type() == NEW) {
+    final_expr = parse_newexpr();
+    final_expr->lineno = lineno;
+  } else if (t.get_type() == KILL) {
+    final_expr = parse_killexpr();
+    final_expr->lineno = lineno;
+  }
+  
+  else {
     vector<Token> tvec;
     int lineno = tbuff.get_lineno();
     int binop_index = -1;
@@ -490,7 +528,7 @@ ExprStmt *Parser::parse_exprstmt() {
     final_expr = parse_binopexpr(tvec, binop_index);
   }
 
-  if (t.get_type() != RETURN) {
+  if (t.get_type() != RETURN && t.get_type() != NEW) {
     if (tbuff.lookahead(0).get_str() != ";") {
       error_expected_token(tbuff.get_lineno(), ";");
       panic_recover();
@@ -504,19 +542,75 @@ ExprStmt *Parser::parse_exprstmt() {
 }
 
 ReturnExpr *Parser::parse_returnexpr() {
+  debug_msg("BEGIN parse_returnexpr()");
+  int lineno = tbuff.get_lineno();
+  ExprStmt *expr;
   tbuff.get_next(); // pop 'return'
-  ExprStmt *expr = parse_exprstmt();
-  if (expr->exprtype == RETURN_EXPR) {
-    string err_msg = "Error: Expression following keyword RETURN cannot be of type RETURN.";
-    error_blank(expr->lineno, err_msg);
+  if (tbuff.lookahead(0).get_str() == ";") {
+    tbuff.get_next();
+    expr = NULL;
+  } else {
+    expr = parse_exprstmt();
+    if (expr->exprtype == RETURN_EXPR) {
+      string err_msg = "Error: Expression following keyword RETURN cannot be of type RETURN.";
+      error_blank(expr->lineno, err_msg);
+      panic_recover();
+      return NULL;
+    }
+  }
+  ReturnExpr *retexpr = new ReturnExpr(expr);
+  retexpr->lineno = lineno;
+  debug_msg("END parse_returnexpr()");
+  return retexpr;
+}
+KillExpr *Parser::parse_killexpr() {
+  debug_msg("BEGIN parse_killexpr()");
+  int lineno = tbuff.get_lineno();
+  string err = "";
+  tbuff.get_next(); // pop 'kill'
+  if (tbuff.lookahead(0).get_str() == ";") {
+    tbuff.get_next();
+    err = "";
+  } else if (tbuff.lookahead(0).get_type() != VERSE_CONST) {
+    string err_msg = "Error: Expression following keyword KILL must be of type VERSE_CONST";
+    error_blank(lineno, err_msg);
+    panic_recover();
+    return NULL;
+  } else {
+    /* collect error message */
+    err = tbuff.get_next().get_str();
+
+  }
+  KillExpr *killexpr= new KillExpr(err);
+  killexpr->lineno = lineno;
+  debug_msg("END parse_killexpr()");
+  return killexpr;
+}
+
+NewExpr *Parser::parse_newexpr() {
+  debug_msg("BEGIN parse_newexpr()");
+  int lineno = tbuff.get_lineno();
+  tbuff.get_next(); // pop 'new'
+  if (tbuff.lookahead(0).get_str() == ";") {
+    string err_msg = "Error: There must be an expression following keyword NEW.";
+    error_blank(lineno, err_msg);
     panic_recover();
     return NULL;
   }
-  ReturnExpr *retexpr = new ReturnExpr(expr);
-  return retexpr;
+  ExprStmt *expr = parse_exprstmt();
+  if (expr->exprtype == NEW_EXPR) {
+    string err_msg = "Error: Expression following keyword NEW cannot be of type NEW.";
+    error_blank(expr->lineno, err_msg);
+    panic_recover();
+    return NULL;
+  }   
+  NewExpr *newexpr = new NewExpr(expr);
+  newexpr->lineno = lineno;
+  debug_msg("END parse_newexpr()");
+  return newexpr;
 }
 
-std::vector<Token> Parser::disp_config_name_and_caller(vector<Token> &token_vec, 
+std::vector<Token> Parser::disp_config_caller_and_name(vector<Token> &token_vec, 
                                                        string &calling_class, string &name) {
   vector<Token> arglist_tvec;
   if (token_vec[1].get_str() == ".") {
@@ -561,7 +655,7 @@ DispatchExpr *Parser::parse_dispexpr(vector<Token> &token_vec) {
   string name;
   ExprList args;
 
-  vector<Token> arglist_tvec = disp_config_name_and_caller(token_vec, calling_class, name);
+  vector<Token> arglist_tvec = disp_config_caller_and_name(token_vec, calling_class, name);
   if (disp_arg_check(arglist_tvec) == -1) {
     return NULL;
   }
@@ -611,7 +705,6 @@ DispatchExpr *Parser::parse_dispexpr(vector<Token> &token_vec) {
 
     argvec.push_back(arglist_tvec[i]);
   }
-
   DispatchExpr *dispexpr = new DispatchExpr(calling_class, name, args);
   dispexpr->lineno = lineno;
   debug_msg("END parse_dispexpr()");
@@ -638,8 +731,7 @@ BinopExpr *Parser::parse_binopexpr(vector<Token> &token_vec, int index) {
       lhs = parse_verse_const_expr(t);
     } else if (t.get_type() == OBJECTID) {
       lhs = parse_objectid_expr(t);
-    } 
-    else if (t.get_type() == THIS) {
+    } else if (t.get_type() == THIS) {
       ThisExpr *thisexpr = new ThisExpr();
       thisexpr->lineno = lineno;
       lhs = thisexpr;
@@ -651,8 +743,7 @@ BinopExpr *Parser::parse_binopexpr(vector<Token> &token_vec, int index) {
       ContExpr *contexpr = new ContExpr();
       contexpr->lineno = lineno;
       lhs = contexpr;
-    }
-    else {
+    } else {
       // some error case??
       if (t.get_type() == RETURN) {
         error_blank(lineno, "Syntax error: 'return' cannot be part of binop expression");
@@ -664,23 +755,17 @@ BinopExpr *Parser::parse_binopexpr(vector<Token> &token_vec, int index) {
     }
     op = "";
     rhs = NULL;
-  } 
-  // 3 * -4 is legal in krutc
-  // -a + (4 * 3)
-  /*
-            *
-          /   \ 
-        3      -
-              /   \  
-            o     4
-  */
-  else if (index == -1 && token_vec[0].get_type() == OBJECTID) {
-    /* if no binops in the token_vec and starts with object id */
+  } else if (index == -1 && (token_vec[0].get_type() == OBJECTID || token_vec[0].get_type() == TYPEID)) {
+    /* if no binops in the token_vec and starts with object id of typeid */
     lhs = parse_dispexpr(token_vec);
     op = "";
     rhs = NULL;
   } else {
-    if (index == -1 && token_vec[0].get_str() != "(") {
+    if (index == -1 && token_vec[0].get_str() != "(" && token_vec[0].get_type() != TYPEID) {
+      /* 
+         if there's no binary operators, its not an expr surrounded by ()'s,
+         and its not a constructor of the form TYPEID()
+      */
       string err_msg = "Error: expected binop type, instead got "; 
       if (token_vec[1].get_str() != "") {
         err_msg += token_vec[1].get_str();
@@ -690,7 +775,9 @@ BinopExpr *Parser::parse_binopexpr(vector<Token> &token_vec, int index) {
       error_blank(token_vec[0].get_lineno(), err_msg);
       panic_recover();
       return NULL;
-    } else if (index == 0 && token_vec[0].get_str() != "-") {
+    } 
+    if (index == 0 && token_vec[0].get_str() != "-") {
+      /* if there is a binary operator at the beginning but its not a '-' */
       string err_msg = "Error: cannot use " + token_vec[0].get_str() + " as a unary operator, only '-'.";
       error_blank(token_vec[0].get_lineno(), err_msg);
       panic_recover();
@@ -698,6 +785,7 @@ BinopExpr *Parser::parse_binopexpr(vector<Token> &token_vec, int index) {
     }
 
     if (token_vec[0].get_str() == "(" && token_vec[token_vec.size() - 1].get_str() == ")") {
+      /* if parentheses surround, remove them and calculate the index */
       token_vec.assign(token_vec.begin() + 1, token_vec.end() - 1);
       index = find_highest_binop_index(token_vec, 0, (int) token_vec.size());
     }
@@ -845,6 +933,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   string filename = argv[1];
+
   bool token_dump = false;
   bool debug = false;
   if (argc >= 3) {

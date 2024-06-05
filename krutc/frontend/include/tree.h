@@ -29,7 +29,10 @@ enum ExprType {
   BOOL_CONST_EXPR = 609,
   BINOP_EXPR = 610,
   CONT_EXPR = 611,
-  BREAK_EXPR = 612
+  BREAK_EXPR = 612,
+  NONE_EXPR = 613,
+  KILL_EXPR = 614,
+  NEW_EXPR = 615
 };
 
 class Program;
@@ -56,6 +59,10 @@ class ObjectIdExpr;
 class DispatchExpr;
 class BinopExpr;
 class ThisExpr; 
+class ContExpr;
+class BreakExpr;
+class NoneExpr;
+class KillExpr;
 
 
 
@@ -367,5 +374,41 @@ public:
   std::string get_name() { return name; }
 };
 
+class NoneExpr : public ExprStmt {
+  std::string name = "NONE";
+public:
+  NoneExpr() {}
+  ExprType exprtype = NONE_EXPR;
+  std::string classname() { return "NoneExpr"; }
+  void dump(int indent);
 
+  std::string get_name() { return name; }
 
+};
+
+class NewExpr : public ExprStmt {
+  ExprStmt *expr;
+public:
+  NewExpr(ExprStmt *expr) : expr(expr) {}
+  ExprType exprtype = NEW_EXPR;
+  std::string classname() { return "NewExpr"; }
+  void dump(int indent);
+
+  ExprStmt *get_expr() { return expr; }
+
+};
+
+class KillExpr: public ExprStmt {
+  std::string name = "KILL";
+  std::string error = "Generic error";
+public:
+  KillExpr() {}
+  KillExpr(std::string err) : error(err) {}
+  ExprType exprtype = NEW_EXPR;
+  std::string classname() { return "KillExpr"; }
+  void dump(int indent);
+
+  std::string get_name() { return name; }
+  std::string get_error() { return error; }
+
+};
