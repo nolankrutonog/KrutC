@@ -1,0 +1,96 @@
+
+bro Node {
+  object val;
+  Node prev;
+  Node next;
+
+  Node init(object o) {
+    val = o;
+    return this;
+  }
+
+  void set_prev(Node n) { prev = n; }
+  void set_next(Node n) { next = n; }
+  object get_prev() { return prev; }
+  object get_next() { return next; }
+}
+
+bro List {
+  int len = 0;
+  Node head;
+  Node tail;
+
+  List init() {
+    head.set_next(tail);
+    tail.set_prev(head);
+  }
+
+  void set_head(Node n) { head = n; }
+  void set_tail(Node n) { tail = n; }
+  Node get_head() { return head; }
+  Node get_tail() { return tail; }
+
+  int size() { return len; }
+
+  void push_back(object o) {
+    Node n = Node.init(o);
+    n.set_prev(tail);
+    tail.set_next(n);
+    len += 1;
+  }
+
+  void pop_back() {
+    if (tail.get_prev() == head;) {
+      return;
+    }
+    tail = tail.get_prev();
+    len -= 1;
+  }
+
+  Node get_index(int i) {
+    if (i > len - 1;) {
+      throw error("List index out of range");
+    }
+
+    while (i < 0;) {
+      i = len - 1 + i;
+    }
+
+    Node curr = head;
+    for (int x; x = 0; x != i; x += 1;) {
+      curr = curr.get_next();
+    }
+    return curr;
+  }
+
+  List take_piece(int start, int end) {
+    if (end > len - 1;) {
+      throw error("List index out of range");
+    }
+
+    while (start < 0;) {
+      start = len - 1 + start;
+    }
+
+    if (start > end;) {
+      throw error("Start index is greater than end index");
+    }
+
+    List new_list;
+    
+    Node start_node = head;
+    for (int x; x = 0; x != start; x += 1) {
+      start_node = start_node.get_next();
+    }
+
+    Node end_node = head;
+    for (int x; x = 0; x != end; x += 1) {
+      end_node = end_node.get_next();
+    }
+
+    new_list.set_head(start_node);
+    new_list.set_tail(end_node);
+
+    return new_list; 
+  }
+}

@@ -1,0 +1,21 @@
+
+bro Krut vibeswith Shay {
+  Krut init(int z, verse y, Shay s) {
+    int x = 5;
+    return this;
+  }
+}
+
+bro Shay {
+  Shay init() {
+    int x = 5;
+    int y;
+    int z = 6969696969696969696;
+    int a = 4;
+    void gang(int a, int b, int c) { 
+      x = 10;
+    }
+    return x;
+  }
+  int n = 10;
+}

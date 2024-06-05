@@ -1,0 +1,7 @@
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles/intrinsics_gen.dir
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles/omp_gen.dir
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles/acc_gen.dir
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles/RISCVTargetParserTableGen.dir
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles/krutc.dir
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles/edit_cache.dir
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles/rebuild_cache.dir

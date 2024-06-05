@@ -1,0 +1,21 @@
+bro Krut {
+  int homies = 0;
+  Krut init() {
+    return this;
+  }
+
+  int get_homies() { return homies; }
+  int set_homies(int n) { homies = n; }
+
+  void vibe() {
+    bool has_homies = facts;
+    while (has_homies;) {
+      while (homies > 0;) {
+        lose_homie();
+      }
+      has_homies = cap;
+    }
+  }
+
+  void lose_homie() { homies -= 1; }
+}
