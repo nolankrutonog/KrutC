@@ -1,41 +1,41 @@
 
 -- Good Examples
 
--- formal, start, end, step
-for (int x; x = 0; x != 5; x += 1;) {
-  print(x);
+-- attr, cond, repeat 
+for (int x = 0; x != 5; x += 1) {
+  -- print(x);
 }
 
 -- start, end, step
 int x;
-for (; x = 0; x != 5; x += 1;) {
-  print(x);
+for (; x != 5; x += 1) {
+  -- print(x);
 }
 
 -- end, step
 int x = 0;
-for (;; x < 5; x += 1;) {
-  print(x);
+for (; x < 5; x += 1) {
+  -- print(x);
 }
 
 int x = 0;
-for (;;; x += 1;) {
-  if (x == 5;) {
+for (;; x += 1) {
+  if (x == 5) {
     break;
   } else {
     break;
   }
    
-  print(x);
+  -- print(x);
 }
 
-for (verse v; v = ""; v != "Hello, world!"; ;) {
+for (verse v; v != "Hello, world!"; ) {
 
 };
 
 int y = 0;
-for (;;;;) {
-  if (y == 1;) {
+for (;;) {
+  if (y == 1) {
     break;
   }
 }

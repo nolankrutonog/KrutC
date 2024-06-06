@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include "include/parser.h"
 
@@ -7,15 +8,14 @@
 using namespace std;
 
 
-void Parser::panic_recover() {
-  // while (true) {
-  //   if (tbuff.lookahead(0).get_type() == EMPTY || tbuff.lookahead(0).get_str() == ";") {
-  //     // tbuff.get_next(); // pop ';'
-  //     break;
-  //   }
-  //   tbuff.get_next();
-  // }
-  
+void Parser::panic_recover(string s) {
+  while (true) {
+    Token t = tbuff.lookahead(0);
+    if (t.get_str() == s || t.get_type() == EMPTY) {
+      break;
+    }
+    tbuff.get_next();
+  } 
 }
 
 
@@ -26,34 +26,57 @@ void Parser::panic_recover() {
 //
 //
 ////////////////////////////////////////////////////////////
-FormalStmt *Parser::parse_formalstmt() {
+FormalList Parser::parse_formallist() {
   debug_msg("BEGIN parse_formal_stmt()");
-  int formalstmt_lineno = tbuff.get_lineno();
-  string type;
-  string name;
 
-  Token next = tbuff.lookahead(0);
-  if (next.get_type() != TYPEID) {
-    string err_msg = "Expected TYPE decl in formal definition";
-    error_blank(tbuff.get_lineno(), err_msg);
-    panic_recover();
-    return NULL;
+  FormalList formal_list;
+
+  while (tbuff.lookahead(0).get_str() != ")") {
+    string type;
+    string name;
+    Token next = tbuff.lookahead(0);
+    int lineno = next.get_lineno();
+    if (next.get_type() != TYPEID) {
+      error_blank(lineno, "Error: Expected TYPEID in formal definition.");
+      if (next.get_str() == ")") {
+        break;
+      }
+    } else {
+      type = next.get_str();      
+    }
+    tbuff.get_next();
+
+    next = tbuff.lookahead(0);
+    if (next.get_type() != OBJECTID) {
+      error_blank(lineno, "Error: Expected OBJECTID to follow TYPEID in formal definition.");
+      if (next.get_str() == ")") {
+        break;
+      }
+    } else {
+      name = next.get_str();
+    }
+    tbuff.get_next();
+
+    FormalStmt *f = new FormalStmt(type, name);
+    f->lineno = lineno;
+    formal_list.push_back(f);
+    
+    if (tbuff.lookahead(0).get_str() == ",") {
+      tbuff.get_next();
+      if (tbuff.lookahead(0).get_str() == ")") {
+        error_blank(lineno, "Error: Expected another formal definition.");
+        break;
+      }
+    } else if (tbuff.lookahead(0).get_str() == ")") {
+      break;
+    } else {
+      error_blank(lineno, "Error: Expected ',' between formal definitions or ')' ");
+      break;
+    }
   }
-  type = tbuff.get_next().get_str();
 
-  next = tbuff.lookahead(0);
-  if (next.get_type() != OBJECTID) {
-    string err_msg = "Expected OBJECTID in method definition";
-    error_blank(tbuff.get_lineno(), err_msg);
-    panic_recover();
-    return NULL;
-  }
-  name = tbuff.get_next().get_str();
-
-  FormalStmt *formal = new FormalStmt(type, name);
-  formal->lineno = formalstmt_lineno;
   debug_msg("END parse_formal_stmt()");
-  return formal;
+  return formal_list;
 }
 
 /* type name(FormalList) {StmtList};*/
@@ -65,51 +88,34 @@ MethodStmt *Parser::parse_methodstmt() {
   FormalList formal_list;  
   StmtList stmt_list;
 
-  type = tbuff.get_next().get_str();
+  Token type_tok = tbuff.get_next();
+  assert(type_tok.get_type() == TYPEID);
+  type = type_tok.get_str();
+
   if (tbuff.lookahead(0).get_str() == "(") {
     name = "constructor";
   } else {
-    Token next = tbuff.lookahead(0);
-    if (parse_check_and_pop_type(next, OBJECTID) == -1) {
-      return NULL;
+    Token next = tbuff.get_next();
+    if (next.get_type() != OBJECTID) {
+      error_blank(next.get_lineno(), "Error: expected an identifier.");
     }
     name = next.get_str();
   }
 
-  tbuff.get_next(); // pop leading '('
-  // doing_formals = true;
-  while (tbuff.lookahead(0).get_str() != ")") {
-    FormalStmt *formal = parse_formalstmt();
-    if (formal)
-      formal_list.push_back(formal);
-    if (tbuff.lookahead(0).get_str() == ",") {
-      tbuff.get_next();
-    }
-  }
+  parse_check_and_pop("("); // pop leading "("
+
+  formal_list = parse_formallist();
   // doing_formals = false;
-  tbuff.get_next(); // pop closing ')'
+  parse_check_and_pop(")"); // pop closing ')'
 
-  if (tbuff.lookahead(0).get_str() != "{") {
-    error_expected_token(tbuff.get_lineno(), "{");
-    panic_recover();
-    return NULL;
-  }
-
-  tbuff.get_next(); // pop open '{'
+  parse_check_and_pop("{"); // parse opening {
 
   while (tbuff.lookahead(0).get_str() != "}") {
     Stmt *stmt = parse_stmt();
     stmt_list.push_back(stmt);
   }
 
-  tbuff.get_next(); // pop closing '}'
-
-  // if (tbuff.lookahead(0).get_str() != ";") {
-  //   error_expected_token(tbuff.get_lineno(), ";");
-  //   panic_recover();
-  //   return NULL;
-  // }
-  // tbuff.get_next();
+  parse_check_and_pop("}");
 
   MethodStmt *methodstmt = new MethodStmt(name, type, formal_list, stmt_list);
   methodstmt->lineno = methodstmt_lineno; 
@@ -123,30 +129,35 @@ MethodStmt *Parser::parse_methodstmt() {
 AttrStmt *Parser::parse_attrstmt() {
   debug_msg("BEGIN parse_attrstmt()");
   int attrstmt_lineno = tbuff.get_lineno();
-
-  string type = tbuff.get_next().get_str();
-
-  if (tbuff.lookahead(0).get_type() != OBJECTID) {
-    error_blank(tbuff.get_lineno(), "Error: expected OBJECTID after type declaration.");
-    panic_recover();
-    return NULL;
-  }
-
-  string name = tbuff.get_next().get_str();
+  string type;
+  string name;
   ExprStmt *init;
 
-  Token next = tbuff.lookahead(0);
-  if (next.get_str() == ";") {
+  Token type_tok = tbuff.get_next();
+  assert(type_tok.get_type() == TYPEID);
+  type = type_tok.get_str();
+
+  Token name_tok = tbuff.lookahead(0);
+  if (name_tok.get_type() != OBJECTID) {
+    error_blank(name_tok.get_lineno(), "Error: expected OBJECTID after type declaration.");
+  } else {
+    name = name_tok.get_str();
+    tbuff.get_next();
+  }
+
+  Token decider_tok = tbuff.lookahead(0);
+  if (decider_tok.get_str() == ";") {
     tbuff.get_next(); // pop ';'
     init = NULL;
-  } else if (next.get_str() == "="){ 
+  } else if (decider_tok.get_str() == "="){ 
     tbuff.get_next(); // pop "="
     build_expr_tq(";");
     init = parse_exprstmt();
-    if (parse_check_and_pop(";") == -1) {
-      return NULL;
-    }
-  } 
+    parse_check_and_pop(";");
+  } else {
+    /* this should never hit because its checked in parse_features() */
+    error_blank(decider_tok.get_lineno(), "Error: Expected either ';' or expression following attribute declaration.");
+  }
 
   AttrStmt *attrstmt = new AttrStmt(name, type, init);
   attrstmt->lineno = attrstmt_lineno;
@@ -169,7 +180,6 @@ Feature *Parser::parse_feature() {
   else {
     string err_msg = "Syntax error at token " + tdecider.get_str() + ". Expected one of ';', '=', '('";
     error_blank(tdecider.get_lineno(), err_msg);
-    panic_recover();
     return NULL;
   }
   // debug_msg("BEGIN parse_feature()");
@@ -180,89 +190,72 @@ Feature *Parser::parse_feature() {
 int Parser::parse_check_and_pop(string s) {
   Token t = tbuff.lookahead(0);
   if (t.get_str() != s) {
-    error_expected_token(tbuff.get_lineno(), s);
-    panic_recover();
+    error_blank(tbuff.get_lineno(), "Error: Expected '" + s + "', instead got '" + t.get_str() + "'.");
+    panic_recover(s);
+    tbuff.get_next(); // pop t
     return -1;
   }
   tbuff.get_next(); // pop t
   return 1;
 }
 
-int Parser::parse_check_and_pop_type(Token t, TokenType type) {
-  if (t.get_type() != type) {
-    error_expected_token(tbuff.get_lineno(), TOKEN_TYPE_TO_STRING[type]);
-    panic_recover();
-    return -1;
-  }
-  tbuff.get_next(); // pop t
-  return 1;
-}
 
-/* FOR (OBJECTID; START=EXPRSTMT; END=EXPRSTMT; STEP=EXPRSTMT) { STMTLIST }*/
+
 ForStmt *Parser::parse_for_stmt() {
   debug_msg("BEGIN parse_for_stmt()");
   int forstmt_lineno = tbuff.get_lineno();
-  FormalStmt *formal;
-  ExprStmt *start;
-  ExprStmt *end;
-  ExprStmt *step;
+  Stmt *stmt;
+  ExprStmt *cond;
+  ExprStmt *repeat;
   StmtList stmt_list;
 
-  tbuff.get_next().get_str(); // pop 'FOR'
+  Token for_tok = tbuff.lookahead(0);
+  assert(for_tok.get_type() == FOR);
+  tbuff.get_next(); // pop 'FOR'
 
-  if (parse_check_and_pop("(") == -1)
-    return NULL;
+  parse_check_and_pop("(");
 
-  if (tbuff.lookahead(0).get_type() == TYPEID) {
-    formal = parse_formalstmt(); /* can be separated by either , and ; */ 
+  Token next = tbuff.lookahead(0);
+  if (next.get_str() == ";") {
+    stmt = NULL;
+    parse_check_and_pop(";"); // pop ';'
+    
   } else {
-    formal = NULL;
-  }
-
-  if (parse_check_and_pop(";") == -1) {
-    return NULL;
+    if (next.get_type() == TYPEID) {
+      stmt = parse_attrstmt();
+    } else {
+      build_expr_tq(";");
+      stmt = parse_exprstmt();
+      parse_check_and_pop(";"); // pop ';'
+    }
   }
 
   if (tbuff.lookahead(0).get_str() != ";") {
     build_expr_tq(";");
-    start = parse_exprstmt(); 
+    cond = parse_exprstmt(); 
   } else {
-    start = NULL;
+    cond = NULL;
   }
-  tbuff.get_next(); // pop ';'
-
-  if (tbuff.lookahead(0).get_str() != ";") {
-    build_expr_tq(";");
-    end = parse_exprstmt(); 
-  } else {
-    end = NULL;
-  }
-  tbuff.get_next(); // pop ';'
+  parse_check_and_pop(";"); // pop ';'
 
   if (tbuff.lookahead(0).get_str() != ")") {
     build_expr_tq(")");
-    step = parse_exprstmt(); 
+    repeat = parse_exprstmt(); 
   } else {
-    step = NULL;
+    repeat = NULL;
   }
-  tbuff.get_next(); // pop ')'
+  parse_check_and_pop(")"); // pop ')'
 
-
-  if (parse_check_and_pop("{") == -1) {
-    return NULL;
-  }
+  parse_check_and_pop("{");
 
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "}") {
     Stmt *stmt = parse_stmt();
     stmt_list.push_back(stmt);
   }
 
-  if (parse_check_and_pop("}") == -1) {
-    return NULL;
-  }
+  parse_check_and_pop("}");
 
-
-  ForStmt *for_stmt = new ForStmt(formal, start, end, step, stmt_list);
+  ForStmt *for_stmt = new ForStmt(stmt, cond, repeat, stmt_list);
   for_stmt->lineno = forstmt_lineno;
   debug_msg("END parse_for_stmt()");
   return for_stmt;
@@ -273,26 +266,26 @@ vector<string> Parser::get_vibers() {
 
   vector<string> vibers;
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "{") {
-    Token viber = tbuff.lookahead(0);
+    Token viber = tbuff.get_next();
     if (viber.get_type() != TYPEID) {
       string err_msg = "Error: VIBER cannot be of type " + viber.get_type_str();
-      error_blank(tbuff.get_lineno(), err_msg);
-      panic_recover();
+      error_blank(viber.get_lineno(), err_msg);
+      // panic_recover();
       /* dont need to return now because we may be able to recover */
+    } else {
+      vibers.push_back(tbuff.get_next().get_str());
     }
-    vibers.push_back(tbuff.get_next().get_str());
 
     Token next = tbuff.lookahead(0);
     if (next.get_str() == "{")
-      continue;
+      break;
     if (next.get_str() == ",") {
-      tbuff.get_next(); // pop ,
+      tbuff.get_next();
       continue;
     } else {
-      string err_msg = "Error: Expected ',' between VIBERs, two VIBERs always need space";
+      string err_msg = "Error: Expected ',' or '{' after VIBER.";
       error_blank(tbuff.get_lineno(), err_msg);
-      panic_recover();
-      continue;
+      return vibers;
     }
   }
   return vibers;
@@ -306,11 +299,13 @@ BroStmt *Parser::parse_bro_stmt() {
   vector<string> vibers;
   StmtList stmt_list;
 
+  Token bro_tok = tbuff.lookahead(0);
+  assert(bro_tok.get_type() == BRO);
   tbuff.get_next(); // pop BRO
 
   Token next = tbuff.lookahead(0);
   if (next.get_type() != TYPEID) {
-    string err_msg = "Error: BRO cannot be of type " + next.get_type_str();
+    string err_msg = "Error: BRO name must start with a capital letter.";
     error_blank(tbuff.get_lineno(), err_msg);
   }
 
@@ -325,17 +320,14 @@ BroStmt *Parser::parse_bro_stmt() {
     }
   }
 
-  if (parse_check_and_pop("{") == -1) {
-    return NULL;
-  }
+  parse_check_and_pop("{");
+
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "}") {
     Stmt *stmt = parse_stmt();
     stmt_list.push_back(stmt);
   }
 
-  if (parse_check_and_pop("}") == -1) {
-    return NULL;
-  }
+  parse_check_and_pop("}");
 
   BroStmt *bro_stmt = new BroStmt(name, vibers, stmt_list);
   bro_stmt->lineno = brostmt_lineno;
@@ -351,20 +343,13 @@ IfStmt *Parser::parse_if_stmt() {
   StmtList else_branch;
   tbuff.get_next(); // pop if
 
-  if (parse_check_and_pop("(") == -1) {
-    return NULL;
-  }
-
+  /* evaluate expression */
+  parse_check_and_pop("(");
   build_expr_tq(")");
   pred = parse_exprstmt();
+  parse_check_and_pop(")");
 
-  if (parse_check_and_pop(")") == -1) {
-    return NULL;
-  }
-
-  if (parse_check_and_pop("{") == -1) {
-    return NULL;
-  }
+  parse_check_and_pop("{");
 
   while (true) {
     if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) {
@@ -375,15 +360,11 @@ IfStmt *Parser::parse_if_stmt() {
       then_branch.push_back(stmt);
   }
 
-  if (parse_check_and_pop("}") == -1) {
-    return NULL;
-  }
+  parse_check_and_pop("}");
 
   if (tbuff.lookahead(0).get_type() == ELSE) {
     tbuff.get_next(); // pop else
-    if (parse_check_and_pop("{") == -1) {
-      return NULL;
-    }
+    parse_check_and_pop("{");
 
     while (true) {
       if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) {
@@ -394,13 +375,10 @@ IfStmt *Parser::parse_if_stmt() {
         else_branch.push_back(stmt);
     }
 
-    if (parse_check_and_pop("}") == -1) {
-      return NULL;
-    }
+    parse_check_and_pop("}");
 
   }
 
-  // IfStmt *ifstmt = new IfStmt(pred, then_list, else_list);
   IfStmt *if_stmt = new IfStmt(pred, then_branch, else_branch);
   if_stmt->lineno = lineno;
   debug_msg("END parse_if_stmt()");
@@ -415,23 +393,13 @@ WhileStmt *Parser::parse_while_stmt() {
 
   tbuff.get_next(); // pop 'while'
 
-  if (parse_check_and_pop("(") == -1) {
-    return NULL;
-  }
-
-  build_expr_tq(";");
+  /* evaluate expression */
+  parse_check_and_pop("(");
+  build_expr_tq(")");
   pred = parse_exprstmt();
-  if (parse_check_and_pop(";") == -1) {
-    return NULL;
-  }
+  parse_check_and_pop(")");
 
-  if (parse_check_and_pop(")") == -1) {
-    return NULL;
-  }
-
-  if (parse_check_and_pop("{") == -1) {
-    return NULL;
-  }
+  parse_check_and_pop("{");
 
   while (true) {
     if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) {
@@ -442,10 +410,7 @@ WhileStmt *Parser::parse_while_stmt() {
       stmt_list.push_back(stmt);
   }
 
-  if (parse_check_and_pop("}") == -1) {
-    return NULL;
-  }
-
+  parse_check_and_pop("}");
 
   WhileStmt *whilestmt = new WhileStmt(pred, stmt_list);
   whilestmt->lineno = lineno;
@@ -490,7 +455,7 @@ int Parser::calibrate_expr_tq() {
 
   if (expr_tq.paren_stack > 0) {
     error_blank(lineno, "Error: unbalanced parentheses.");
-    panic_recover();
+    // panic_recover();
     return 0;
   }
 
@@ -505,12 +470,11 @@ bool Parser::build_expr_tq(string s) {
   int binop_prec= -1;
   int paren_stack = 0;
 
-
   int i = -1;
   while (true) {
     i++;
     Token t = tbuff.lookahead(0);
-    if (t.get_type() == EMPTY) { 
+    if (t.get_type() == EMPTY || t.get_str() == ";") { 
       break;
     }
 
@@ -543,7 +507,7 @@ bool Parser::build_expr_tq(string s) {
 
   if (expr_tq.paren_stack > 0) {
     error_blank(lineno, "Error: unbalanced parentheses.");
-    panic_recover();
+    // panic_recover();
     return false;
   }
   return true;
@@ -603,14 +567,14 @@ ExprStmt *Parser::parse_exprstmt() {
   } else {
     error_blank(lineno, "Error: unrecognized expression.");
     expr_tq.dump();
-    panic_recover();
+    // panic_recover();
     return NULL;
   }
 
   if (!expr_tq.tq.empty()) {
     error_blank(lineno, "Error, unkown expression.");
     expr_tq.dump();
-    panic_recover();
+    // panic_recover();
     return NULL;
   }
   
@@ -624,18 +588,17 @@ ReturnExpr *Parser::parse_returnexpr() {
   int lineno = expr_tq.tq[0].get_lineno();
   ExprStmt *expr;
   expr_tq.tq.pop_front();
+  calibrate_expr_tq();
   if (expr_tq.tq.empty()) {
     /* let the caller of expr handle ';' */
     expr = NULL;
   } else {
-    build_expr_tq(";");
     expr = parse_exprstmt();
-    if (expr->exprtype == RETURN_EXPR) {
-      string err_msg = "Error: Expression following keyword RETURN cannot be of type RETURN.";
-      error_blank(expr->lineno, err_msg);
-      panic_recover();
-      return NULL;
-    }
+    // if (expr->exprtype == RETURN_EXPR) {
+    //   string err_msg = "Error: Expression following keyword RETURN cannot be of type RETURN.";
+    //   error_blank(expr->lineno, err_msg);
+    //   panic_recover(";");
+    // }
   }
   ReturnExpr *retexpr = new ReturnExpr(expr);
   retexpr->lineno = lineno;
@@ -646,10 +609,11 @@ ReturnExpr *Parser::parse_returnexpr() {
 KillExpr *Parser::parse_killexpr() {
   debug_msg("BEGIN parse_killexpr()");
   int lineno = expr_tq.tq[0].get_lineno();
-  string err = "";
+  ExprStmt *expr;
   expr_tq.tq.pop_front(); // pop 'kill'
+  calibrate_expr_tq();
   if (expr_tq.tq.empty()) {
-    err = "Generic Error";
+    expr = NULL;
   } 
   // else if (expr_tq.tq[0].get_type() != VERSE_CONST) {
   //   string err_msg = "Error: Expression following keyword KILL must be of type VERSE_CONST";
@@ -657,16 +621,17 @@ KillExpr *Parser::parse_killexpr() {
   //   panic_recover();
   //   return NULL;
   // } 
-  else if (expr_tq.tq.size() > 1) {
-    error_blank(lineno, "Error: cannot have expression after KILL.");
-    panic_recover();
-    return NULL;
-  } else {
+  // else if (expr_tq.tq.size() > 1) {
+  //   error_blank(lineno, "Error: cannot have expression after KILL.");
+  //   expr_tq.tq.clear();
+  // } 
+  else {
     /* collect error message */
-    err = expr_tq.tq.front().get_str();
-    expr_tq.tq.pop_front(); // pop err string
+    // err = expr_tq.tq.front().get_str();
+    // expr_tq.tq.pop_front(); // pop err string
+    expr = parse_exprstmt();
   }
-  KillExpr *killexpr= new KillExpr(err);
+  KillExpr *killexpr= new KillExpr(expr);
   killexpr->lineno = lineno;
   debug_msg("END parse_killexpr()");
   return killexpr;
@@ -679,7 +644,7 @@ NewExpr *Parser::parse_newexpr() {
   if (expr_tq.tq.empty()) {
     string err_msg = "Error: There must be an expression following keyword NEW.";
     error_blank(lineno, err_msg);
-    panic_recover();
+    panic_recover(";");
     return NULL;
   }
   build_expr_tq(";");
@@ -696,16 +661,16 @@ NewExpr *Parser::parse_newexpr() {
   return newexpr;
 }
 
-bool Parser::expr_tvec_size_check(int n) {
-  if (expr_tq.tq.size() < n) {
-    error_blank(expr_tq.tq[0].get_lineno(), "Error: unknown dipsatch call");
-    panic_recover();
-    expr_tq.dump();
-    return false;
-  }
-  return true;
+// bool Parser::expr_tvec_size_check(int n) {
+//   if (expr_tq.tq.size() < n) {
+//     error_blank(expr_tq.tq[0].get_lineno(), "Error: unknown dipsatch call");
+//     panic_recover();
+//     expr_tq.dump();
+//     return false;
+//   }
+//   return true;
 
-}
+// }
 
 DispatchExpr *Parser::parse_dispexpr() {
   debug_msg("BEGIN parse_dispexpr()");
@@ -731,13 +696,13 @@ BinopExpr *Parser::parse_binopexpr() {
   string op;
   ExprStmt *rhs;
 
-  if (expr_tq.binop_index == 0 && expr_tq.tq.front().get_str() != "-") {
-    /* if there is a binary operator at the beginning but its not a '-' */
-    string err_msg = "Error: cannot use " + expr_tq.tq.front().get_str() + " as a unary operator, only '-'.";
-    error_blank(expr_tq.lineno, err_msg);
-    panic_recover();
-    return NULL;
-  }
+  // if (expr_tq.binop_index == 0 && expr_tq.tq.front().get_str() != "-") {
+  //   /* if there is a binary operator at the beginning but its not a '-' */
+  //   string err_msg = "Error: cannot use " + expr_tq.tq.front().get_str() + " as a unary operator, only '-'.";
+  //   error_blank(expr_tq.lineno, err_msg);
+  //   panic_recover();
+  //   return NULL;
+  // }
 
   /* this will never hit in here because if there are () then binop_index = -1 */
   // if (expr_tq.tq.front().get_str() == "(" && expr_tq.tq.back().get_str() == ")") {
@@ -749,11 +714,7 @@ BinopExpr *Parser::parse_binopexpr() {
   // }
 
   Token op_tok = expr_tq.tq[expr_tq.binop_index];
-  if (op_tok.get_type() != BINOP) {
-    error_blank(op_tok.get_lineno(), "Error: '" + op_tok.get_str() + "' is not of type BINOP.");
-    panic_recover();
-    return NULL;
-  }
+  assert(op_tok.get_type() == BINOP);
   op = op_tok.get_str();
   
   ExprTQ original = expr_tq;

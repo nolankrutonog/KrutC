@@ -72,21 +72,22 @@ private:
     std::string filename;
     bool doing_formals = false;
 
-    void panic_recover(); 
+    void panic_recover(std::string s); 
     void debug_msg(std::string);
+
 
     Stmt *parse_stmt();
 
     Feature* parse_feature();
     AttrStmt* parse_attrstmt();
     MethodStmt* parse_methodstmt();
-    FormalStmt* parse_formalstmt();
+    FormalList parse_formallist();
     IfStmt *parse_if_stmt();
     WhileStmt *parse_while_stmt();
     ForStmt *parse_for_stmt();
 
     int parse_check_and_pop(std::string s);
-    int parse_check_and_pop_type(Token t, TokenType type);
+    // int parse_check_and_pop_type(TokenType type);
 
     BroStmt *parse_bro_stmt();
     std::vector<std::string> get_vibers();
@@ -99,7 +100,7 @@ private:
     BinopExpr *parse_binopexpr();
 
     DispatchExpr *parse_dispexpr();
-    bool expr_tvec_size_check(int n);
+    // bool expr_tvec_size_check(int n);
 
     IntConstExpr* parse_int_const_expr();
     BoolConstExpr* parse_bool_const_expr();

@@ -188,25 +188,25 @@ public:
 
 /* in the form FOR (OBJECTID, START=START_EXPR, END=END_EXPR, STEP=STEP_EXPR) {STMT_LIST}; */
 class ForStmt : public Stmt {
-  FormalStmt *formal;
-  ExprStmt *start;
-  ExprStmt *end;
-  ExprStmt *step;
+  Stmt *stmt;
+  // ExprStmt *start;
+  ExprStmt *cond;
+  ExprStmt *repeat;
   StmtList stmt_list;
 
 public:
-  ForStmt(FormalStmt *formal, ExprStmt *start, ExprStmt *end, 
-          ExprStmt *step, StmtList stmt_list)
-    : formal(formal), start(start), end(end), 
-      step(step), stmt_list(stmt_list) {}
+  ForStmt(Stmt *stmt, /* ExprStmt *start,*/ ExprStmt *cond, 
+          ExprStmt *repeat, StmtList stmt_list)
+    : stmt(stmt), /* start(start),*/ cond(cond), 
+      repeat(repeat), stmt_list(stmt_list) {}
   StmtType stmttype = FOR_STMT;
   void dump(int indent);
   std::string classname() { return "ForStmt"; }
 
-  FormalStmt *get_formal() { return formal; }
-  ExprStmt *get_start() { return start; }
-  ExprStmt *get_end() { return end; }
-  ExprStmt *get_step() { return step; }
+  Stmt *get_formal() { return stmt; }
+  // ExprStmt *get_start() { return start; }
+  ExprStmt *get_cond() { return cond; }
+  ExprStmt *get_repeat() { return repeat; }
   StmtList get_stmt_list() { return stmt_list; }
 };
 
@@ -400,15 +400,15 @@ public:
 
 class KillExpr: public ExprStmt {
   std::string name = "KILL";
-  std::string error;
+  ExprStmt *expr;
 public:
   // KillExpr() {}
-  KillExpr(std::string err) : error(err) {}
+  KillExpr(ExprStmt *expr) : expr(expr) {}
   ExprType exprtype = KILL_EXPR;
   std::string classname() { return "KillExpr"; }
   void dump(int indent);
 
   std::string get_name() { return name; }
-  std::string get_error() { return error; }
+  ExprStmt *get_error() { return expr; }
 
 };

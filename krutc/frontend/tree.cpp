@@ -113,15 +113,13 @@ void IfStmt::dump(int n) {
 }
 void ForStmt::dump(int n) {
   indent(n); cout << "for" << endl;
-  if (formal) {
-    indent(n + 1); formal->dump(0); cout << endl;
+  if (stmt) {
+    indent(n + 1); stmt->dump(0); cout << endl;
   }
-  if (start)
-    start->dump(n + 1);
-  if (end)
-    end->dump(n + 1);
-  if (step)
-    step->dump(n + 1);
+  if (cond)
+    cond->dump(n + 1);
+  if (repeat)
+    repeat->dump(n + 1);
 
   for (Stmt *s: stmt_list) {
     s->dump(n + 2);
@@ -163,6 +161,7 @@ void NewExpr::dump(int n) {
 }
 void KillExpr::dump(int n) {
   indent(n);
-  cout << "kill: " + error << endl;
+  cout << "kill: " << endl;
+  expr->dump(n + 1);
 }
 

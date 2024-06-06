@@ -9,11 +9,11 @@ bro Krut {
 
   void vibe() {
     bool has_homies = facts;
-    while (has_homies;) {
-      while (homies > 0;) {
-        lose_homie();
+    while (has_homies) {
+      while ((homies) > 0) {
+        -- lose_homie();
       }
-      has_homies = cap;
+      -- has_homies = cap;
     }
   }
 
