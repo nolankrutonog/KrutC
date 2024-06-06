@@ -75,6 +75,7 @@
     "valarray": "cpp",
     "variant": "cpp",
     "*.ipp": "cpp",
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "system_error": "cpp"
   }
 }

@@ -38,14 +38,31 @@ static int get_op_precedence(std::string op) {
   return OP_PRECEDENCE[op];
 }
 
+class ExprTQ {
+public:
+  int lineno = 0;
+  int binop_index = -1;
+  int binop_prec = -1;
+  int paren_stack = 0;
+  std::deque<Token> tq;
+
+  void dump() {
+    for (Token t: tq) {
+      std::cout << t.get_str() + " ";
+    }
+    std::cout << std::endl;
+  }
+};
+
 class Parser {
 public:
     int parser_errors = 0;
-    bool tdump = false;
+    // bool tdump = false;
     bool debug = false;
+    // bool tree = false;
 
-    Parser(std::string filename, bool tdump, bool debug) 
-      : tbuff(filename), filename(filename), tdump(tdump), debug(debug) {}
+    Parser(std::string filename, bool debug) 
+      : tbuff(filename), debug(debug), filename(filename) {}
     void parse_program();
     void token_dump();
     Program program;
@@ -68,28 +85,29 @@ private:
     WhileStmt *parse_while_stmt();
     ForStmt *parse_for_stmt();
 
-    int parse_check_and_pop(Token t, std::string s);
+    int parse_check_and_pop(std::string s);
     int parse_check_and_pop_type(Token t, TokenType type);
 
     BroStmt *parse_bro_stmt();
     std::vector<std::string> get_vibers();
 
+    ExprTQ expr_tq;
+    bool build_expr_tq(std::string s);
+    int calibrate_expr_tq();
     ExprStmt *parse_exprstmt();
 
-    BinopExpr *parse_binopexpr(std::vector<Token> &token_vec, int index);
-    int find_highest_binop_index(std::vector<Token> &tvec, int start_iter, int end_iter);
+    BinopExpr *parse_binopexpr();
 
-    DispatchExpr *parse_dispexpr(std::vector<Token> &token_vec);
-    std::vector<Token> disp_config_caller_and_name(std::vector<Token> &token_vec, std::string &calling_class, std::string &name);
-    int disp_arg_check(std::vector<Token> &arglist_tvec);
+    DispatchExpr *parse_dispexpr();
+    bool expr_tvec_size_check(int n);
 
-    IntConstExpr* parse_int_const_expr(Token t);
-    BoolConstExpr* parse_bool_const_expr(Token t);
-    VerseConstExpr* parse_verse_const_expr(Token t);
+    IntConstExpr* parse_int_const_expr();
+    BoolConstExpr* parse_bool_const_expr();
+    VerseConstExpr* parse_verse_const_expr();
     ReturnExpr *parse_returnexpr();
     NewExpr *parse_newexpr();
     KillExpr *parse_killexpr();
-    ObjectIdExpr *parse_objectid_expr(Token t);
+    ObjectIdExpr *parse_objectid_expr();
 
     /* Print errors */
     void print_error(int lineno, const std::string& err_msg) {

@@ -5,7 +5,7 @@ bro Node {
   Node next;
 
   Node(object o) {
-    val = o;
+    val = o; 
     return this;
   }
 
@@ -21,6 +21,8 @@ bro List {
   Node tail;
 
   List() {
+    head = new Node(new object());
+    -- tail = new Node(new object());
     head.set_next(tail);
     tail.set_prev(head);
     return this;

@@ -1,5 +1,4 @@
 
-
-if (tail.get_prev() == head;) {
+if ((tail == head)) {
   return;
 }

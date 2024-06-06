@@ -46,7 +46,6 @@ private:
     while (lexer.has_more()) {
       Token t = lexer.get_next_token();
       if (t.get_type() == ERROR) {
-        std::cout << "in fill buffer error " << std::endl;
         std::cout << t.get_str() << std::endl;
         has_errors++;
         continue;

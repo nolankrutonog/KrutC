@@ -270,17 +270,17 @@ public:
 
 class DispatchExpr : public ExprStmt {
   // ExprStmt *calling_class;
-  std::string calling_class;
+  ExprStmt *calling_expr;
   std::string name;
   ExprList args;
 
 public:
-  DispatchExpr(std::string calling_class, std::string name, ExprList args) 
-    : calling_class(calling_class), name(name), args(args) {}
+  DispatchExpr(ExprStmt *calling_expr, std::string name, ExprList args) 
+    : calling_expr(calling_expr), name(name), args(args) {}
   ExprType exprtype = DISPATCH_EXPR;
   void dump(int indent);
 
-  std::string get_calling_stmt() { return calling_class; }
+  ExprStmt *get_calling_expr() { return calling_expr; }
   std::string get_name() { return name; }
   ExprList get_args() { return args; }
   
@@ -400,11 +400,11 @@ public:
 
 class KillExpr: public ExprStmt {
   std::string name = "KILL";
-  std::string error = "Generic error";
+  std::string error;
 public:
-  KillExpr() {}
+  // KillExpr() {}
   KillExpr(std::string err) : error(err) {}
-  ExprType exprtype = NEW_EXPR;
+  ExprType exprtype = KILL_EXPR;
   std::string classname() { return "KillExpr"; }
   void dump(int indent);
 

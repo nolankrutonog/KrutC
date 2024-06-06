@@ -67,16 +67,6 @@ static const unordered_set<string> BINOPM {
 
   "="
 };
-// static const unordered_set<string> ASSIGNM {
-// };
-
-// static const unordered_set<string> ARITHMETICM {
-//   "*",
-//   "/",
-//   "+",
-//   "-",
-// };
-
 
 /* remove all characters that are part of comments */
 Token Lexer::ml_comment() {
@@ -163,6 +153,12 @@ Token Lexer::get_next_token() {
         buff.get_next();
       }
       continue;
+    }
+
+    if (curr == "*" && buff.lookahead(0) == '/') {
+      string err_msg = filepath + ":" + to_string(curr_lineno) + ": Lexer Error: Unrecognized token " + curr + buff.lookahead(0);
+      t = Token(curr_lineno, ERROR, err_msg);
+      break;
     }
 
     if (curr == "\n") {

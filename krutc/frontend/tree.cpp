@@ -128,14 +128,9 @@ void ForStmt::dump(int n) {
   }
 }
 void DispatchExpr::dump(int n) {
-  indent(n);
-  if (calling_class != "")
-    cout << calling_class + ".";
-  cout << name << endl;
-  for (ExprStmt *arg: args) {
-    arg->dump(n + 1);
-  }
+
 }
+
 void FormalStmt::dump(int n) {
   // indent(n); 
   cout <<  type + " " + name + ", ";
