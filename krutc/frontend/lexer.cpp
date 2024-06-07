@@ -28,6 +28,7 @@ unordered_set<string> BASIC_TYPES = {
   "verse",
   "bool",
   "void",
+  "list",
   "object"
 };
 

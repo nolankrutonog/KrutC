@@ -43,7 +43,7 @@ public:
   int lineno = 0;
   int binop_index = -1;
   int binop_prec = -1;
-  int paren_stack = 0;
+  // int paren_stack = 0;
   std::deque<Token> tq;
 
   void dump() {
@@ -97,10 +97,14 @@ private:
     int calibrate_expr_tq();
     ExprStmt *parse_exprstmt();
 
+    ListConstExpr *parse_list_const_expr();
+    ExprList parse_comma_separated_exprlist();
+
+    ListElemRef *parse_list_elem_ref_expr();
+
     BinopExpr *parse_binopexpr();
 
     DispatchExpr *parse_dispexpr();
-    // bool expr_tvec_size_check(int n);
 
     IntConstExpr* parse_int_const_expr();
     BoolConstExpr* parse_bool_const_expr();

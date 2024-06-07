@@ -151,8 +151,13 @@ AttrStmt *Parser::parse_attrstmt() {
     init = NULL;
   } else if (decider_tok.get_str() == "="){ 
     tbuff.get_next(); // pop "="
-    build_expr_tq(";");
-    init = parse_exprstmt();
+    if (tbuff.lookahead(0).get_str() == ";") {
+      error_blank(tbuff.get_lineno(), "Error: expected expression after attribute definition.");
+      init = NULL;
+    } else if (!build_expr_tq(";"))
+      init = NULL;
+    else 
+      init = parse_exprstmt();
     parse_check_and_pop(";");
   } else {
     /* this should never hit because its checked in parse_features() */
@@ -224,23 +229,29 @@ ForStmt *Parser::parse_for_stmt() {
     if (next.get_type() == TYPEID) {
       stmt = parse_attrstmt();
     } else {
-      build_expr_tq(";");
-      stmt = parse_exprstmt();
+      if (!build_expr_tq(";"))
+        stmt = NULL;
+      else 
+        stmt = parse_exprstmt();
       parse_check_and_pop(";"); // pop ';'
     }
   }
 
   if (tbuff.lookahead(0).get_str() != ";") {
-    build_expr_tq(";");
-    cond = parse_exprstmt(); 
+    if (!build_expr_tq(";"))
+      stmt = NULL;
+    else
+      cond = parse_exprstmt(); 
   } else {
     cond = NULL;
   }
   parse_check_and_pop(";"); // pop ';'
 
   if (tbuff.lookahead(0).get_str() != ")") {
-    build_expr_tq(")");
-    repeat = parse_exprstmt(); 
+    if (!build_expr_tq(")"))
+      repeat = NULL;
+    else
+      repeat = parse_exprstmt(); 
   } else {
     repeat = NULL;
   }
@@ -345,8 +356,10 @@ IfStmt *Parser::parse_if_stmt() {
 
   /* evaluate expression */
   parse_check_and_pop("(");
-  build_expr_tq(")");
-  pred = parse_exprstmt();
+  if (!build_expr_tq(")"))
+    pred = NULL;
+  else
+    pred = parse_exprstmt();
   parse_check_and_pop(")");
 
   parse_check_and_pop("{");
@@ -395,8 +408,10 @@ WhileStmt *Parser::parse_while_stmt() {
 
   /* evaluate expression */
   parse_check_and_pop("(");
-  build_expr_tq(")");
-  pred = parse_exprstmt();
+  if (build_expr_tq(")"))
+    pred = NULL;
+  else 
+    pred = parse_exprstmt();
   parse_check_and_pop(")");
 
   parse_check_and_pop("{");
@@ -433,14 +448,20 @@ int Parser::calibrate_expr_tq() {
   int binop_index = -1;
   int binop_prec = -1;
   int paren_stack = 0;
+  int bracket_stack = 0;
 
   for (int i = 0; i < (int) expr_tq.tq.size(); i++) {
     Token t = expr_tq.tq[i];
-    if (t.get_str() == "(") 
+    if (t.get_str() == "[") {
+      bracket_stack++;
+    } else if (t.get_str() == "]") {
+      bracket_stack--;
+    }
+    else if (t.get_str() == "(") 
       paren_stack++;
     else if (t.get_str() == ")")
       paren_stack--;
-    else if (t.get_type() == BINOP && paren_stack == 0) {
+    else if (t.get_type() == BINOP && paren_stack == 0 && bracket_stack == 0) {
       int curr_precedence = get_op_precedence(t.get_str());
       if (curr_precedence > binop_prec) {
         binop_prec = curr_precedence;
@@ -451,11 +472,17 @@ int Parser::calibrate_expr_tq() {
   expr_tq.lineno = lineno;
   expr_tq.binop_index = binop_index;
   expr_tq.binop_prec = binop_prec;
-  expr_tq.paren_stack = paren_stack;
+  // expr_tq.paren_stack = paren_stack;
 
-  if (expr_tq.paren_stack > 0) {
+  if (paren_stack != 0) {
     error_blank(lineno, "Error: unbalanced parentheses.");
-    // panic_recover();
+    expr_tq.tq.clear();
+    return 0;
+  }
+
+  if (bracket_stack != 0) {
+    error_blank(lineno, "Error: unbalanced brackets.");
+    expr_tq.tq.clear();
     return 0;
   }
 
@@ -469,27 +496,33 @@ bool Parser::build_expr_tq(string s) {
   int binop_index = -1;
   int binop_prec= -1;
   int paren_stack = 0;
+  int bracket_stack = 0;
 
   int i = -1;
   while (true) {
     i++;
     Token t = tbuff.lookahead(0);
+    /* regardless of S, expr cannot include ';' */
     if (t.get_type() == EMPTY || t.get_str() == ";") { 
       break;
     }
 
+    /* sometimes the expression ends with a ')' and expression contains parens */
     if (t.get_str() == s) {
       if (s != ")") 
         break;
       else if (paren_stack == 0)
         break;
     }
-
-    if (t.get_str() == "(") 
+    if (t.get_str() == "[")
+      bracket_stack++;
+    else if (t.get_str() == "]")
+      bracket_stack--;
+    else if (t.get_str() == "(") 
       paren_stack++;
     else if (t.get_str() == ")")
       paren_stack--;
-    else if (paren_stack == 0 && t.get_type() == BINOP) {
+    else if (paren_stack == 0 && bracket_stack == 0 && t.get_type() == BINOP) {
       int curr_prec = get_op_precedence(t.get_str());
       if (curr_prec > binop_prec) {
         binop_index = i;
@@ -503,13 +536,20 @@ bool Parser::build_expr_tq(string s) {
   expr_tq.lineno = lineno;
   expr_tq.binop_index = binop_index;
   expr_tq.binop_prec = binop_prec;
-  expr_tq.paren_stack = paren_stack;
+  // expr_tq.paren_stack = paren_stack;
 
-  if (expr_tq.paren_stack > 0) {
+  if (paren_stack != 0) {
     error_blank(lineno, "Error: unbalanced parentheses.");
-    // panic_recover();
+    expr_tq.tq.clear();
     return false;
   }
+
+  if (bracket_stack != 0) {
+    error_blank(lineno, "Error: unbalanced brackets.");
+    expr_tq.tq.clear();
+    return false;
+  }
+
   return true;
 }
 
@@ -517,16 +557,12 @@ bool Parser::build_expr_tq(string s) {
 ExprStmt *Parser::parse_exprstmt() {
   debug_msg("BEGIN: parse_exprstmt()");
 
-  if (!expr_tq.tq.empty()) {
-    if (!calibrate_expr_tq()) {
-      return NULL;
-    }
-  }
-
-  if (expr_tq.tq.size() == 0) {
-    /* does this ever happen? */
+  if (expr_tq.tq.empty())
     return NULL;
-  }
+
+
+  if (!calibrate_expr_tq())
+    return NULL;
 
   ExprStmt *expr;
   int lineno = expr_tq.tq.front().get_lineno();
@@ -558,29 +594,111 @@ ExprStmt *Parser::parse_exprstmt() {
     expr_tq.tq.pop_front();
   } else if (t.get_type() == OBJECTID && expr_tq.tq.size() == 1) {
     expr = parse_objectid_expr();
+  } else if (t.get_type() == OBJECTID 
+             && expr_tq.tq[1].get_str() == "[" 
+             && expr_tq.tq.back().get_str() == "]") {
+    expr = parse_list_elem_ref_expr();
+  } else if (t.get_str() == "[" && expr_tq.tq.back().get_str() == "]") {
+    expr = parse_list_const_expr();
   } else if (t.get_type() == TYPEID || t.get_type() == OBJECTID) {
     expr = parse_dispexpr();
   } else if (t.get_str() == "(" && expr_tq.tq.back().get_str() == ")") {
     expr_tq.tq.pop_front();
     expr_tq.tq.pop_back();
     expr = parse_exprstmt();
-  } else {
-    error_blank(lineno, "Error: unrecognized expression.");
+  } 
+  // else {
+  //   error_blank(lineno, "Error: unrecognized expression.");
+  //   expr_tq.dump();
+  //   expr_tq.tq.clear();
+  // }
+
+  if (!expr_tq.tq.empty()) {
+    error_blank(lineno, "Error, unknown expression.");
     expr_tq.dump();
-    // panic_recover();
+    expr_tq.tq.clear();
     return NULL;
   }
 
-  if (!expr_tq.tq.empty()) {
-    error_blank(lineno, "Error, unkown expression.");
-    expr_tq.dump();
-    // panic_recover();
-    return NULL;
-  }
-  
   expr->lineno = lineno; 
   debug_msg("END: parse_exprstmt()");
   return expr;
+}
+
+ExprList Parser::parse_comma_separated_exprlist() {
+  ExprList exprlist;
+
+  ExprTQ original = expr_tq;
+  expr_tq.tq.clear();
+
+  int paren_stack = 0;
+  int bracket_stack = 0;
+  while (!original.tq.empty()) {
+    Token t = original.tq.front();
+    original.tq.pop_front();
+    if (t.get_str() == "(")
+      paren_stack++;
+    else if (t.get_str() == ")")
+      paren_stack--;
+    else if (t.get_str() == "[")
+      bracket_stack++;
+    else if (t.get_str() == "]") 
+      bracket_stack--;
+    else if (t.get_str() == "," && bracket_stack == 0 && paren_stack == 0) {
+      if (original.tq.empty()) {
+        error_blank(t.get_lineno(), "Error: expected expression after ','");
+      }
+
+      ExprStmt *expr = parse_exprstmt();
+      if (expr)
+        exprlist.push_back(expr);
+      continue;
+    }
+
+    expr_tq.tq.push_back(t);
+
+  }
+
+  /* for the spill over*/
+  if (!expr_tq.tq.empty()) {
+    ExprStmt *expr = parse_exprstmt();
+    if (expr)
+      exprlist.push_back(expr);
+  }
+
+  return exprlist;
+
+  
+}
+
+ListConstExpr *Parser::parse_list_const_expr() {
+  debug_msg("BEGIN parse_list_const_expr()");
+  ExprList exprlist;
+  int lineno = expr_tq.tq[0].get_lineno();
+  assert(expr_tq.tq.front().get_str() == "[");
+  assert(expr_tq.tq.back().get_str() == "]");
+
+  if (expr_tq.tq.empty()) {
+    /* this is allowed. ex: list l = []; */
+    return NULL;
+  }
+
+  expr_tq.tq.pop_front();
+  expr_tq.tq.pop_back();
+
+  if (!expr_tq.tq.empty()) {
+    exprlist = parse_comma_separated_exprlist();
+  }
+
+
+  ListConstExpr *list_const_expr = new ListConstExpr(exprlist);
+  list_const_expr->lineno = lineno;
+  debug_msg("END parse_list_const_expr()");
+  return list_const_expr;
+}
+
+ListElemRef *Parser::parse_list_elem_ref_expr() {
+  return NULL;
 }
 
 ReturnExpr *Parser::parse_returnexpr() {
@@ -589,17 +707,12 @@ ReturnExpr *Parser::parse_returnexpr() {
   ExprStmt *expr;
   expr_tq.tq.pop_front();
   calibrate_expr_tq();
-  if (expr_tq.tq.empty()) {
-    /* let the caller of expr handle ';' */
-    expr = NULL;
-  } else {
-    expr = parse_exprstmt();
-    // if (expr->exprtype == RETURN_EXPR) {
-    //   string err_msg = "Error: Expression following keyword RETURN cannot be of type RETURN.";
-    //   error_blank(expr->lineno, err_msg);
-    //   panic_recover(";");
-    // }
-  }
+  // if (expr_tq.tq.empty()) {
+  //   /* let the caller of expr handle ';' */
+  //   expr = NULL;
+  // } else {
+  // }
+  expr = parse_exprstmt();
   ReturnExpr *retexpr = new ReturnExpr(expr);
   retexpr->lineno = lineno;
   debug_msg("END parse_returnexpr()");
@@ -612,25 +725,11 @@ KillExpr *Parser::parse_killexpr() {
   ExprStmt *expr;
   expr_tq.tq.pop_front(); // pop 'kill'
   calibrate_expr_tq();
-  if (expr_tq.tq.empty()) {
-    expr = NULL;
-  } 
-  // else if (expr_tq.tq[0].get_type() != VERSE_CONST) {
-  //   string err_msg = "Error: Expression following keyword KILL must be of type VERSE_CONST";
-  //   error_blank(lineno, err_msg);
-  //   panic_recover();
-  //   return NULL;
-  // } 
-  // else if (expr_tq.tq.size() > 1) {
-  //   error_blank(lineno, "Error: cannot have expression after KILL.");
-  //   expr_tq.tq.clear();
-  // } 
-  else {
-    /* collect error message */
-    // err = expr_tq.tq.front().get_str();
-    // expr_tq.tq.pop_front(); // pop err string
-    expr = parse_exprstmt();
-  }
+  // if (expr_tq.tq.empty()) {
+  //   expr = NULL;
+  // } else {
+  // }
+  expr = parse_exprstmt();
   KillExpr *killexpr= new KillExpr(expr);
   killexpr->lineno = lineno;
   debug_msg("END parse_killexpr()");
@@ -640,6 +739,7 @@ KillExpr *Parser::parse_killexpr() {
 NewExpr *Parser::parse_newexpr() {
   debug_msg("BEGIN parse_newexpr()");
   int lineno = expr_tq.tq[0].get_lineno();
+  ExprStmt *expr;
   expr_tq.tq.pop_front();
   if (expr_tq.tq.empty()) {
     string err_msg = "Error: There must be an expression following keyword NEW.";
@@ -647,30 +747,18 @@ NewExpr *Parser::parse_newexpr() {
     panic_recover(";");
     return NULL;
   }
-  build_expr_tq(";");
-  ExprStmt *expr = parse_exprstmt();
-  // if (expr->exprtype == NEW_EXPR || expr->exprtype == RETURN_EXPR) {
-  //   string err_msg = "Error: Expression following keyword NEW cannot be of type " + expr->classname();
-  //   error_blank(expr->lineno, err_msg);
-  //   panic_recover();
-  //   return NULL;
-  // }   
+  // if (!build_expr_tq(";"))
+  //   expr = NULL;
+  // else
+  calibrate_expr_tq();
+  expr = parse_exprstmt();
   NewExpr *newexpr = new NewExpr(expr);
   newexpr->lineno = lineno;
   debug_msg("END parse_newexpr()");
   return newexpr;
 }
 
-// bool Parser::expr_tvec_size_check(int n) {
-//   if (expr_tq.tq.size() < n) {
-//     error_blank(expr_tq.tq[0].get_lineno(), "Error: unknown dipsatch call");
-//     panic_recover();
-//     expr_tq.dump();
-//     return false;
-//   }
-//   return true;
 
-// }
 
 DispatchExpr *Parser::parse_dispexpr() {
   debug_msg("BEGIN parse_dispexpr()");
@@ -679,10 +767,8 @@ DispatchExpr *Parser::parse_dispexpr() {
   string name;
   ExprList args;
 
-
-  
-
-
+  // iterate backwards until you get the first '.' or the beginning of the 
+  // dispatch string.
 
   DispatchExpr *disp_expr = new DispatchExpr(calling_class, name, args);
   disp_expr->lineno = lineno;
@@ -696,22 +782,6 @@ BinopExpr *Parser::parse_binopexpr() {
   string op;
   ExprStmt *rhs;
 
-  // if (expr_tq.binop_index == 0 && expr_tq.tq.front().get_str() != "-") {
-  //   /* if there is a binary operator at the beginning but its not a '-' */
-  //   string err_msg = "Error: cannot use " + expr_tq.tq.front().get_str() + " as a unary operator, only '-'.";
-  //   error_blank(expr_tq.lineno, err_msg);
-  //   panic_recover();
-  //   return NULL;
-  // }
-
-  /* this will never hit in here because if there are () then binop_index = -1 */
-  // if (expr_tq.tq.front().get_str() == "(" && expr_tq.tq.back().get_str() == ")") {
-  //   /* if parentheses surround, remove them and recalibrate */
-  //   expr_tq.tq.pop_front();
-  //   expr_tq.tq.pop_back();
-  //   if (!calibrate_expr_tq())
-  //     return NULL;
-  // }
 
   Token op_tok = expr_tq.tq[expr_tq.binop_index];
   assert(op_tok.get_type() == BINOP);
@@ -793,8 +863,10 @@ Stmt *Parser::parse_stmt() {
   } else if (t.get_type() == WHILE) {
     stmt = parse_while_stmt();
   } else {
-    build_expr_tq(";");
-    stmt = parse_exprstmt();
+    if (!build_expr_tq(";"))
+      stmt = NULL;
+    else 
+      stmt = parse_exprstmt();
     if (parse_check_and_pop(";") == -1) {
       return NULL;
     }

@@ -21,7 +21,7 @@ enum ExprType {
   RETURN_EXPR = 601,
   INT_CONST_EXPR = 602,
   VERSE_CONST_EXPR = 603,
-  // ASSIGN_EXPR = 604,
+  LIST_CONST_EXPR = 604,
   OBJECTID_EXPR = 605,
   DISPATCH_EXPR = 606,
   OP_EXPR = 607,
@@ -32,7 +32,8 @@ enum ExprType {
   BREAK_EXPR = 612,
   NONE_EXPR = 613,
   KILL_EXPR = 614,
-  NEW_EXPR = 615
+  NEW_EXPR = 615,
+  LIST_ELEM_REF = 616
 };
 
 class Program;
@@ -55,6 +56,7 @@ class ReturnExpr;
 class IntConstExpr;
 class VerseConstExpr;
 class BoolConstExpr;
+class ListConstExpr;
 class ObjectIdExpr;
 class DispatchExpr;
 class BinopExpr;
@@ -309,7 +311,6 @@ public:
   ExprType exprtype = INT_CONST_EXPR;
   void dump(int indent);
   std::string classname() { return "IntConstExpr"; }
-  std::string get_name() { return "IntConstExpr"; }
 
   long get_val() { return val; }
 };
@@ -320,7 +321,7 @@ public:
   VerseConstExpr(std::string verse) : verse(verse) {}
   ExprType exprtype = VERSE_CONST_EXPR;
   void dump(int indent);
-  std::string classname() { return "VerseConstStmt";}
+  std::string classname() { return "VerseConstExpr";}
 
   std::string get_verse() { return verse; }
 };
@@ -331,9 +332,35 @@ public:
   BoolConstExpr(std::string bool_val) { val = bool_val == "facts" ? 1 : 0; }
   ExprType exprtype = BOOL_CONST_EXPR;
   void dump(int indent);
-  std::string classname() { return "BoolConstStmt";}
+  std::string classname() { return "BoolConstExpr";}
 
   int get_val() { return val; }
+};
+
+class ListConstExpr : public ExprStmt {
+  ExprList exprlist;
+public:
+  ListConstExpr(ExprList exprlist) : exprlist(exprlist) {}
+  ExprType exprtype = LIST_CONST_EXPR;
+  void dump(int indent);
+  std::string classname() { return "ListConstExpr"; }
+
+  ExprList get_exprlist() { return exprlist; }
+};
+
+class ListElemRef: public ExprStmt {
+  ObjectIdExpr *list_name;
+  IntConstExpr *index;
+public:
+  ListElemRef(ObjectIdExpr *list_name, IntConstExpr *index) 
+    : list_name(list_name), index(index) {}
+  ExprType exprtype = LIST_ELEM_REF;
+  void dump(int indent);
+  std::string classname() { return "ListElemRef"; }
+
+  ObjectIdExpr *get_list_name() { return list_name; }
+  IntConstExpr *get_index() { return index; }
+
 };
 
 class ThisExpr : public ExprStmt {

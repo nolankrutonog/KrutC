@@ -2,3 +2,5 @@
 if ((tail == head)) {
   return;
 }
+
+int x = (a + b) * c;

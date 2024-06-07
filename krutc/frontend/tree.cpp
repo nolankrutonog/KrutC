@@ -52,8 +52,6 @@ void MethodStmt::dump(int n) {
     }
     cout << endl;
   }
-  // indent(n);
-  // cout << " EXPRESSIONS:" << endl;
   for (Stmt *stmt : stmt_list) {
     stmt->dump(n + 2);
   }
@@ -84,6 +82,14 @@ void VerseConstExpr::dump(int n) {
   indent(n);
   cout << verse << endl;
 }
+
+void ListConstExpr::dump(int n) {
+  for (ExprStmt *e: exprlist) {
+    e->dump(n);
+  }
+}
+void ListElemRef::dump(int n) {}
+
 void ReturnExpr::dump(int n) {
   indent(n);
   cout << "return " << endl;
@@ -113,9 +119,8 @@ void IfStmt::dump(int n) {
 }
 void ForStmt::dump(int n) {
   indent(n); cout << "for" << endl;
-  if (stmt) {
-    indent(n + 1); stmt->dump(0); cout << endl;
-  }
+  if (stmt)
+    stmt->dump(n + 1); cout << endl;
   if (cond)
     cond->dump(n + 1);
   if (repeat)

@@ -13,9 +13,11 @@ bro Krut {
       while ((homies) > 0) {
         -- lose_homie();
       }
-      -- has_homies = cap;
+      has_homies = cap;
     }
   }
 
   void lose_homie() { homies -= 1; }
 }
+Krut k;
+
