@@ -349,16 +349,16 @@ public:
 };
 
 class ListElemRef: public ExprStmt {
-  ObjectIdExpr *list_name;
+  ExprStmt *list_name;
   IntConstExpr *index;
 public:
-  ListElemRef(ObjectIdExpr *list_name, IntConstExpr *index) 
+  ListElemRef(ExprStmt *list_name, IntConstExpr *index) 
     : list_name(list_name), index(index) {}
   ExprType exprtype = LIST_ELEM_REF;
   void dump(int indent);
   std::string classname() { return "ListElemRef"; }
 
-  ObjectIdExpr *get_list_name() { return list_name; }
+  ExprStmt *get_list_name() { return list_name; }
   IntConstExpr *get_index() { return index; }
 
 };

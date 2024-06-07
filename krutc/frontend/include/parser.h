@@ -48,7 +48,11 @@ public:
 
   void dump() {
     for (Token t: tq) {
-      std::cout << t.get_str() + " ";
+      if (t.get_str() == "") {
+        std::cout << t.get_type_str() + " ";
+      } else {
+        std::cout << t.get_str() + " ";
+      }
     }
     std::cout << std::endl;
   }
@@ -94,7 +98,7 @@ private:
 
     ExprTQ expr_tq;
     bool build_expr_tq(std::string s);
-    int calibrate_expr_tq();
+    void calibrate_expr_tq();
     ExprStmt *parse_exprstmt();
 
     ListConstExpr *parse_list_const_expr();
@@ -105,6 +109,7 @@ private:
     BinopExpr *parse_binopexpr();
 
     DispatchExpr *parse_dispexpr();
+    int get_dot_index();
 
     IntConstExpr* parse_int_const_expr();
     BoolConstExpr* parse_bool_const_expr();
