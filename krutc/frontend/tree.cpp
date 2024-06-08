@@ -85,9 +85,11 @@ void VerseConstExpr::dump(int n) {
 }
 
 void ListConstExpr::dump(int n) {
+  indent(n); cout << "[" << endl;
   for (ExprStmt *e: exprlist) {
-    e->dump(n);
+    e->dump(n + 1);
   }
+  indent(n); cout << "]" << endl;
 }
 void ListElemRef::dump(int n) {
   list_name->dump(n);
