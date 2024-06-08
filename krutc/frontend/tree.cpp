@@ -34,7 +34,8 @@ void BroStmt::dump(int n) {
 }
 
 void AttrStmt::dump(int n) {
-  indent(n); cout << type + " " + name << endl;
+  // indent(n); cout << type->dump(n) + " " + name << endl;
+  indent(n); type->dump(0); cout << " " + name << endl;
   // indent(n + 1); cout << name << endl;
   if (init) {
     indent(n + 1); cout << "init" << endl;
@@ -44,7 +45,7 @@ void AttrStmt::dump(int n) {
 
 void MethodStmt::dump(int n) {
   indent(n);
-  cout << "method: " + ret_type + " " + name + "()" << endl;
+  cout << "method: "; ret_type->dump(0); cout << " " + name + "()" << endl;
   if (formal_list.size()) {
     indent(n + 1); cout << "formals -> ";
     for (FormalStmt *formal: formal_list) {
@@ -88,7 +89,16 @@ void ListConstExpr::dump(int n) {
     e->dump(n);
   }
 }
-void ListElemRef::dump(int n) {}
+void ListElemRef::dump(int n) {
+  list_name->dump(n);
+  indent(n + 1); cout << "[" << endl;
+  index->dump(n + 2);
+  indent(n + 1); cout << "]" << endl;
+}
+// void ContainerStmt::dump(int n) {
+//   indent(n); cout << type + "<" + elem_type + "> " + name << endl;
+//   init->dump(n + 1);
+// }
 
 void ReturnExpr::dump(int n) {
   indent(n);
@@ -131,12 +141,27 @@ void ForStmt::dump(int n) {
   }
 }
 void DispatchExpr::dump(int n) {
+  if (calling_expr)
+    calling_expr->dump(n);
+  indent(n); cout << "." + name << endl;
+  for (ExprStmt *a: args) {
+    a->dump(n + 1);
+  }
 
+}
+
+void TypeExpr::dump(int n) {
+  cout << name;
+  if (nested_type) {
+    cout << "<";
+    nested_type->dump(n + 1);
+    cout << ">";
+  }
 }
 
 void FormalStmt::dump(int n) {
   // indent(n); 
-  cout <<  type + " " + name + ", ";
+  cout <<  type->get_name() + " " + name + ", ";
 }
 
 void ObjectIdExpr::dump(int n) {

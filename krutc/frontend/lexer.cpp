@@ -29,6 +29,7 @@ unordered_set<string> BASIC_TYPES = {
   "bool",
   "void",
   "list",
+  "stack",
   "object"
 };
 
@@ -149,8 +150,8 @@ Token Lexer::get_next_token() {
       continue;
     } else if (curr == "-" && buff.lookahead(0) == '-') {
       /* single line comments */
-      buff.get_next(); // pop trailing '%'
-      while (buff.lookahead(0) != '\n') {
+      buff.get_next(); // pop trailing '-'
+      while (buff.lookahead(0) != '\n' && buff.has_next()) {
         buff.get_next();
       }
       continue;

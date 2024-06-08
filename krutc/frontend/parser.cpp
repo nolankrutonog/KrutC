@@ -33,23 +33,30 @@ FormalList Parser::parse_formallist() {
   FormalList formal_list;
 
   while (tbuff.lookahead(0).get_str() != ")") {
-    string type;
+    TypeExpr *type;
     string name;
     Token next = tbuff.lookahead(0);
     int lineno = next.get_lineno();
     if (next.get_type() != TYPEID) {
-      error_blank(lineno, "Error: Expected TYPEID in formal definition.");
+      error_blank(lineno, "Error: Expected type in formal definition.");
       if (next.get_str() == ")") {
         break;
       }
     } else {
-      type = next.get_str();      
+      type = parse_typeexpr(); 
+      // if (tbuff.lookahead(0).get_str() == ">") {
+      //   error_blank(tbuff.get_lineno(), "Error: unbalanced '<' '>' in type declaration.");
+
+      //   while (tbuff.lookahead(0).get_str() == ">") {
+      //     tbuff.get_next();
+      //   }
+      // }
     }
-    tbuff.get_next();
+    // tbuff.get_next();
 
     next = tbuff.lookahead(0);
     if (next.get_type() != OBJECTID) {
-      error_blank(lineno, "Error: Expected OBJECTID to follow TYPEID in formal definition.");
+      error_blank(lineno, "Error: Expected OBJECTID to follow TYPEID in formal definition. Instead got " + next.get_str());
       if (next.get_str() == ")") {
         break;
       }
@@ -81,17 +88,16 @@ FormalList Parser::parse_formallist() {
 }
 
 /* type name(FormalList) {StmtList};*/
-MethodStmt *Parser::parse_methodstmt() {
+MethodStmt *Parser::parse_methodstmt(TypeExpr *type) {
   debug_msg("BEGIN parse_method_stmt()");
   int methodstmt_lineno = tbuff.get_lineno();
-  string type;
+  // TypeExpr *type;
   string name;
   FormalList formal_list;  
   StmtList stmt_list;
 
-  Token type_tok = tbuff.get_next();
-  assert(type_tok.get_type() == TYPEID);
-  type = type_tok.get_str();
+  // assert(tbuff.lookahead(0).get_type() == TYPEID);
+  // type = parse_typeexpr();
 
   if (tbuff.lookahead(0).get_str() == "(") {
     name = "constructor";
@@ -118,7 +124,7 @@ MethodStmt *Parser::parse_methodstmt() {
 
   parse_check_and_pop("}");
 
-  MethodStmt *methodstmt = new MethodStmt(name, type, formal_list, stmt_list);
+  MethodStmt *methodstmt = new MethodStmt(type, name, formal_list, stmt_list);
   methodstmt->lineno = methodstmt_lineno; 
   debug_msg("END parse_method_stmt()");
 
@@ -127,16 +133,11 @@ MethodStmt *Parser::parse_methodstmt() {
 
 
 
-AttrStmt *Parser::parse_attrstmt() {
+AttrStmt *Parser::parse_attrstmt(TypeExpr *type) {
   debug_msg("BEGIN parse_attrstmt()");
   int attrstmt_lineno = tbuff.get_lineno();
-  string type;
   string name;
   ExprStmt *init;
-
-  Token type_tok = tbuff.get_next();
-  assert(type_tok.get_type() == TYPEID);
-  type = type_tok.get_str();
 
   Token name_tok = tbuff.lookahead(0);
   if (name_tok.get_type() != OBJECTID) {
@@ -165,30 +166,77 @@ AttrStmt *Parser::parse_attrstmt() {
     error_blank(decider_tok.get_lineno(), "Error: Expected either ';' or expression following attribute declaration.");
   }
 
-  AttrStmt *attrstmt = new AttrStmt(name, type, init);
+  AttrStmt *attrstmt = new AttrStmt(type, name, init);
   attrstmt->lineno = attrstmt_lineno;
   debug_msg("END parse_attrstmt()");
   return attrstmt;
 }
 
+TypeExpr *Parser::parse_typeexpr() {
+  debug_msg("BEGIN parse_typeexpr()");
+
+  string name;
+  TypeExpr *nested;
+  int lineno = tbuff.get_lineno();
+
+  Token name_tok = tbuff.lookahead(0);
+  if (name_tok.get_type() != TYPEID) {
+    error_blank(lineno, "Error: expected typeid in type declaration. Instead got " + name_tok.get_str());
+    name = "";
+  } else {
+    name = name_tok.get_str();
+  }
+  tbuff.get_next();
+
+  if (tbuff.lookahead(0).get_str() == "<") {
+    tbuff.get_next();
+    nested = parse_typeexpr();
+    if (tbuff.lookahead(0).get_str() == ">") {
+      tbuff.get_next();
+    } 
+    // else {
+    //   error_blank(tbuff.lookahead(0).get_lineno(), "Error: expected closing '>'. ");
+    // }
+  } else {
+    nested = NULL;
+  } 
+
+
+  TypeExpr *expr = new TypeExpr(name, nested);
+  expr->lineno = lineno;
+  debug_msg("END parse_typeexpr()");
+  return expr;
+}
+
 
 Feature *Parser::parse_feature() {
-  // debug_msg("BEGIN parse_feature()");
-  Token tdecider = tbuff.lookahead(2); // 0 - type, 1 - name, 2 - = or (
-  if (tdecider.get_str() == "=" || tdecider.get_str() == ";") {
-    return parse_attrstmt();
-  } else if (tdecider.get_str() == "(") {
-    return parse_methodstmt();
-  } else if (tbuff.lookahead(1).get_str() == "(") {
-    return parse_methodstmt();
+  debug_msg("BEGIN parse_feature()");
+  assert(tbuff.lookahead(0).get_type() == TYPEID);
+
+  TypeExpr *type = parse_typeexpr();
+
+  if (tbuff.lookahead(0).get_str() == ">") {
+    error_blank(tbuff.get_lineno(), "Error: unbalanced '<' '>' in type declaration.");
+    tbuff.get_next();
+
+    while (tbuff.lookahead(0).get_str() == ">") {
+      tbuff.get_next();
+    }
   }
-  
-  else {
-    string err_msg = "Syntax error at token " + tdecider.get_str() + ". Expected one of ';', '=', '('";
-    error_blank(tdecider.get_lineno(), err_msg);
+
+  Feature *f;
+  if (tbuff.lookahead(0).get_str() == "(" || tbuff.lookahead(1).get_str() == "(") {
+    f = parse_methodstmt(type);
+  } else if (tbuff.lookahead(1).get_str() == ";" || tbuff.lookahead(1).get_str() == "=") {
+    f = parse_attrstmt(type);
+  } else {
+    string err_msg = "Syntax error at token " + tbuff.lookahead(2).get_str() + ". Expected one of ';', '=', '('";
+    error_blank(tbuff.lookahead(2).get_lineno(), err_msg);
     return NULL;
   }
-  // debug_msg("BEGIN parse_feature()");
+  debug_msg("END parse_feature()");
+  
+  return f;
 
 }
 
@@ -228,7 +276,7 @@ ForStmt *Parser::parse_for_stmt() {
     
   } else {
     if (next.get_type() == TYPEID) {
-      stmt = parse_attrstmt();
+      stmt = parse_feature();
     } else {
       if (!build_expr_tq(";"))
         stmt = NULL;
@@ -591,37 +639,19 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_objectid_expr();
   } else if (t.get_str() == "[" && expr_tq.tq.back().get_str() == "]") {
     expr = parse_list_const_expr();
-  } 
-  else if (t.get_str() == "(" && expr_tq.tq.back().get_str() == ")") {
+  } else if (t.get_str() == "(" && expr_tq.tq.back().get_str() == ")") {
     expr_tq.tq.pop_front();
     expr_tq.tq.pop_back();
     expr = parse_exprstmt();
-  } 
-  else if (expr_tq.tq.back().get_str() == ")") {
+  } else if (expr_tq.tq.back().get_str() == ")") {
     expr = parse_dispexpr();
-  }
-
-  else if (expr_tq.tq.back().get_str() == "]") {
+  } else if (expr_tq.tq.back().get_str() == "]") {
     expr = parse_list_elem_ref_expr();
   }
 
-
-  else if (t.get_type() == OBJECTID 
-             && expr_tq.tq[1].get_str() == "[" 
-             && expr_tq.tq.back().get_str() == "]") {
-    expr = parse_list_elem_ref_expr();
-  } 
-  else if (t.get_type() == TYPEID || t.get_type() == OBJECTID) {
-    expr = parse_dispexpr();
-  } 
-  // else {
-  //   error_blank(lineno, "Error: unrecognized expression.");
-  //   expr_tq.dump();
-  //   expr_tq.tq.clear();
-  // }
 
   if (!expr_tq.tq.empty()) {
-    error_blank(lineno, "Error, unknown expression.");
+    error_blank(lineno, "Error, unrecognized expression.");
     expr_tq.dump();
     expr_tq.tq.clear();
     return NULL;
@@ -638,20 +668,15 @@ ExprList Parser::parse_comma_separated_exprlist() {
   ExprTQ original = expr_tq;
   expr_tq.tq.clear();
 
-  int paren_stack = 0;
-  int bracket_stack = 0;
+  int stack = 0;
   while (!original.tq.empty()) {
     Token t = original.tq.front();
     original.tq.pop_front();
-    if (t.get_str() == "(")
-      paren_stack++;
-    else if (t.get_str() == ")")
-      paren_stack--;
-    else if (t.get_str() == "[")
-      bracket_stack++;
-    else if (t.get_str() == "]") 
-      bracket_stack--;
-    else if (t.get_str() == "," && bracket_stack == 0 && paren_stack == 0) {
+    if (t.get_str() == "(" || t.get_str() == "[")
+      stack++;
+    else if (t.get_str() == ")" || t.get_str() == "]")
+      stack--;
+    else if (t.get_str() == "," && stack == 0) {
       if (original.tq.empty()) {
         error_blank(t.get_lineno(), "Error: expected expression after ','");
       }
@@ -707,27 +732,110 @@ ListConstExpr *Parser::parse_list_const_expr() {
 ListElemRef *Parser::parse_list_elem_ref_expr() {
   int lineno = expr_tq.tq[0].get_lineno();
   ExprStmt *list_name;
-  IntConstExpr *index;
+  ExprStmt *index;
 
+  assert(expr_tq.tq.back().get_str() == "]");
 
+  int open_brack_idx = get_str_idx_expr_tq("[");
+  ExprTQ original = expr_tq;
+  expr_tq.tq.clear();
+  for (int i = 0; i < (int) open_brack_idx; i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
+  list_name = parse_exprstmt();
 
+  assert(expr_tq.tq.empty());
+  for (int i = open_brack_idx; i < (int) original.tq.size(); i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
+
+  assert(expr_tq.tq[0].get_str() == "[" && expr_tq.tq[expr_tq.tq.size() - 1].get_str() == "]");
+
+  expr_tq.tq.pop_front();
+  expr_tq.tq.pop_back();
+
+  index = parse_exprstmt();
 
   ListElemRef *list_elem_ref = new ListElemRef(list_name, index);
   list_elem_ref->lineno = lineno;
   return list_elem_ref;
 }
 
+int Parser::get_str_idx_expr_tq(string s) {
+  int idx = -1;
+
+  stack<string> stk;
+  for (int i = (int) expr_tq.tq.size() - 1; i >= 0; i--) {
+    Token t = expr_tq.tq[i];
+    if (t.get_str() == "]" || t.get_str() == ")") {
+      stk.push(t.get_str());
+    } else if (t.get_str() == "(" || t.get_str() == "[") {
+      stk.pop();
+    }
+
+    if (stk.empty() && t.get_str() == s) {
+      idx = i;
+      break;
+    }
+  }
+
+  
+  // assert(idx != -1);
+  assert(stk.empty());
+
+  return idx;
+}
+
+DispatchExpr *Parser::parse_dispexpr() {
+  debug_msg("BEGIN parse_dispexpr()");
+  int lineno = expr_tq.tq.front().get_lineno();
+  ExprStmt *calling_class;
+  string name;
+  ExprList args;
+
+  // find index of last '.'
+  int dot_index = get_str_idx_expr_tq(".");
+
+  ExprTQ original = expr_tq;
+  expr_tq.tq.clear();
+  for (int i = 0; i < dot_index; i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
+  /* parse on tokens from 0 to dot_index */
+  calling_class = parse_exprstmt();
+  assert(expr_tq.tq.empty());
+
+
+  for (int i = dot_index + 1; i < original.tq.size(); i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
+
+  name = expr_tq.tq[0].get_str();
+  expr_tq.tq.pop_front();
+
+  assert(expr_tq.tq.front().get_str() == "(");
+  assert(expr_tq.tq.back().get_str() == ")");
+
+  expr_tq.tq.pop_front();
+  expr_tq.tq.pop_back();
+
+  if (!expr_tq.tq.empty())
+    args = parse_comma_separated_exprlist();
+
+  DispatchExpr *disp_expr = new DispatchExpr(calling_class, name, args);
+  disp_expr->lineno = lineno;
+  return disp_expr;
+}
+
 ReturnExpr *Parser::parse_returnexpr() {
   debug_msg("BEGIN parse_returnexpr()");
   int lineno = expr_tq.tq[0].get_lineno();
   ExprStmt *expr;
+
+  assert(expr_tq.tq.front().get_type() == RETURN);
+
   expr_tq.tq.pop_front();
   calibrate_expr_tq();
-  // if (expr_tq.tq.empty()) {
-  //   /* let the caller of expr handle ';' */
-  //   expr = NULL;
-  // } else {
-  // }
   expr = parse_exprstmt();
   ReturnExpr *retexpr = new ReturnExpr(expr);
   retexpr->lineno = lineno;
@@ -739,12 +847,11 @@ KillExpr *Parser::parse_killexpr() {
   debug_msg("BEGIN parse_killexpr()");
   int lineno = expr_tq.tq[0].get_lineno();
   ExprStmt *expr;
+
+  assert(expr_tq.tq.front().get_type() == KILL);
+
   expr_tq.tq.pop_front(); // pop 'kill'
   calibrate_expr_tq();
-  // if (expr_tq.tq.empty()) {
-  //   expr = NULL;
-  // } else {
-  // }
   expr = parse_exprstmt();
   KillExpr *killexpr= new KillExpr(expr);
   killexpr->lineno = lineno;
@@ -756,6 +863,9 @@ NewExpr *Parser::parse_newexpr() {
   debug_msg("BEGIN parse_newexpr()");
   int lineno = expr_tq.tq[0].get_lineno();
   ExprStmt *expr;
+
+  assert(expr_tq.tq.front().get_type() == NEW);
+
   expr_tq.tq.pop_front();
   if (expr_tq.tq.empty()) {
     string err_msg = "Error: There must be an expression following keyword NEW.";
@@ -774,41 +884,7 @@ NewExpr *Parser::parse_newexpr() {
   return newexpr;
 }
 
-int Parser::get_dot_index() {
-  int dot_index = -1;
 
-
-
-  return dot_index;
-}
-
-DispatchExpr *Parser::parse_dispexpr() {
-  debug_msg("BEGIN parse_dispexpr()");
-  int lineno = expr_tq.tq.front().get_lineno();
-  ExprStmt *calling_class;
-  string name;
-  ExprList args;
-
-
-  // find index of last '.'
-  int dot_index = get_dot_index();
-  name = expr_tq.tq[dot_index + 1].get_str();
-
-
-  if (dot_index == -1) {
-    calling_class = NULL;
-  } else {
-
-  }
-
-
-  // calling class is on left, name is directly on right
-  // args are in parentheses
-
-  DispatchExpr *disp_expr = new DispatchExpr(calling_class, name, args);
-  disp_expr->lineno = lineno;
-  return disp_expr;
-}
 
 BinopExpr *Parser::parse_binopexpr() {
   debug_msg("BEGIN parse_binopexpr()");

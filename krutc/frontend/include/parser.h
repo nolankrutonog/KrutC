@@ -83,8 +83,11 @@ private:
     Stmt *parse_stmt();
 
     Feature* parse_feature();
-    AttrStmt* parse_attrstmt();
-    MethodStmt* parse_methodstmt();
+    AttrStmt* parse_attrstmt(TypeExpr *type);
+    MethodStmt* parse_methodstmt(TypeExpr *type);
+    TypeExpr *parse_typeexpr();
+    
+    // ContainerStmt *parse_container_stmt();
     FormalList parse_formallist();
     IfStmt *parse_if_stmt();
     WhileStmt *parse_while_stmt();
@@ -100,16 +103,13 @@ private:
     bool build_expr_tq(std::string s);
     void calibrate_expr_tq();
     ExprStmt *parse_exprstmt();
+    BinopExpr *parse_binopexpr();
 
     ListConstExpr *parse_list_const_expr();
     ExprList parse_comma_separated_exprlist();
-
-    ListElemRef *parse_list_elem_ref_expr();
-
-    BinopExpr *parse_binopexpr();
-
     DispatchExpr *parse_dispexpr();
-    int get_dot_index();
+    ListElemRef *parse_list_elem_ref_expr();
+    int get_str_idx_expr_tq(std::string);
 
     IntConstExpr* parse_int_const_expr();
     BoolConstExpr* parse_bool_const_expr();

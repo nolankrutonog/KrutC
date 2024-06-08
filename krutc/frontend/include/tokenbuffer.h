@@ -44,7 +44,6 @@ private:
 
   void fill_buffer() {
     while (lexer.has_more()) {
-      // std::cout << "here" << std::endl;
       Token t = lexer.get_next_token();
       if (t.get_type() == ERROR) {
         std::cout << t.get_str() << std::endl;
