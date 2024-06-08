@@ -97,10 +97,6 @@ void ListElemRef::dump(int n) {
   index->dump(n + 2);
   indent(n + 1); cout << "]" << endl;
 }
-// void ContainerStmt::dump(int n) {
-//   indent(n); cout << type + "<" + elem_type + "> " + name << endl;
-//   init->dump(n + 1);
-// }
 
 void ReturnExpr::dump(int n) {
   indent(n);

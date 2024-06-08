@@ -194,9 +194,6 @@ TypeExpr *Parser::parse_typeexpr() {
     if (tbuff.lookahead(0).get_str() == ">") {
       tbuff.get_next();
     } 
-    // else {
-    //   error_blank(tbuff.lookahead(0).get_lineno(), "Error: expected closing '>'. ");
-    // }
   } else {
     nested = NULL;
   } 
@@ -987,18 +984,23 @@ Stmt *Parser::parse_stmt() {
 }
 
 
-void Parser::parse_program() {
-  if (tbuff.has_errors) {
-    token_dump();
-    return; 
-  }
-
+Program Parser::parse_program() {
+  Program program;
   while (tbuff.has_next()) {
     Stmt *stmt = parse_stmt();
     if (stmt != NULL) 
       program.add_stmt(stmt);
   }
+  return program;
 
+}
+
+bool Parser::check_lexer_errors() {
+  if (tbuff.has_errors) {
+    token_dump();
+    return false;
+  }
+  return true;
 }
 
 void Parser::token_dump() {
@@ -1020,54 +1022,4 @@ void Parser::token_dump() {
 void Parser::debug_msg(string s) {
   if (debug)
     cout << s << endl;
-}
-
-
-int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    cerr << "Usage: " << argv[0] << " <file.krut>" << endl;
-    return -1;
-  }
-  string filename = argv[1];
-  string suffix = ".krut";
-
-  if (filename.compare(filename.size() - suffix.size(), suffix.size(), suffix) != 0) {
-    cerr << "Error: file must be of extension " + suffix << endl;
-    return -1;
-  } 
-
-  bool token_dump = false;
-  bool debug = false;
-  bool tree = false;
-  if (argc >= 3) {
-    for (int i = 2; i < argc; i++) {
-      string flag = argv[i];
-      if (strncmp(flag.c_str(), "-debug", 6) == 0) {
-        debug = true;
-      } else if (strncmp(flag.c_str(), "-tdump", 6) == 0) {
-        token_dump = true;
-      } else if (strncmp(flag.c_str(), "-tree", 5) == 0) {
-        tree = true;
-      }
-      else {
-        cerr << "Error: Unknown flag " + flag << endl;
-        cerr << "Expected flag '-tdump', '-debug', or '-tree'." << endl;
-      }
-
-    }
-  }
-
-  Parser parser = Parser(filename, debug);
-
-  if (token_dump) {
-    parser.token_dump();
-  } else {
-    parser.parse_program();
-    if (tree && !parser.parser_errors) {
-      parser.program.dump();      
-    }
-  } 
-
-  return 1;
-
 }

@@ -61,15 +61,14 @@ public:
 class Parser {
 public:
     int parser_errors = 0;
-    // bool tdump = false;
     bool debug = false;
-    // bool tree = false;
 
-    Parser(std::string filename, bool debug) 
-      : tbuff(filename), debug(debug), filename(filename) {}
-    void parse_program();
+    Parser(std::string filename, bool debug, bool token_dump) 
+      : tbuff(filename, token_dump), debug(debug), filename(filename) {}
+    Program parse_program();
     void token_dump();
-    Program program;
+    bool check_lexer_errors();
+    // Program program;
 
 private:
     TokenBuffer tbuff;
@@ -87,14 +86,12 @@ private:
     MethodStmt* parse_methodstmt(TypeExpr *type);
     TypeExpr *parse_typeexpr();
     
-    // ContainerStmt *parse_container_stmt();
     FormalList parse_formallist();
     IfStmt *parse_if_stmt();
     WhileStmt *parse_while_stmt();
     ForStmt *parse_for_stmt();
 
     int parse_check_and_pop(std::string s);
-    // int parse_check_and_pop_type(TokenType type);
 
     BroStmt *parse_bro_stmt();
     std::vector<std::string> get_vibers();

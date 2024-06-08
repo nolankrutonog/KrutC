@@ -69,10 +69,24 @@ include CMakeFiles/krutc.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/krutc.dir/flags.make
 
+CMakeFiles/krutc.dir/frontend/main.cpp.o: CMakeFiles/krutc.dir/flags.make
+CMakeFiles/krutc.dir/frontend/main.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/main.cpp
+CMakeFiles/krutc.dir/frontend/main.cpp.o: CMakeFiles/krutc.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/krutc.dir/frontend/main.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/krutc.dir/frontend/main.cpp.o -MF CMakeFiles/krutc.dir/frontend/main.cpp.o.d -o CMakeFiles/krutc.dir/frontend/main.cpp.o -c /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/main.cpp
+
+CMakeFiles/krutc.dir/frontend/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/krutc.dir/frontend/main.cpp.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/main.cpp > CMakeFiles/krutc.dir/frontend/main.cpp.i
+
+CMakeFiles/krutc.dir/frontend/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/krutc.dir/frontend/main.cpp.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/main.cpp -o CMakeFiles/krutc.dir/frontend/main.cpp.s
+
 CMakeFiles/krutc.dir/frontend/lexer.cpp.o: CMakeFiles/krutc.dir/flags.make
 CMakeFiles/krutc.dir/frontend/lexer.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/lexer.cpp
 CMakeFiles/krutc.dir/frontend/lexer.cpp.o: CMakeFiles/krutc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/krutc.dir/frontend/lexer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/krutc.dir/frontend/lexer.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/krutc.dir/frontend/lexer.cpp.o -MF CMakeFiles/krutc.dir/frontend/lexer.cpp.o.d -o CMakeFiles/krutc.dir/frontend/lexer.cpp.o -c /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/lexer.cpp
 
 CMakeFiles/krutc.dir/frontend/lexer.cpp.i: cmake_force
@@ -86,7 +100,7 @@ CMakeFiles/krutc.dir/frontend/lexer.cpp.s: cmake_force
 CMakeFiles/krutc.dir/frontend/parser.cpp.o: CMakeFiles/krutc.dir/flags.make
 CMakeFiles/krutc.dir/frontend/parser.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.cpp
 CMakeFiles/krutc.dir/frontend/parser.cpp.o: CMakeFiles/krutc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/krutc.dir/frontend/parser.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/krutc.dir/frontend/parser.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/krutc.dir/frontend/parser.cpp.o -MF CMakeFiles/krutc.dir/frontend/parser.cpp.o.d -o CMakeFiles/krutc.dir/frontend/parser.cpp.o -c /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.cpp
 
 CMakeFiles/krutc.dir/frontend/parser.cpp.i: cmake_force
@@ -100,7 +114,7 @@ CMakeFiles/krutc.dir/frontend/parser.cpp.s: cmake_force
 CMakeFiles/krutc.dir/frontend/tree.cpp.o: CMakeFiles/krutc.dir/flags.make
 CMakeFiles/krutc.dir/frontend/tree.cpp.o: /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp
 CMakeFiles/krutc.dir/frontend/tree.cpp.o: CMakeFiles/krutc.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/krutc.dir/frontend/tree.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/krutc.dir/frontend/tree.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/krutc.dir/frontend/tree.cpp.o -MF CMakeFiles/krutc.dir/frontend/tree.cpp.o.d -o CMakeFiles/krutc.dir/frontend/tree.cpp.o -c /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp
 
 CMakeFiles/krutc.dir/frontend/tree.cpp.i: cmake_force
@@ -113,6 +127,7 @@ CMakeFiles/krutc.dir/frontend/tree.cpp.s: cmake_force
 
 # Object files for target krutc
 krutc_OBJECTS = \
+"CMakeFiles/krutc.dir/frontend/main.cpp.o" \
 "CMakeFiles/krutc.dir/frontend/lexer.cpp.o" \
 "CMakeFiles/krutc.dir/frontend/parser.cpp.o" \
 "CMakeFiles/krutc.dir/frontend/tree.cpp.o"
@@ -120,6 +135,7 @@ krutc_OBJECTS = \
 # External object files for target krutc
 krutc_EXTERNAL_OBJECTS =
 
+krutc: CMakeFiles/krutc.dir/frontend/main.cpp.o
 krutc: CMakeFiles/krutc.dir/frontend/lexer.cpp.o
 krutc: CMakeFiles/krutc.dir/frontend/parser.cpp.o
 krutc: CMakeFiles/krutc.dir/frontend/tree.cpp.o
@@ -141,7 +157,7 @@ krutc: /opt/homebrew/lib/libzstd.dylib
 krutc: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/lib/libcurses.tbd
 krutc: /opt/homebrew/Cellar/llvm/18.1.5/lib/libLLVMDemangle.a
 krutc: CMakeFiles/krutc.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable krutc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable krutc"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/krutc.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

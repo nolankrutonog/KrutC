@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/lexer.cpp" "CMakeFiles/krutc.dir/frontend/lexer.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/lexer.cpp.o.d"
+  "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/main.cpp" "CMakeFiles/krutc.dir/frontend/main.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/main.cpp.o.d"
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.cpp" "CMakeFiles/krutc.dir/frontend/parser.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/parser.cpp.o.d"
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp" "CMakeFiles/krutc.dir/frontend/tree.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/tree.cpp.o.d"
   )

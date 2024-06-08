@@ -7,10 +7,8 @@ class TokenBuffer {
 public:
   int has_errors = 0;
 
-  TokenBuffer(const std::string filepath) : lexer(filepath) {
-    fill_buffer();
-  }
-  // size_t get_size() { return buffer.size(); }
+  TokenBuffer(const std::string filepath, bool token_dump) 
+    : lexer(filepath), token_dump(token_dump) { fill_buffer(); }
 
   bool has_next() {
     return buffer.size();
@@ -21,6 +19,8 @@ public:
       return Token(EMPTY);
     }
     Token t = buffer.front();
+    if (token_dump)
+      t.dump();
     buffer.pop_front();
     curr_lineno = t.get_lineno();
     return t;
@@ -40,6 +40,7 @@ public:
 private:
   Lexer lexer;
   std::deque<Token> buffer;
+  bool token_dump;
   int curr_lineno = 0;
 
   void fill_buffer() {

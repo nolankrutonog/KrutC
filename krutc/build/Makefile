@@ -205,6 +205,30 @@ frontend/lexer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/lexer.cpp.s
 .PHONY : frontend/lexer.cpp.s
 
+frontend/main.o: frontend/main.cpp.o
+.PHONY : frontend/main.o
+
+# target to build an object file
+frontend/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/main.cpp.o
+.PHONY : frontend/main.cpp.o
+
+frontend/main.i: frontend/main.cpp.i
+.PHONY : frontend/main.i
+
+# target to preprocess a source file
+frontend/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/main.cpp.i
+.PHONY : frontend/main.cpp.i
+
+frontend/main.s: frontend/main.cpp.s
+.PHONY : frontend/main.s
+
+# target to generate assembly for a file
+frontend/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/main.cpp.s
+.PHONY : frontend/main.cpp.s
+
 frontend/parser.o: frontend/parser.cpp.o
 .PHONY : frontend/parser.o
 
@@ -269,6 +293,9 @@ help:
 	@echo "... frontend/lexer.o"
 	@echo "... frontend/lexer.i"
 	@echo "... frontend/lexer.s"
+	@echo "... frontend/main.o"
+	@echo "... frontend/main.i"
+	@echo "... frontend/main.s"
 	@echo "... frontend/parser.o"
 	@echo "... frontend/parser.i"
 	@echo "... frontend/parser.s"
