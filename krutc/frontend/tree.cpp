@@ -16,13 +16,13 @@ void Program::dump() {
   }
 }
 
-void BroStmt::dump(int n) {
+void ClassStmt::dump(int n) {
   indent(n); cout << "bro" << endl;
   indent(n + 1); cout << name << endl;
-  if (vibers.size() > 0) {
+  if (parents.size() > 0) {
     indent(n + 2);
     cout << "vibers: ";
-    for (string viber: vibers) {
+    for (string viber: parents) {
       cout <<  viber + " ";
     }
     cout << endl;
@@ -75,13 +75,13 @@ void IntConstExpr::dump(int n) {
   cout << to_string(val) << endl;
 }
 void BoolConstExpr::dump(int n) {
-  string out = val == 1 ? "facts" : "cap";
+  string out = val == 1 ? "true" : "false";
   indent(n);
   cout << out << endl;
 }
-void VerseConstExpr::dump(int n) {
+void StrConstExpr::dump(int n) {
   indent(n);
-  cout << verse << endl;
+  cout << str << endl;
 }
 
 void ListConstExpr::dump(int n) {
@@ -148,13 +148,18 @@ void DispatchExpr::dump(int n) {
 
 }
 
-void TypeExpr::dump(int n) {
+void Type_::dump(int n) {
   cout << name;
   if (nested_type) {
     cout << "<";
     nested_type->dump(n + 1);
     cout << ">";
   }
+}
+string Type_::to_str() {
+  cout << name;
+  if (nested_type)
+    cout << "<" << nested_type->to_str() << ">";
 }
 
 void FormalStmt::dump(int n) {

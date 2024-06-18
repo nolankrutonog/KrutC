@@ -253,6 +253,30 @@ frontend/parser.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/parser.cpp.s
 .PHONY : frontend/parser.cpp.s
 
+frontend/scopetable.o: frontend/scopetable.cpp.o
+.PHONY : frontend/scopetable.o
+
+# target to build an object file
+frontend/scopetable.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/scopetable.cpp.o
+.PHONY : frontend/scopetable.cpp.o
+
+frontend/scopetable.i: frontend/scopetable.cpp.i
+.PHONY : frontend/scopetable.i
+
+# target to preprocess a source file
+frontend/scopetable.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/scopetable.cpp.i
+.PHONY : frontend/scopetable.cpp.i
+
+frontend/scopetable.s: frontend/scopetable.cpp.s
+.PHONY : frontend/scopetable.s
+
+# target to generate assembly for a file
+frontend/scopetable.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/scopetable.cpp.s
+.PHONY : frontend/scopetable.cpp.s
+
 frontend/tree.o: frontend/tree.cpp.o
 .PHONY : frontend/tree.o
 
@@ -277,6 +301,30 @@ frontend/tree.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/tree.cpp.s
 .PHONY : frontend/tree.cpp.s
 
+frontend/typechecker.o: frontend/typechecker.cpp.o
+.PHONY : frontend/typechecker.o
+
+# target to build an object file
+frontend/typechecker.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/typechecker.cpp.o
+.PHONY : frontend/typechecker.cpp.o
+
+frontend/typechecker.i: frontend/typechecker.cpp.i
+.PHONY : frontend/typechecker.i
+
+# target to preprocess a source file
+frontend/typechecker.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/typechecker.cpp.i
+.PHONY : frontend/typechecker.cpp.i
+
+frontend/typechecker.s: frontend/typechecker.cpp.s
+.PHONY : frontend/typechecker.s
+
+# target to generate assembly for a file
+frontend/typechecker.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/typechecker.cpp.s
+.PHONY : frontend/typechecker.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -299,9 +347,15 @@ help:
 	@echo "... frontend/parser.o"
 	@echo "... frontend/parser.i"
 	@echo "... frontend/parser.s"
+	@echo "... frontend/scopetable.o"
+	@echo "... frontend/scopetable.i"
+	@echo "... frontend/scopetable.s"
 	@echo "... frontend/tree.o"
 	@echo "... frontend/tree.i"
 	@echo "... frontend/tree.s"
+	@echo "... frontend/typechecker.o"
+	@echo "... frontend/typechecker.i"
+	@echo "... frontend/typechecker.s"
 .PHONY : help
 
 

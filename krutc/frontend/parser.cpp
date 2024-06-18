@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <stack>
+#include <set>
 
 #include "include/parser.h"
 
@@ -9,10 +10,10 @@
 using namespace std;
 
 
-void Parser::panic_recover(string s) {
+void Parser::panic_recover(set<string> ss) {
   while (true) {
     Token t = tbuff.lookahead(0);
-    if (t.get_str() == s || t.get_type() == EMPTY) {
+    if ((ss.find(t.get_str()) != ss.end()) || t.get_type() == EMPTY) {
       break;
     }
     tbuff.get_next();
@@ -33,7 +34,7 @@ FormalList Parser::parse_formallist() {
   FormalList formal_list;
 
   while (tbuff.lookahead(0).get_str() != ")") {
-    TypeExpr *type;
+    Type_ *type;
     string name;
     Token next = tbuff.lookahead(0);
     int lineno = next.get_lineno();
@@ -88,7 +89,7 @@ FormalList Parser::parse_formallist() {
 }
 
 /* type name(FormalList) {StmtList};*/
-MethodStmt *Parser::parse_methodstmt(TypeExpr *type) {
+MethodStmt *Parser::parse_methodstmt(Type_ *type) {
   debug_msg("BEGIN parse_method_stmt()");
   int methodstmt_lineno = tbuff.get_lineno();
   // TypeExpr *type;
@@ -133,7 +134,7 @@ MethodStmt *Parser::parse_methodstmt(TypeExpr *type) {
 
 
 
-AttrStmt *Parser::parse_attrstmt(TypeExpr *type) {
+AttrStmt *Parser::parse_attrstmt(Type_ *type) {
   debug_msg("BEGIN parse_attrstmt()");
   int attrstmt_lineno = tbuff.get_lineno();
   string name;
@@ -172,11 +173,11 @@ AttrStmt *Parser::parse_attrstmt(TypeExpr *type) {
   return attrstmt;
 }
 
-TypeExpr *Parser::parse_typeexpr() {
+Type_ *Parser::parse_typeexpr() {
   debug_msg("BEGIN parse_typeexpr()");
 
   string name;
-  TypeExpr *nested;
+  Type_ *nested;
   int lineno = tbuff.get_lineno();
 
   Token name_tok = tbuff.lookahead(0);
@@ -199,7 +200,7 @@ TypeExpr *Parser::parse_typeexpr() {
   } 
 
 
-  TypeExpr *expr = new TypeExpr(name, nested);
+  Type_ *expr = new Type_(name, nested);
   expr->lineno = lineno;
   debug_msg("END parse_typeexpr()");
   return expr;
@@ -210,7 +211,7 @@ Feature *Parser::parse_feature() {
   debug_msg("BEGIN parse_feature()");
   assert(tbuff.lookahead(0).get_type() == TYPEID);
 
-  TypeExpr *type = parse_typeexpr();
+  Type_ *type = parse_typeexpr();
 
   if (tbuff.lookahead(0).get_str() == ">") {
     error_blank(tbuff.get_lineno(), "Error: unbalanced '<' '>' in type declaration.");
@@ -242,7 +243,7 @@ int Parser::parse_check_and_pop(string s) {
   Token t = tbuff.lookahead(0);
   if (t.get_str() != s) {
     error_blank(tbuff.get_lineno(), "Error: Expected '" + s + "', instead got '" + t.get_str() + "'.");
-    panic_recover(s);
+    panic_recover({s});
     tbuff.get_next(); // pop t
     return -1;
   }
@@ -318,61 +319,66 @@ ForStmt *Parser::parse_for_stmt() {
   return for_stmt;
 }
 
-vector<string> Parser::get_vibers() {
-  tbuff.get_next(); // pop keyword VIBESWITH
+set<string> Parser::get_inheritees() {
+  tbuff.get_next(); // pop keyword INHERITS
 
-  vector<string> vibers;
+  set<string> parents;
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "{") {
-    Token viber = tbuff.get_next();
-    if (viber.get_type() != TYPEID) {
-      string err_msg = "Error: VIBER cannot be of type " + viber.get_type_str();
-      error_blank(viber.get_lineno(), err_msg);
-      // panic_recover();
+    Token parent = tbuff.lookahead(0);
+    if (parent.get_type() != TYPEID) {
+      string err_msg = "Error: INHERITEE cannot be of type " + parent.get_type_str();
+      error_blank(parent.get_lineno(), err_msg);
       /* dont need to return now because we may be able to recover */
     } else {
-      vibers.push_back(tbuff.get_next().get_str());
+      if (parents.find(parent.get_str()) != parents.end()) {
+        string err_msg = "Error: INHERITEE " + parent.get_str() + " cannot be defined twice.";
+        error_blank(parent.get_lineno(), err_msg);
+      } else {
+        parents.insert(parent.get_str());
+      }
     }
+    tbuff.get_next(); // pop parent token
 
     Token next = tbuff.lookahead(0);
-    if (next.get_str() == "{")
+    if (next.get_str() == "{") // dont pop '{'
       break;
-    if (next.get_str() == ",") {
+    if (next.get_str() == ",") { // pop ','
       tbuff.get_next();
       continue;
     } else {
-      string err_msg = "Error: Expected ',' or '{' after VIBER.";
+      string err_msg = "Error: Expected ',' or '{' after INHERITEE.";
       error_blank(tbuff.get_lineno(), err_msg);
-      return vibers;
+      return parents;
     }
   }
-  return vibers;
+  return parents;
 }
 
-/* BRO TYPEID [VIBESWITH [OBJECTID[, OBJECTID]*]]? { STMTLIST }; */
-BroStmt *Parser::parse_bro_stmt() {
-  debug_msg("BEGIN parse_bro_stmt()");
-  int brostmt_lineno = tbuff.get_lineno();
+/* CLASS TYPEID [INHERITS [OBJECTID[, OBJECTID]*]]? { STMTLIST }; */
+ClassStmt *Parser::parse_class_stmt() {
+  debug_msg("BEGIN parse_class_stmt()");
+  int classstmt_lineno = tbuff.get_lineno();
   string name;
-  vector<string> vibers;
-  StmtList stmt_list;
+  set<string> parents;
+  FeatureList feature_list;
 
-  Token bro_tok = tbuff.lookahead(0);
-  assert(bro_tok.get_type() == BRO);
-  tbuff.get_next(); // pop BRO
+  Token class_tok = tbuff.lookahead(0);
+  assert(class_tok.get_type() == CLASS);
+  tbuff.get_next(); // pop CLASS
 
   Token next = tbuff.lookahead(0);
   if (next.get_type() != TYPEID) {
-    string err_msg = "Error: BRO name must start with a capital letter.";
+    string err_msg = "Error: CLASS name must start with a capital letter.";
     error_blank(tbuff.get_lineno(), err_msg);
   }
 
   name = tbuff.get_next().get_str();
 
   next = tbuff.lookahead(0);
-  if (next.get_type() == VIBESWITH) {
-    vibers = get_vibers();
-    if (vibers.size() == 0) {
-      string err_msg = "Error: Every BRO must have one or more VIBER if keyword VIBESWITH is present";
+  if (next.get_type() == INHERITS) {
+    parents = get_inheritees();
+    if (parents.size() == 0) {
+      string err_msg = "Error: Every CLASS must have one or more parent if keyword INHERITS is present";
       error_blank(tbuff.get_lineno(), err_msg);
     }
   }
@@ -380,16 +386,23 @@ BroStmt *Parser::parse_bro_stmt() {
   parse_check_and_pop("{");
 
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "}") {
-    Stmt *stmt = parse_stmt();
-    stmt_list.push_back(stmt);
+    if (tbuff.lookahead(0).get_type() != TYPEID) {
+      string err_msg = "Error: Every CLASS must be defined by only METHODS or ATTRIBUTES.";
+      error_blank(tbuff.get_lineno(), err_msg);
+      // recover to next typeid
+      panic_recover({"}", ";"});
+      continue;
+    }
+    Feature *f = parse_feature();
+    feature_list.push_back(f);
   }
 
   parse_check_and_pop("}");
 
-  BroStmt *bro_stmt = new BroStmt(name, vibers, stmt_list);
-  bro_stmt->lineno = brostmt_lineno;
-  debug_msg("END parse_bro_stmt()");
-  return bro_stmt;
+  ClassStmt *class_stmt = new ClassStmt(name, parents, feature_list);
+  class_stmt->lineno = classstmt_lineno;
+  debug_msg("END parse_class_stmt()");
+  return class_stmt;
 }
 
 IfStmt *Parser::parse_if_stmt() {
@@ -598,6 +611,7 @@ bool Parser::build_expr_tq(string s) {
 
 ExprStmt *Parser::parse_exprstmt() {
   debug_msg("BEGIN: parse_exprstmt()");
+  
 
   if (expr_tq.tq.empty())
     return NULL;
@@ -621,8 +635,8 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_int_const_expr();
   } else if (t.get_type() == BOOL_CONST) {
     expr = parse_bool_const_expr();
-  } else if (t.get_type() == VERSE_CONST) {
-    expr = parse_verse_const_expr();
+  } else if (t.get_type() == STR_CONST) {
+    expr = parse_str_const_expr();
   } else if (t.get_type() == CONTINUE) {
     expr = new ContExpr();
     expr_tq.tq.pop_front();
@@ -648,6 +662,10 @@ ExprStmt *Parser::parse_exprstmt() {
 
 
   if (!expr_tq.tq.empty()) {
+    if (t.get_type() == OBJECTID) {
+      // error here on an attribute that is not basic and lowercase
+      // ex: gang g;
+    }
     error_blank(lineno, "Error, unrecognized expression.");
     expr_tq.dump();
     expr_tq.tq.clear();
@@ -867,7 +885,7 @@ NewExpr *Parser::parse_newexpr() {
   if (expr_tq.tq.empty()) {
     string err_msg = "Error: There must be an expression following keyword NEW.";
     error_blank(lineno, err_msg);
-    panic_recover(";");
+    panic_recover({";"});
     return NULL;
   }
   // if (!build_expr_tq(";"))
@@ -935,14 +953,14 @@ BoolConstExpr *Parser::parse_bool_const_expr() {
   bcstmt->lineno = lineno;
   return bcstmt;
 }
-VerseConstExpr *Parser::parse_verse_const_expr() {
+StrConstExpr *Parser::parse_str_const_expr() {
   Token t = expr_tq.tq.front();
   expr_tq.tq.pop_front();
   int lineno = t.get_lineno();
   string val = t.get_str();
-  VerseConstExpr *vcstmt = new VerseConstExpr(val);
-  vcstmt->lineno = lineno;
-  return vcstmt; 
+  StrConstExpr *strstmt = new StrConstExpr(val);
+  strstmt->lineno = lineno;
+  return strstmt; 
 }
 
 ObjectIdExpr *Parser::parse_objectid_expr() {
@@ -964,13 +982,16 @@ Stmt *Parser::parse_stmt() {
     stmt = parse_feature();
   } else if (t.get_type() == FOR) {
     stmt = parse_for_stmt();
-  } else if (t.get_type() == BRO) {
-    stmt = parse_bro_stmt();
+  } else if (t.get_type() == CLASS) {
+    stmt = parse_class_stmt();
   } else if (t.get_type() == IF) {
     stmt = parse_if_stmt();
   } else if (t.get_type() == WHILE) {
     stmt = parse_while_stmt();
-  } else {
+  } else if (t.get_type() == OBJECTID && tbuff.lookahead(1).get_type() == OBJECTID) {
+    // error case here
+  }
+  else {
     if (!build_expr_tq(";"))
       stmt = NULL;
     else 

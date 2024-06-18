@@ -68,23 +68,21 @@ public:
     Program parse_program();
     void token_dump();
     bool check_lexer_errors();
-    // Program program;
 
 private:
     TokenBuffer tbuff;
     std::string filename;
-    bool doing_formals = false;
 
-    void panic_recover(std::string s); 
+    void panic_recover(std::set<std::string> ss); 
     void debug_msg(std::string);
 
 
     Stmt *parse_stmt();
 
     Feature* parse_feature();
-    AttrStmt* parse_attrstmt(TypeExpr *type);
-    MethodStmt* parse_methodstmt(TypeExpr *type);
-    TypeExpr *parse_typeexpr();
+    AttrStmt* parse_attrstmt(Type_ *type);
+    MethodStmt* parse_methodstmt(Type_ *type);
+    Type_ *parse_typeexpr();
     
     FormalList parse_formallist();
     IfStmt *parse_if_stmt();
@@ -93,8 +91,8 @@ private:
 
     int parse_check_and_pop(std::string s);
 
-    BroStmt *parse_bro_stmt();
-    std::vector<std::string> get_vibers();
+    ClassStmt *parse_class_stmt();
+    std::set<std::string> get_inheritees();
 
     ExprTQ expr_tq;
     bool build_expr_tq(std::string s);
@@ -110,7 +108,7 @@ private:
 
     IntConstExpr* parse_int_const_expr();
     BoolConstExpr* parse_bool_const_expr();
-    VerseConstExpr* parse_verse_const_expr();
+    StrConstExpr* parse_str_const_expr();
     ReturnExpr *parse_returnexpr();
     NewExpr *parse_newexpr();
     KillExpr *parse_killexpr();

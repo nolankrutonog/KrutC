@@ -1,8 +1,11 @@
+#ifndef LEXER_H
+#define LEXER_H
+
 #include <iostream>
 #include "filestreambuffer.h"
 #include "token.h"
 
-#define MAX_VERSE_LEN 1024
+#define MAX_STRING_LEN 1024
 
 
 class Lexer {
@@ -14,13 +17,15 @@ public:
 private:
   FileStreamBuffer buff;
   std::string filepath;
-  std::string verse_err_buff;
+  std::string string_err_buff;
 
-  char char_buff[MAX_VERSE_LEN];
+  char char_buff[MAX_STRING_LEN];
   
   int curr_lineno = 1;
   
   Token ml_comment();
-  int verse();
+  int get_string();
 
 };
+
+#endif // LEXER_H

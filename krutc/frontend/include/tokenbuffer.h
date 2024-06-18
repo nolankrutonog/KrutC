@@ -1,3 +1,6 @@
+#ifndef TOKEN_BUFFER_H
+#define TOKEN_BUFFER_H
+
 #include <iostream>
 #include <deque>
 
@@ -59,3 +62,5 @@ private:
     }
   }
 };
+
+#endif // TOKEN_BUFFER_H

@@ -8,8 +8,8 @@
 using namespace std;
 
 static unordered_set<string> KEYWORDS_STR = {
-  "BRO",
-  "VIBESWITH",
+  "CLASS",
+  "INHERITS",
   "FOR",
   "IF",
   "ELSE",
@@ -24,15 +24,17 @@ static unordered_set<string> KEYWORDS_STR = {
 };
 
 unordered_set<string> BASIC_TYPES = {
-  "int",
-  "verse",
+  "int", /* currently represented as long */
+  /* TODO: double, float, long, etc */
+  "string",
   "bool",
   "void",
+  // "none",
   "list",
   "stack",
-  "object"
+  "object",
+  "char"
 };
-
 
 static const unordered_set<string> SPECIAL_CHARS = {
   "(",
@@ -105,24 +107,24 @@ Token Lexer::ml_comment() {
   return t;
 }
 
-/* find every verse */
-int Lexer::verse() {
-  verse_err_buff = "";
-  int verse_start_lineno = curr_lineno;
+/* find every string */
+int Lexer::get_string() {
+  string_err_buff = "";
+  int string_start_lineno = curr_lineno;
   int char_buff_size = 0;
   while (true) {
     char curr = buff.get_next();
     
     if (curr == '\0') {
       char_buff_size = -1;
-      verse_err_buff = filepath + ":" + to_string(verse_start_lineno) + ": " + "Lexer Error: EOF in verse.";
+      string_err_buff = filepath + ":" + to_string(string_start_lineno) + ": " + "Lexer Error: EOF in string.";
     } else if (curr == '\n') {
       curr_lineno++;
       char_buff[char_buff_size++] = curr;
       continue;
-    } else if (char_buff_size >= MAX_VERSE_LEN) {
+    } else if (char_buff_size >= MAX_STRING_LEN) {
       char_buff_size = -1;
-      verse_err_buff = filepath + ":" + to_string(verse_start_lineno) + ": " + "Lexer Error. Verse too long. Maximum verse length is " + to_string(MAX_VERSE_LEN);
+      string_err_buff = filepath + ":" + to_string(string_start_lineno) + ": " + "Lexer Error. Verse too long. Maximum string length is " + to_string(MAX_STRING_LEN);
     } else if (curr == '\"') {
       break;
     } else {
@@ -188,14 +190,14 @@ Token Lexer::get_next_token() {
       break;
     }
 
-    // Handle VERSE_CONST
+    // Handle STRING_CONST
     if (curr == "\"") {
-      int num_chars = verse();
+      int num_chars = get_string();
       if (num_chars >= 0) {
         string str(char_buff, num_chars);
-        t = Token(curr_lineno, VERSE_CONST, "\"" + str + "\"");
+        t = Token(curr_lineno, STR_CONST, "\"" + str + "\"");
       } else {
-        t = Token(curr_lineno, ERROR, verse_err_buff);
+        t = Token(curr_lineno, ERROR, string_err_buff);
       }
       break;
     }
@@ -222,7 +224,7 @@ Token Lexer::get_next_token() {
         t = Token(curr_lineno, KEYWORDS_STR_TO_TTYPE[curr_upper], "");
       } else if (isupper(curr[0]) || BASIC_TYPES.find(curr) != BASIC_TYPES.end()) {
         t = Token(curr_lineno, TYPEID, curr);
-      } else if (curr == "facts" || curr == "cap") {
+      } else if (curr == "true" || curr == "false") {
         t = Token(curr_lineno, BOOL_CONST, curr);
       } else {
         t = Token(curr_lineno, OBJECTID, curr);

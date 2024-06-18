@@ -21,7 +21,8 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 # Source files
-set(SOURCES frontend/main.cpp frontend/lexer.cpp frontend/parser.cpp frontend/tree.cpp)
+set(SOURCES frontend/main.cpp frontend/lexer.cpp frontend/parser.cpp 
+            frontend/tree.cpp frontend/typechecker.cpp frontend/scopetable.cpp)
 
 # Add the executable
 add_executable(krutc ${SOURCES})

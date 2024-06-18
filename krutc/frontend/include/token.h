@@ -1,11 +1,15 @@
+#ifndef TOKEN_H
+#define TOKEN_H
+
 #include <iostream>
 #include <unordered_map>
 #include <set>
 
 
+
 enum TokenType {
-  BRO = 256,
-  VIBESWITH = 257,
+  CLASS = 256,
+  INHERITS = 257,
   FOR = 258,
   IF = 262,
   ELSE = 263,
@@ -14,7 +18,7 @@ enum TokenType {
   THIS = 266,
   INT_CONST = 267,
   BOOL_CONST = 268,
-  VERSE_CONST = 269,
+  STR_CONST = 269,
   SPECIAL_CHAR = 278,
   BINOP = 282,
   TYPEID = 285,
@@ -32,9 +36,9 @@ enum TokenType {
 
 
 
-static std::unordered_map<TokenType, std::string> TOKEN_TYPE_TO_STRING = {
-    {BRO, "BRO"},
-    {VIBESWITH, "VIBESWITH"},
+static std::unordered_map<TokenType, std::string> TOKEN_TYPE_TO_STR = {
+    {CLASS, "CLASS"},
+    {INHERITS, "INHERITS"},
     {FOR, "FOR"},
     {IF, "IF"},
     {ELSE, "ELSE"},
@@ -43,7 +47,7 @@ static std::unordered_map<TokenType, std::string> TOKEN_TYPE_TO_STRING = {
     {THIS, "THIS"},
     {INT_CONST, "INT_CONST"},
     {BOOL_CONST, "BOOL_CONST"},
-    {VERSE_CONST, "VERSE_CONST"},
+    {STR_CONST, "STR_CONST"},
     {SPECIAL_CHAR, "SPECIAL_CHAR"},
     {BINOP, "BINOP"},
     {TYPEID, "TYPEID"},
@@ -74,7 +78,7 @@ public:
   int get_lineno() { return lineno; }
   TokenType get_type() { return type; }
   std::string get_type_str() {
-    return TOKEN_TYPE_TO_STRING[type];
+    return TOKEN_TYPE_TO_STR[type];
   }
   std::string get_str() { return str; }
 
@@ -83,22 +87,19 @@ public:
   void set_str(std::string s) { str = s; }
 
   void dump() {
-    std::cout << "#" << lineno << " " << TOKEN_TYPE_TO_STRING[type] << " " << str << std::endl;
+    std::cout << "#" << lineno << " " << TOKEN_TYPE_TO_STR[type] << " " << str << std::endl;
   }
 
 };
 
 static std::set<TokenType> KEYWORDS_TTYPE {
-  BRO, VIBESWITH, FOR, /* START, END, STEP,*/ IF, ELSE, WHILE, RETURN, // THIS
+  CLASS, INHERITS, FOR, /* START, END, STEP,*/ IF, ELSE, WHILE, RETURN, // THIS
 };
 
 static std::unordered_map<std::string, TokenType> KEYWORDS_STR_TO_TTYPE {
-  {"BRO", BRO},
-  {"VIBESWITH", VIBESWITH},
+  {"CLASS", CLASS},
+  {"INHERITS", INHERITS},
   {"FOR", FOR},
-  // {"START", START},
-  // {"END", END},
-  // {"STEP", STEP},
   {"IF", IF},
   {"ELSE", ELSE},
   {"WHILE", WHILE},
@@ -109,17 +110,6 @@ static std::unordered_map<std::string, TokenType> KEYWORDS_STR_TO_TTYPE {
   {"NONE", NONE},
   {"NEW", NEW},
   {"KILL", KILL}
-  /*
-  {"INT_CONST", INT_CONST},
-  {"BOOL_CONST", BOOL_CONST},
-  {"VERSE_CONST", VERSE_CONST},
-  {"ASSIGN", ASSIGN},
-  {"LEQ", LEQ},
-  {"GEQ", GEQ},
-  {"EQ", EQ},
-  {"ASSIGN_PLUS", ASSIGN_PLUS},
-  {"ASSIGN_SUB", ASSIGN_SUB},
-  {"ASSIGN_MUL", ASSIGN_MUL},
-  {"ASSIGN_DIV", ASSIGN_DIV},
-  */
 };
+
+#endif // TOKEN_H

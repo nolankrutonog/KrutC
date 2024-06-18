@@ -1,18 +1,21 @@
+#ifndef TREE_H
+#define TREE_H
+
 #include <iostream>
 #include <vector>
+#include <set>
 
 
 
 enum StmtType {
   STMT = 500,
-  BRO_STMT = 501,
+  CLASS_STMT = 501,
   ATTR_STMT = 502,
   METHOD_STMT = 503,
   FORMAL_STMT = 504,
   FOR_STMT = 505,
   IF_STMT = 506,
   WHILE_STMT = 507,
-  // CONTAINER_STMT = 508,
 };
 
 enum ExprType {
@@ -38,10 +41,11 @@ enum ExprType {
 
 class Program;
 class Stmt;
-typedef class std::vector<Stmt*> StmtList; /* Stmtessions is a vector of Stmt ptrs */
+typedef class std::vector<Stmt*> StmtList; 
 
-class BroStmt;
+class ClassStmt;
 class Feature;
+typedef class std::vector<Feature*> FeatureList;
 class AttrStmt;
 class MethodStmt;
 class FormalStmt;
@@ -54,7 +58,7 @@ class ExprStmt;
 typedef class std::vector<ExprStmt*> ExprList;
 class ReturnExpr;
 class IntConstExpr;
-class VerseConstExpr;
+class StrConstExpr;
 class BoolConstExpr;
 class ListConstExpr;
 class ObjectIdExpr;
@@ -65,7 +69,7 @@ class ContExpr;
 class BreakExpr;
 class NoneExpr;
 class KillExpr;
-class TypeExpr;
+class Type_;
 
 
 
@@ -74,7 +78,6 @@ class TypeExpr;
   Defines the KrutC language. A program is represented as a list (vector) of stmts.
   Every stmt can be broken up into smaller parts. 
 */
-
 class Stmt {
 public:
   StmtType stmttype = STMT;
@@ -82,6 +85,8 @@ public:
   virtual ~Stmt() = default;
   virtual void dump(int indent) = 0;
   virtual std::string classname() { return "Stmt"; };
+
+  virtual Type_ *typecheck() = 0;
 };
 
 class Program {
@@ -89,17 +94,21 @@ class Program {
 public:
   Program() {}
   void add_stmt(Stmt *stmt) { stmt_list.push_back(stmt); } 
+  int len() { return (int) stmt_list.size(); }
+  Stmt *ith(int i) { return stmt_list[i]; }
   void dump(); 
+  StmtList get_stmt_list() { return stmt_list; }
 };
 
 class ExprStmt : public Stmt {
 public:
   int lineno = 0;
   ExprType exprtype = EXPR_EXPR;
+  // ExprStmt *type;
   virtual std::string classname() { return "ExprStmt";}
   virtual void dump(int indent);
-
-  std::string get_name() { return "ExprStmt"; }
+  // virtual Type_ *typecheck();
+  
 };
 
 
@@ -110,21 +119,22 @@ public:
 //
 //
 ////////////////////////////////////////////////////////////
-class BroStmt: public Stmt {
+class ClassStmt: public Stmt {
   std::string name;
-  std::vector<std::string> vibers;
-  StmtList stmt_list;
+  std::set<std::string> parents;
+  FeatureList feature_list;
 
 public:
-  BroStmt(std::string name, std::vector<std::string> vibers, StmtList stmt_list):
-    name(name), vibers(vibers), stmt_list(stmt_list) {}
-  StmtType stmttype = BRO_STMT; 
-  std::string classname() { return "BroStmt"; } 
+  ClassStmt(std::string name, std::set<std::string> parents, FeatureList feature_list):
+    name(name), parents(parents), feature_list(feature_list) {}
+  StmtType stmttype = CLASS_STMT; 
+  std::string classname() { return "ClassStmt"; } 
   void dump(int indent); 
 
   std::string get_name() { return name; } 
-  std::vector<std::string> get_vibers() { return vibers; } 
-  StmtList get_stmt_list() { return stmt_list; } 
+  std::set<std::string> get_parents() { return parents; } 
+  FeatureList get_feature_list() { return feature_list; } 
+  Type_ *typecheck();
 
 };
 
@@ -136,81 +146,61 @@ public:
 
 /* in the form TYPEID OBJECTID = EXPRSTMT; */
 class AttrStmt : public Feature {
-  TypeExpr *type;
+  Type_ *type;
   std::string name;
   ExprStmt *init;
 public:
-  AttrStmt(TypeExpr *type, std::string name, ExprStmt *init) : 
+  AttrStmt(Type_ *type, std::string name, ExprStmt *init) : 
     type(type), name(name), init(init) {}
   StmtType stmttype = ATTR_STMT;
   void dump(int indent);
   bool is_method() { return false; } 
   std::string classname()  { return "AttrStmt"; } 
-  TypeExpr *get_type() { return type; } 
+  Type_ *get_type() { return type; } 
   std::string get_name() { return name; } 
   ExprStmt *get_init() { return init; }  
+  Type_ *typecheck();
 
 };
 
-// class ContainerStmt : public Feature {
-//   std::string type;
-//   std::string elem_type;
-//   std::string name;
-//   ExprStmt *init;
-
-// public:
-//   ContainerStmt(std::string type, std::string elem_type, std::string name, ExprStmt *init) : 
-//     type(type), elem_type(elem_type), name(name), init(init) {}
-//   StmtType stmttype = CONTAINER_STMT;
-//   void dump(int indent);
-//   std::string classname()  { return "ContainerStmt"; } 
-//   bool is_method() { return false; } 
-
-//   std::string get_type() { return type; } 
-//   std::string get_elem_type() { return elem_type; }
-//   std::string get_name() { return name; } 
-//   ExprStmt *get_init() { return init; }  
-
-// };
-
 class FormalStmt : public Stmt {
-  TypeExpr *type;
+  Type_ *type;
   std::string name;
 
 public:
-  FormalStmt(TypeExpr *type, std::string name) : type(type), name(name) {}
+  FormalStmt(Type_ *type, std::string name) : type(type), name(name) {}
   StmtType stmttype = FORMAL_STMT;
   void dump(int indent);
   std::string classname()  { return "FORMAL_STMT"; } 
   std::string get_name() { return name; } 
-  TypeExpr *get_type() { return type; } 
+  Type_ *get_type() { return type; } 
+  Type_ *typecheck();
 };
 
 
 
 /* in the form TYPEID OBJECTID(FORMAL_LIST) {STMT_LIST}*/
 class MethodStmt : public Feature {
+  Type_ *ret_type;
   std::string name;
-  TypeExpr *ret_type;
   FormalList formal_list;
   StmtList stmt_list;
 public:
-  MethodStmt(TypeExpr *ret_type, std::string name, FormalList formal_list, StmtList stmt):
+  MethodStmt(Type_ *ret_type, std::string name, FormalList formal_list, StmtList stmt):
     ret_type(ret_type), name(name), formal_list(formal_list), stmt_list(stmt) {}
   StmtType stmttype = METHOD_STMT;
   std::string classname() { return "MethodStmt"; } 
   void dump(int indent);
 
-
   bool is_method() { return true; } 
   std::string get_name() { return name; } 
-  TypeExpr *get_ret_type() { return ret_type; } 
+  Type_ *get_ret_type() { return ret_type; } 
   FormalList get_formal_list() { return formal_list; } 
   StmtList get_stmt_list() { return stmt_list; } 
+  Type_ *typecheck();
 
 };
 
-/* in the form FOR (OBJECTID, START=START_EXPR, END=END_EXPR, STEP=STEP_EXPR) {STMT_LIST}; */
 class ForStmt : public Stmt {
   Stmt *stmt;
   // ExprStmt *start;
@@ -219,19 +209,19 @@ class ForStmt : public Stmt {
   StmtList stmt_list;
 
 public:
-  ForStmt(Stmt *stmt, /* ExprStmt *start,*/ ExprStmt *cond, 
+  ForStmt(Stmt *stmt, ExprStmt *cond, 
           ExprStmt *repeat, StmtList stmt_list)
-    : stmt(stmt), /* start(start),*/ cond(cond), 
+    : stmt(stmt), cond(cond), 
       repeat(repeat), stmt_list(stmt_list) {}
   StmtType stmttype = FOR_STMT;
   void dump(int indent);
   std::string classname() { return "ForStmt"; }
 
   Stmt *get_formal() { return stmt; }
-  // ExprStmt *get_start() { return start; }
   ExprStmt *get_cond() { return cond; }
   ExprStmt *get_repeat() { return repeat; }
   StmtList get_stmt_list() { return stmt_list; }
+  Type_ *typecheck();
 };
 
 
@@ -251,6 +241,7 @@ public:
   ExprStmt *get_pred() { return pred; }
   StmtList get_then() { return then_branch; }
   StmtList get_else() { return else_branch; }
+  Type_ *typecheck();
 };
 
 class WhileStmt : public Stmt {
@@ -265,6 +256,7 @@ public:
 
   ExprStmt *get_pred() { return pred; }
   StmtList get_stmt_list() { return stmt_list; }
+  Type_ *typecheck();
 };
 
 
@@ -290,6 +282,7 @@ public:
   ExprStmt *get_lhs() { return lhs; }
   std::string get_op() { return op; }
   ExprStmt *get_rhs() { return rhs; }
+  Type_ *typecheck();
 };
 
 class DispatchExpr : public ExprStmt {
@@ -303,13 +296,14 @@ public:
     : calling_expr(calling_expr), name(name), args(args) {}
   ExprType exprtype = DISPATCH_EXPR;
   void dump(int indent);
+  std::string classname() { return "DispatchExpr"; }
 
   ExprStmt *get_calling_expr() { return calling_expr; }
   std::string get_name() { return name; }
   ExprList get_args() { return args; }
   
 
-  std::string classname() { return "DispatchExpr"; }
+  Type_ *typecheck();
 };
 
 
@@ -323,6 +317,7 @@ public:
   std::string classname() { return "ReturnExpr";}
 
   ExprStmt *get_expr() { return expr; }
+  Type_ *typecheck();
 };
 
 
@@ -335,28 +330,31 @@ public:
   std::string classname() { return "IntConstExpr"; }
 
   long get_val() { return val; }
+  Type_ *typecheck();
 };
 
-class VerseConstExpr : public ExprStmt {
-  const std::string verse;
+class StrConstExpr : public ExprStmt {
+  const std::string str;
 public: 
-  VerseConstExpr(std::string verse) : verse(verse) {}
+  StrConstExpr(std::string str) : str(str) {}
   ExprType exprtype = VERSE_CONST_EXPR;
   void dump(int indent);
-  std::string classname() { return "VerseConstExpr";}
+  std::string classname() { return "StrConstExpr";}
 
-  std::string get_verse() { return verse; }
+  std::string get_str() { return str; }
+  Type_ *typecheck();
 };
 
 class BoolConstExpr : public ExprStmt {
   int val;
 public:
-  BoolConstExpr(std::string bool_val) { val = bool_val == "facts" ? 1 : 0; }
+  BoolConstExpr(std::string bool_val) { val = bool_val == "true" ? 1 : 0; }
   ExprType exprtype = BOOL_CONST_EXPR;
   void dump(int indent);
   std::string classname() { return "BoolConstExpr";}
 
   int get_val() { return val; }
+  Type_ *typecheck();
 };
 
 class ListConstExpr : public ExprStmt {
@@ -368,6 +366,7 @@ public:
   std::string classname() { return "ListConstExpr"; }
 
   ExprList get_exprlist() { return exprlist; }
+  Type_ *typecheck();
 };
 
 class ListElemRef: public ExprStmt {
@@ -383,6 +382,7 @@ public:
   ExprStmt *get_list_name() { return list_name; }
   ExprStmt *get_index() { return index; }
 
+  Type_ *typecheck();
 };
 
 class ThisExpr : public ExprStmt {
@@ -392,6 +392,7 @@ public:
   ExprType exprtype = THIS_EXPR;
   std::string classname() { return "ThisExpr"; }
   void dump(int indent);
+  Type_ *typecheck();
 };
 
 class ContExpr : public ExprStmt {
@@ -401,6 +402,7 @@ public:
   ExprType exprtype = CONT_EXPR;
   std::string classname() { return "ContExpr"; }
   void dump(int indent);
+  Type_ *typecheck();
 };
 
 class BreakExpr: public ExprStmt {
@@ -410,6 +412,7 @@ public:
   ExprType exprtype = BREAK_EXPR;
   std::string classname() { return "BreakExpr"; }
   void dump(int indent);
+  Type_ *typecheck();
 };
 
 class ObjectIdExpr : public ExprStmt {
@@ -421,6 +424,7 @@ public:
   void dump(int indent);
 
   std::string get_name() { return name; }
+  Type_ *typecheck();
 };
 
 class NoneExpr : public ExprStmt {
@@ -432,6 +436,7 @@ public:
   void dump(int indent);
 
   std::string get_name() { return name; }
+  // Type_ *typecheck();
 
 };
 
@@ -444,6 +449,7 @@ public:
   void dump(int indent);
 
   ExprStmt *get_expr() { return expr; }
+  Type_ *typecheck();
 
 };
 
@@ -460,18 +466,27 @@ public:
   std::string get_name() { return name; }
   ExprStmt *get_error() { return expr; }
 
+  Type_ *typecheck();
 };
 
-class TypeExpr : public ExprStmt {
+/* this is not an actual expression, but a class used for 
+   typechecking. 
+
+  Basic types include:
+  object, int, str, bool, float(maybe?), list<object>, stack<object>
+*/
+class Type_ {
   std::string name;
-  TypeExpr *nested_type;
+  Type_ *nested_type;
 public:
-  TypeExpr(std::string name, TypeExpr *nested_type)
+  int lineno;
+  Type_(std::string name, Type_ *nested_type)
     : name(name), nested_type(nested_type) {}
-  ExprType exprtype = TYPE_EXPR;
-  std::string classname() { return "TypeExpr"; }
   void dump(int indent);
+  std::string to_str();
 
   std::string get_name() { return name; }
-  TypeExpr *get_nested_type() { return nested_type; }
+  Type_ *get_nested_type() { return nested_type; }
 };
+
+#endif // TREE_H

@@ -1,14 +1,15 @@
+/*
 Krut k;
-list<bool> l = [];
+list<bool> l = [facts, cap, cap, facts];
 list<object> l = [1, "gang", k];
 int x = l[0];
--- list<list<int>> l = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
-list<int> l = [1 + 3];
+-- gang<gang<int>> l = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+gang<int> l = [1 + 3];
 int x = l[0];
 
 int x = l[0][x]["gang"];
 
-list<int> l = [1, 2, 3];
+gang<int> l = [1, 2, 3];
 [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
 print();
 print(i);
@@ -17,4 +18,17 @@ for (int i = 0; i < l.size(); i += 1) {
   print(l[i]);
 }
 
-l[0].print(l[1].get_str().get_type().dump(gang[4].vibe()));
+l[0].print(l[1].get_str().get_type().dump(mygang[4].vibe()));
+*/
+
+/*
+list<int> l;
+bool<int> b;
+*/
+
+class Krut inherits Shay {
+
+};
+
+bool a = true;
+bool a = 1;
