@@ -45,15 +45,7 @@ FormalList Parser::parse_formallist() {
       }
     } else {
       type = parse_typeexpr(); 
-      // if (tbuff.lookahead(0).get_str() == ">") {
-      //   error_blank(tbuff.get_lineno(), "Error: unbalanced '<' '>' in type declaration.");
-
-      //   while (tbuff.lookahead(0).get_str() == ">") {
-      //     tbuff.get_next();
-      //   }
-      // }
     }
-    // tbuff.get_next();
 
     next = tbuff.lookahead(0);
     if (next.get_type() != OBJECTID) {
@@ -91,7 +83,7 @@ FormalList Parser::parse_formallist() {
 /* type name(FormalList) {StmtList};*/
 MethodStmt *Parser::parse_methodstmt(Type_ *type) {
   debug_msg("BEGIN parse_method_stmt()");
-  int methodstmt_lineno = tbuff.get_lineno();
+  int methodstmt_lineno = tbuff.lookahead(0).get_lineno();
   // TypeExpr *type;
   string name;
   FormalList formal_list;  
@@ -136,7 +128,7 @@ MethodStmt *Parser::parse_methodstmt(Type_ *type) {
 
 AttrStmt *Parser::parse_attrstmt(Type_ *type) {
   debug_msg("BEGIN parse_attrstmt()");
-  int attrstmt_lineno = tbuff.get_lineno();
+  int attrstmt_lineno = tbuff.lookahead(0).get_lineno();
   string name;
   ExprStmt *init;
 
@@ -155,7 +147,7 @@ AttrStmt *Parser::parse_attrstmt(Type_ *type) {
   } else if (decider_tok.get_str() == "="){ 
     tbuff.get_next(); // pop "="
     if (tbuff.lookahead(0).get_str() == ";") {
-      error_blank(tbuff.get_lineno(), "Error: expected expression after attribute definition.");
+      error_blank(tbuff.lookahead(0).get_lineno(), "Error: expected expression after attribute definition.");
       init = NULL;
     } else if (!build_expr_tq(";"))
       init = NULL;
@@ -178,7 +170,7 @@ Type_ *Parser::parse_typeexpr() {
 
   string name;
   Type_ *nested;
-  int lineno = tbuff.get_lineno();
+  int lineno = tbuff.lookahead(0).get_lineno();
 
   Token name_tok = tbuff.lookahead(0);
   if (name_tok.get_type() != TYPEID) {
@@ -214,7 +206,7 @@ Feature *Parser::parse_feature() {
   Type_ *type = parse_typeexpr();
 
   if (tbuff.lookahead(0).get_str() == ">") {
-    error_blank(tbuff.get_lineno(), "Error: unbalanced '<' '>' in type declaration.");
+    error_blank(tbuff.lookahead(0).get_lineno(), "Error: unbalanced '<' '>' in type declaration.");
     tbuff.get_next();
 
     while (tbuff.lookahead(0).get_str() == ">") {
@@ -242,7 +234,7 @@ Feature *Parser::parse_feature() {
 int Parser::parse_check_and_pop(string s) {
   Token t = tbuff.lookahead(0);
   if (t.get_str() != s) {
-    error_blank(tbuff.get_lineno(), "Error: Expected '" + s + "', instead got '" + t.get_str() + "'.");
+    error_blank(t.get_lineno(), "Error: Expected '" + s + "', instead got '" + t.get_str() + "'.");
     panic_recover({s});
     tbuff.get_next(); // pop t
     return -1;
@@ -255,7 +247,7 @@ int Parser::parse_check_and_pop(string s) {
 
 ForStmt *Parser::parse_for_stmt() {
   debug_msg("BEGIN parse_for_stmt()");
-  int forstmt_lineno = tbuff.get_lineno();
+  int forstmt_lineno = tbuff.lookahead(0).get_lineno();
   Stmt *stmt;
   ExprStmt *cond;
   ExprStmt *repeat;
@@ -348,7 +340,7 @@ vector<string> Parser::get_parents() {
       continue;
     } else {
       string err_msg = "Error: Expected ',' or '{' after INHERITEE.";
-      error_blank(tbuff.get_lineno(), err_msg);
+      error_blank(next.get_lineno(), err_msg);
       return parents;
     }
   }
@@ -358,7 +350,7 @@ vector<string> Parser::get_parents() {
 /* CLASS TYPEID [INHERITS [OBJECTID[, OBJECTID]*]]? { STMTLIST }; */
 ClassStmt *Parser::parse_class_stmt() {
   debug_msg("BEGIN parse_class_stmt()");
-  int classstmt_lineno = tbuff.get_lineno();
+  int classstmt_lineno = tbuff.lookahead(0).get_lineno();
   string name;
   vector<string> parents;
   FeatureList feature_list;
@@ -370,7 +362,7 @@ ClassStmt *Parser::parse_class_stmt() {
   Token next = tbuff.lookahead(0);
   if (next.get_type() != TYPEID) {
     string err_msg = "Error: CLASS name must start with a capital letter.";
-    error_blank(tbuff.get_lineno(), err_msg);
+    error_blank(next.get_lineno(), err_msg);
   }
 
   name = tbuff.get_next().get_str();
@@ -380,7 +372,7 @@ ClassStmt *Parser::parse_class_stmt() {
     parents = get_parents();
     if (parents.size() == 0) {
       string err_msg = "Error: Every CLASS must have one or more parent if keyword INHERITS is present";
-      error_blank(tbuff.get_lineno(), err_msg);
+      error_blank(next.get_lineno(), err_msg);
     }
   }
 
@@ -389,7 +381,7 @@ ClassStmt *Parser::parse_class_stmt() {
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "}") {
     if (tbuff.lookahead(0).get_type() != TYPEID) {
       string err_msg = "Error: Every CLASS must be defined by only METHODS or ATTRIBUTES.";
-      error_blank(tbuff.get_lineno(), err_msg);
+      error_blank(tbuff.lookahead(0).get_lineno(), err_msg);
       // recover to next typeid
       panic_recover({"}", ";"});
       continue;
@@ -408,7 +400,7 @@ ClassStmt *Parser::parse_class_stmt() {
 
 IfStmt *Parser::parse_if_stmt() {
   debug_msg("BEGIN parse_if_stmt()");
-  int lineno = tbuff.get_lineno();
+  int lineno = tbuff.lookahead(0).get_lineno();
   ExprStmt *pred;
   StmtList then_branch;
   StmtList else_branch;
@@ -460,7 +452,7 @@ IfStmt *Parser::parse_if_stmt() {
 
 WhileStmt *Parser::parse_while_stmt() {
   debug_msg("BEGIN parse_while_stmt()");
-  int lineno = tbuff.get_lineno();
+  int lineno = tbuff.lookahead(0).get_lineno();
   ExprStmt *pred;
   StmtList stmt_list;
 
@@ -531,7 +523,7 @@ void Parser::calibrate_expr_tq() {
 /* builds up an expression token deque which stops after finding 'S'*/
 bool Parser::build_expr_tq(string s) {
   // deque<Token> tvec;
-  int lineno = tbuff.get_lineno();
+  int lineno = tbuff.lookahead(0).get_lineno();
   int binop_index = -1;
   int binop_prec= -1;
   int paren_stack = 0;
@@ -1030,7 +1022,7 @@ void Parser::token_dump() {
     while (tbuff.has_next()) {
       Token t = tbuff.get_next();
       if (t.get_type() == ERROR) {
-        error_blank(tbuff.get_lineno(), t.get_str());
+        error_blank(t.get_lineno(), t.get_str());
       }
     }
   } else {

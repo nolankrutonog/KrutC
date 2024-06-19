@@ -17,11 +17,11 @@ void Program::dump() {
 }
 
 void ClassStmt::dump(int n) {
-  indent(n); cout << "bro" << endl;
+  indent(n); cout << "class" << endl;
   indent(n + 1); cout << name << endl;
   if (parents.size() > 0) {
     indent(n + 2);
-    cout << "vibers: ";
+    cout << "inherits: ";
     for (string viber: parents) {
       cout <<  viber + " ";
     }

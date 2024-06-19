@@ -25,7 +25,7 @@ public:
     if (token_dump)
       t.dump();
     buffer.pop_front();
-    curr_lineno = t.get_lineno();
+    // curr_lineno = t.get_lineno();
     return t;
   }
 
@@ -36,15 +36,15 @@ public:
     return buffer[n];
   }
 
-  int get_lineno() {
-    return curr_lineno;
-  }
+  // int get_lineno() {
+  //   return curr_lineno;
+  // }
 
 private:
   Lexer lexer;
   std::deque<Token> buffer;
   bool token_dump;
-  int curr_lineno = 0;
+  // int curr_lineno = 0;
 
   void fill_buffer() {
     while (lexer.has_more()) {

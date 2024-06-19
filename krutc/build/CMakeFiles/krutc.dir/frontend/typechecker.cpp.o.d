@@ -823,4 +823,5 @@ CMakeFiles/krutc.dir/frontend/typechecker.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/recursive_directory_iterator.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/u8path.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/scopetable.h

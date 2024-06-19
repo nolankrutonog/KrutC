@@ -237,7 +237,6 @@ Token Lexer::get_next_token() {
     t = Token(curr_lineno, ERROR, err_msg);
     break;
   }
-
   return t;
 }
 

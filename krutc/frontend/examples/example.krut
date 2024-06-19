@@ -5,6 +5,8 @@ for (int i = 0; i < 10; i += 1) {
 
 }
 
+
+
 class Krut {
   int age;
   string name;
@@ -16,9 +18,17 @@ class Krut {
   void set_name(string name) { name = name; }
 }
 
-class A inherits F {}
+class A {}
+class A {}
+/*
 class B inherits A, C {}
 class C inherits A {}
 class D inherits C {}
 class E inherits D, B {}
-class F inherits Krut {}
+class F inherits E {}
+
+*/
+
+-- class Noli inherits Soren {}
+-- class Soren inherits Noli {}
+

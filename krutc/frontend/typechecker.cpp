@@ -30,6 +30,7 @@ using namespace std;
 #define Pop_Front "pop_front"
 #define Pop "pop"
 #define Push "push"
+#define Contains "contains"
 
 static const set<string> basic_classes = {
   "void", 
@@ -46,12 +47,11 @@ static string curr_filename;
 static int semant_errors = 0;
 static ScopeTable scopetable;
 
-// static set<Type_*> classes; // defines the basic classes Type_ expressions
 static map<string, Type_*> class_type;
 static map<string, ClassStmt*> classes;
 static map<string, vector<string>> class_parents;
-static map<string, int> class_tags;
-static int next_class_tag = 0;
+// static map<string, int> class_tags;
+// static int next_class_tag = 0;
 static map<string, set<MethodStmt*>> class_methods;
 static map<string, set<AttrStmt*>> class_attrs;
 
@@ -82,7 +82,7 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Void] = new Type_(Void, NULL);
   class_parents[Void] = {};
-  class_tags[Void] = next_class_tag++;
+  // class_tags[Void] = next_class_tag++;
   // classes[Void] = new ClassStmt(Void, {}, {});
 
   /*
@@ -92,7 +92,7 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Object] = new Type_(Object, NULL);
   class_parents[Object] = {};
-  class_tags[Object] = next_class_tag++;
+  // class_tags[Object] = next_class_tag++;
   // classes[Object] = new ClassStmt(Object, {}, {});
 
   /*
@@ -102,7 +102,7 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Bool] = new Type_(Bool, NULL);
   class_parents[Bool].push_back(Object);
-  class_tags[Bool] = next_class_tag++;
+  // class_tags[Bool] = next_class_tag++;
   // classes[Bool] = new ClassStmt(Bool, {Object}, {});
   
   /*
@@ -112,7 +112,7 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Int] = new Type_(Bool, NULL);
   class_parents[Int].push_back(Object);
-  class_tags[Int] = next_class_tag++;
+  // class_tags[Int] = next_class_tag++;
   // classes[Int] = new ClassStmt(Int, {Object}, {});
 
   /*
@@ -122,7 +122,7 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Char] = new Type_(Char, NULL);
   class_parents[Char].push_back(Object);
-  class_tags[Char] = next_class_tag++;
+  // class_tags[Char] = next_class_tag++;
   // classes[Char] = new ClassStmt(Char, {Object}, {});
 
   /*
@@ -153,7 +153,7 @@ void TypeChecker::initialize_basic_classes() {
     new MethodStmt(class_type[Char], Back, {}, {})
   };
   class_methods[String] = string_methods;
-  class_tags[String] = next_class_tag++;
+  // class_tags[String] = next_class_tag++;
   // classes[String] = new ClassStmt(String, {Object}, string_methods);
   
   /*
@@ -164,10 +164,11 @@ void TypeChecker::initialize_basic_classes() {
     bool is_empty() -- returns true on length == 0, false otherwise
     void push_back(object o) -- adds object to end
     void push_front(object o) -- adds object to front
-    object front() -- returns first object (None on empty)
-    object back() -- returns last object
     void pop_front() -- pops first object
     void pop_back() -- pops last object
+    object front() -- returns first object (None on empty)
+    object back() -- returns last object
+    int contains(object o) -- returns idx if o in list, else -1
     binary operators -- in the form `list1 op list2`
       acceptable ops: +, +=, ==, !=
 
@@ -189,10 +190,11 @@ void TypeChecker::initialize_basic_classes() {
     new MethodStmt(class_type[Void], Pop_Front, {}, {}),
     new MethodStmt(class_type[Void], Pop_Back, {}, {}),
     new MethodStmt(class_type[Object], Front, {}, {}),
-    new MethodStmt(class_type[Object], Back, {}, {})
+    new MethodStmt(class_type[Object], Back, {}, {}),
+    new MethodStmt(class_type[Int], Contains, {new FormalStmt(class_type[Object], Object)}, {})
   };
   class_methods[List] = list_methods; 
-  class_tags[List] = next_class_tag++;
+  // class_tags[List] = next_class_tag++;
 
   /*
   stack<object> ->
@@ -214,7 +216,7 @@ void TypeChecker::initialize_basic_classes() {
     new MethodStmt(class_type[Void], Pop, {}, {}),
   };
   class_methods[Stack] = stack_methods; 
-  class_tags[Stack] = next_class_tag++;
+  // class_tags[Stack] = next_class_tag++;
 
 }
 
@@ -226,19 +228,37 @@ void TypeChecker::initialize_declared_classes() {
     ClassStmt *cs = dynamic_cast<ClassStmt*>(s);
     if (!cs)
       continue;
+    string name = cs->get_name();
     // if class defined twice
-    if (class_type.find(cs->get_name()) != class_type.end()) {
-      string err_msg = "Error: Class " + cs->get_name() + " cannot be defined twice.";
+    if (class_type.find(name) != class_type.end()) {
+      string err_msg = "Error: Class " + name + " cannot be defined twice.";
       error(cs->lineno, err_msg);
       continue;
     }
-    class_type[cs->get_name()] = new Type_(cs->get_name(), NULL);
-    class_tags[cs->get_name()] = next_class_tag++;
+    class_type[name] = new Type_(name, NULL);
 
-    class_parents[cs->get_name()] = cs->get_parents();
-    /* object is parent of every declared class */
-    // class_parents[cs->get_name()].push_back(Object);
-
+    /* check that parents arent repeating and are not from base classes */
+    vector<string> parents = cs->get_parents();
+    for (string parent: parents) {
+      if (class_type.find(parent) == class_type.end()) {
+        // unknown parent
+        string err_msg = "Error: Class " + name + " inheriting from unknown class " + parent;
+        error(cs->lineno, err_msg);
+        /* erase bad parents so we can typecheck as if they have good parents */
+        parents.erase(remove(parents.begin(), parents.end(), parent), parents.end());
+        continue;
+      }
+      if (basic_classes.find(parent) != basic_classes.end()) {
+        string err_msg = "Error: Class " + name + " cannot inherit from base class " + parent;
+        error(cs->lineno, err_msg);
+        /* erase bad parents so we can typecheck as if they have good parents */
+        parents.erase(remove(parents.begin(), parents.end(), parent), parents.end());
+        continue;
+      }
+    }
+    if (parents.empty())
+      parents.push_back(Object);
+    class_parents[name] = parents;
 
     FeatureList feature_list = cs->get_feature_list();
     for (Feature *f: feature_list) {
@@ -269,40 +289,41 @@ void TypeChecker::initialize_declared_classes() {
       }
     }
   }
-  check_declared_classes_parents();
+  // check_declared_classes_parents();
 }
 
-/* make sure parents are real and are not basic classes. Has to be done after
-   collecting all classes because they are global
-*/
-void TypeChecker::check_declared_classes_parents() {
-  for (int i = 0; i < program.len(); i++) {
-    /* have to iterate through program rather than classes to get lineno */
-    ClassStmt *cs = dynamic_cast<ClassStmt*>(program.ith(i));
-    if (!cs)
-      continue;
-    string name = cs->get_name();
-    vector<string> parents = class_parents[name];
-    for (string parent: parents) {
-      if (class_type.find(parent) == class_type.end()) {
-        // unknown parent
-        string err_msg = "Error: Class " + name + " inheriting from unknown class " + parent;
-        error(cs->lineno, err_msg);
-        /* erase bad parents so we can typecheck as if they have good parents */
-        class_parents[name].erase(remove(class_parents[name].begin(), class_parents[name].end(), parent), class_parents[name].end());
-        continue;
-      }
-      if (basic_classes.find(parent) != basic_classes.end()) {
-        string err_msg = "Error: Class " + name + " cannot inherit from base class " + parent;
-        error(cs->lineno, err_msg);
-        /* erase bad parents so we can typecheck as if they have good parents */
-        class_parents[name].erase(remove(class_parents[name].begin(), class_parents[name].end(), parent), class_parents[name].end());
-        continue;
-      }
-    }
-    class_parents[cs->get_name()].push_back(Object);
-  }
-}
+// /* make sure parents are real and are not basic classes. Has to be done after
+//    collecting all classes because they are global
+// */
+// void TypeChecker::check_valid_parents() {
+//   for (int i = 0; i < program.len(); i++) {
+//     /* have to iterate through program rather than classes to get lineno */
+//     ClassStmt *cs = dynamic_cast<ClassStmt*>(program.ith(i));
+//     if (!cs)
+//       continue;
+//     string name = cs->get_name();
+//     vector<string> parents = class_parents[name];
+//     for (string parent: parents) {
+//       if (class_type.find(parent) == class_type.end()) {
+//         // unknown parent
+//         string err_msg = "Error: Class " + name + " inheriting from unknown class " + parent;
+//         error(cs->lineno, err_msg);
+//         /* erase bad parents so we can typecheck as if they have good parents */
+//         class_parents[name].erase(remove(class_parents[name].begin(), class_parents[name].end(), parent), class_parents[name].end());
+//         continue;
+//       }
+//       if (basic_classes.find(parent) != basic_classes.end()) {
+//         string err_msg = "Error: Class " + name + " cannot inherit from base class " + parent;
+//         error(cs->lineno, err_msg);
+//         /* erase bad parents so we can typecheck as if they have good parents */
+//         class_parents[name].erase(remove(class_parents[name].begin(), class_parents[name].end(), parent), class_parents[name].end());
+//         continue;
+//       }
+//     }
+//     if (parents.empty())
+//       class_parents[cs->get_name()].push_back(Object);
+//   }
+// }
 
 /* prints class_parents */
 void print_class_parents() {
@@ -320,37 +341,48 @@ void print_class_parents() {
   }
 }
 
-/* 
-  Creates graph where nodes are classes and edges are from children to parents. 
-  Returns false if contains inheritance cycles, true otherwise. 
-*/
-bool TypeChecker::check_inheritance_cycles() {
-
-  /* create graph 
-     nodes --> classes
-     edges --> from children to parents 
-  */
-  Graph graph = Graph();
+/* creates graph where nodes are classes and edges are from parents to children. */
+InheritanceGraph TypeChecker::create_inheritance_graph() {
+  InheritanceGraph graph = InheritanceGraph();
 
   for (pair<string, vector<string>> cp: class_parents) {
     /* build graph */
     string curr_class = cp.first;
+    if (basic_classes.find(curr_class) != basic_classes.end())
+      continue;
     graph.add_node(curr_class);
-    for (string parent: cp.second) {
-      graph.add_edge(curr_class, parent);
+    for (string p: cp.second) {
+      graph.add_parent(curr_class, p);
+      graph.add_child(p, curr_class);
     }
   }
 
-  vector<string> cycle_path;
-  if (graph.has_cycle(cycle_path)) {
-    string err_msg = "Error: cycle in classes " + cycle_path[0];
-    for (int i = 1; i < (int) cycle_path.size(); i++) {
-      err_msg += ", " + cycle_path[i];
+  return graph;
+
+}
+
+/* 
+  Returns false if graph contains inheritance cycles, true otherwise. 
+*/
+bool TypeChecker::check_inheritance_cycles(InheritanceGraph& g) {
+
+  vector<vector<string>> cycle_paths;
+  g.detect_cycles(cycle_paths);
+  if (!cycle_paths.empty()) {
+    for (vector<string> cycle: cycle_paths) {
+      string err_msg = "Error: cycle in classes " + cycle[0];
+      for (int i = 1; i < (int) cycle.size(); i++) {
+        err_msg += ", " + cycle[i];
+      }
+      error(0, err_msg);
+
     }
-    error(0, err_msg);
     return false;
   }
   return true;
+}
+
+void TypeChecker::populate_meth_attr_tables(InheritanceGraph& g) {
 
 }
 
@@ -361,20 +393,15 @@ int TypeChecker::typecheck() {
 
   initialize_basic_classes();
   initialize_declared_classes();
+  // check_valid_parents();
 
-  if (!check_inheritance_cycles()) {
+  InheritanceGraph graph = create_inheritance_graph();
+  if (!check_inheritance_cycles(graph)) {
     /* cant continue to add methods/attrs to classes if there are inheritance cycles */
     return semant_errors;
   }
 
-  /* AT EVERY SCOPE: identify every new CLASS 
-     check inheritance to make sure there arent cycles
-
-  */
-
-  /* check inheritance at every scope */
-
-
+  populate_meth_attr_tables(graph);
 
   scopetable.push_scope();
 

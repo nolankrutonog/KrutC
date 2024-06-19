@@ -1636,6 +1636,7 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: /Users/nolankrutonog/Desktop/workspace
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h \
@@ -4906,6 +4907,7 @@ CMakeFiles/krutc.dir/frontend/typechecker.cpp.o: /Users/nolankrutonog/Desktop/wo
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/scopetable.h \
@@ -4928,6 +4930,8 @@ CMakeFiles/krutc.dir/frontend/typechecker.cpp.o: /Users/nolankrutonog/Desktop/wo
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tokenbuffer.h:
 
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h:
+
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/map:
 
