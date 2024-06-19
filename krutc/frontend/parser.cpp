@@ -319,10 +319,10 @@ ForStmt *Parser::parse_for_stmt() {
   return for_stmt;
 }
 
-set<string> Parser::get_inheritees() {
+vector<string> Parser::get_parents() {
   tbuff.get_next(); // pop keyword INHERITS
 
-  set<string> parents;
+  vector<string> parents;
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "{") {
     Token parent = tbuff.lookahead(0);
     if (parent.get_type() != TYPEID) {
@@ -330,11 +330,12 @@ set<string> Parser::get_inheritees() {
       error_blank(parent.get_lineno(), err_msg);
       /* dont need to return now because we may be able to recover */
     } else {
-      if (parents.find(parent.get_str()) != parents.end()) {
+      // if (parents.find(parent.get_str()) != parents.end()) {
+      if (find(parents.begin(), parents.end(), parent.get_str()) != parents.end()) {
         string err_msg = "Error: INHERITEE " + parent.get_str() + " cannot be defined twice.";
         error_blank(parent.get_lineno(), err_msg);
       } else {
-        parents.insert(parent.get_str());
+        parents.push_back(parent.get_str());
       }
     }
     tbuff.get_next(); // pop parent token
@@ -359,7 +360,7 @@ ClassStmt *Parser::parse_class_stmt() {
   debug_msg("BEGIN parse_class_stmt()");
   int classstmt_lineno = tbuff.get_lineno();
   string name;
-  set<string> parents;
+  vector<string> parents;
   FeatureList feature_list;
 
   Token class_tok = tbuff.lookahead(0);
@@ -376,7 +377,7 @@ ClassStmt *Parser::parse_class_stmt() {
 
   next = tbuff.lookahead(0);
   if (next.get_type() == INHERITS) {
-    parents = get_inheritees();
+    parents = get_parents();
     if (parents.size() == 0) {
       string err_msg = "Error: Every CLASS must have one or more parent if keyword INHERITS is present";
       error_blank(tbuff.get_lineno(), err_msg);

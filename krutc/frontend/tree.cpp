@@ -28,8 +28,8 @@ void ClassStmt::dump(int n) {
     cout << endl;
 
   }
-  for (Stmt *stmt : stmt_list) {
-    stmt->dump(n + 2);
+  for (Feature *f : feature_list) {
+    f->dump(n + 2);
   }
 }
 

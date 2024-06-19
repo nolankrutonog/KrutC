@@ -1,1 +1,24 @@
 int x = 1;
+
+for (int i = 0; i < 10; i += 1) {
+  print(i);
+
+}
+
+class Krut {
+  int age;
+  string name;
+
+  int get_age() { return age; } 
+  void set_age(int a) { age = a; }
+
+  string get_name() { return name; }
+  void set_name(string name) { name = name; }
+}
+
+class A inherits F {}
+class B inherits A, C {}
+class C inherits A {}
+class D inherits C {}
+class E inherits D, B {}
+class F inherits Krut {}

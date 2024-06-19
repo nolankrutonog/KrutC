@@ -121,18 +121,18 @@ public:
 ////////////////////////////////////////////////////////////
 class ClassStmt: public Stmt {
   std::string name;
-  std::set<std::string> parents;
+  std::vector<std::string> parents;
   FeatureList feature_list;
 
 public:
-  ClassStmt(std::string name, std::set<std::string> parents, FeatureList feature_list):
+  ClassStmt(std::string name, std::vector<std::string> parents, FeatureList feature_list):
     name(name), parents(parents), feature_list(feature_list) {}
   StmtType stmttype = CLASS_STMT; 
   std::string classname() { return "ClassStmt"; } 
   void dump(int indent); 
 
   std::string get_name() { return name; } 
-  std::set<std::string> get_parents() { return parents; } 
+  std::vector<std::string> get_parents() { return parents; } 
   FeatureList get_feature_list() { return feature_list; } 
   Type_ *typecheck();
 

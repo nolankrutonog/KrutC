@@ -92,7 +92,7 @@ private:
     int parse_check_and_pop(std::string s);
 
     ClassStmt *parse_class_stmt();
-    std::set<std::string> get_inheritees();
+    std::vector<std::string> get_parents();
 
     ExprTQ expr_tq;
     bool build_expr_tq(std::string s);
