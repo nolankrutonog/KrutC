@@ -157,9 +157,11 @@ void Type_::dump(int n) {
   }
 }
 string Type_::to_str() {
-  cout << name;
+  string ret_str = name;
+  
   if (nested_type)
-    cout << "<" << nested_type->to_str() << ">";
+    ret_str += "<" + nested_type->to_str() + ">";
+  return ret_str;
 }
 
 void FormalStmt::dump(int n) {

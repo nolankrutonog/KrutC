@@ -451,7 +451,9 @@ Type_ *MethodStmt::typecheck() {
 Type_ *IfStmt::typecheck() {}
 
 Type_ *ClassStmt::typecheck() {
-
+  for (Feature *f: feature_list) {
+    f->typecheck();
+  }
 }
 
 Type_ *ForStmt::typecheck() {}

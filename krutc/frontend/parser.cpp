@@ -384,6 +384,7 @@ ClassStmt *Parser::parse_class_stmt() {
       error_blank(tbuff.lookahead(0).get_lineno(), err_msg);
       // recover to next typeid
       panic_recover({"}", ";"});
+      tbuff.get_next();
       continue;
     }
     Feature *f = parse_feature();
@@ -460,7 +461,7 @@ WhileStmt *Parser::parse_while_stmt() {
 
   /* evaluate expression */
   parse_check_and_pop("(");
-  if (build_expr_tq(")"))
+  if (!build_expr_tq(")"))
     pred = NULL;
   else 
     pred = parse_exprstmt();
@@ -653,12 +654,17 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_list_elem_ref_expr();
   }
 
+  if (expr_tq.tq.back().get_str() == ")") {
+    expr = parse_dispexpr();
+  }
+
 
   if (!expr_tq.tq.empty()) {
     if (t.get_type() == OBJECTID) {
       // error here on an attribute that is not basic and lowercase
       // ex: gang g;
     }
+    bool val = expr_tq.tq.back().get_str() == ")";
     error_blank(lineno, "Error, unrecognized expression.");
     expr_tq.dump();
     expr_tq.tq.clear();
