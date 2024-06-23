@@ -61,6 +61,7 @@ static set<MethodStmt*> global_methods;               /* set of global methods *
 
 static bool conforms(Type_ *a, Type_ *b);
 static void populate_parent_feature_tables(string& child, map<string, bool>& visited);
+static bool check_valid_type_(Type_ *t);
 bool check_method_sigs(MethodStmt *p, MethodStmt *c, const string& cname);
 
 void error(int lineno, std::string err_msg) {
@@ -240,6 +241,22 @@ void TypeChecker::initialize_basic_classes() {
 
 }
 
+/* check return types and formals are valid types. ex: list, char<string> are invalid */ 
+bool check_valid_type_(Type_ *t) {
+  Type_ *nested = t->get_nested_type();
+  if (t->get_name() == List || t->get_name() == Stack) {
+    if (nested == NULL) {
+      return false; 
+    } else {
+      check_valid_type_(nested);
+    }
+  } else if (nested) {
+    return false;
+  }
+  return true;
+    
+}
+
 /* Declared classes (of the form class ClassName {...}) can only be decalared in outer scope */
 void TypeChecker::initialize_declared_classes() {
   for (int i = 0; i < program.len(); i++) {
@@ -270,8 +287,24 @@ void TypeChecker::initialize_declared_classes() {
             error(m->lineno, err_msg);
             continue;
           }
+          
         }
         existing_methods->insert(m); // this should insert it in class_methods bc ptr
+
+        bool valid_ret_type = check_valid_type_(m->get_ret_type());
+        if (!valid_ret_type) {
+          string err_msg = "Error: Method `" + m->get_name() + "` has invalid return type `" + m->get_ret_type()->to_str() + "`";
+          error(m->lineno, err_msg);
+        }
+
+        FormalList formal_list = m->get_formal_list();
+        for (FormalStmt *f: formal_list) {
+          bool valid_formal_type = check_valid_type_(f->get_type());
+          if (!valid_formal_type) {
+            string err_msg = "Error: Formal `" + f->get_name() + "` has invalid type `" + f->get_type()->to_str() + "`";
+            error(f->lineno, err_msg);
+          }
+        }
 
       } else {
         AttrStmt *a = static_cast<AttrStmt*>(f);
@@ -282,6 +315,10 @@ void TypeChecker::initialize_declared_classes() {
             error(a->lineno, err_msg);
             continue;
           }
+        }
+        if (!check_valid_type_(a->get_type())) {
+          string err_msg = "Error: Attribute `" + a->get_name() + "` in class `" + name + "` has invalid type `" + a->get_type()->to_str() + "`";
+          error(a->lineno, err_msg);
         }
         existing_attrs->insert(a); // this should insert it in class_attrs bc ptr
       }
@@ -401,7 +438,7 @@ void populate_parent_feature_tables(string& child, map<string, bool>& visited) {
 bool check_method_sigs(MethodStmt *p, MethodStmt *c, const string& cname) {
   bool ret_val = true;
   if (!conforms(c->get_ret_type(), p->get_ret_type())) {
-    string err_msg = "Error: Return type `" + c->get_ret_type()->to_str() + "` of method `" + c->get_name() + "` in class `" + cname + "`";
+    string err_msg = "Error: Return type `" + c->get_ret_type()->to_str() + "`"; //  of method `" + c->get_name() + "` in class `" + cname + "`";
     err_msg += " does not conform to inherited return type `" + p->get_ret_type()->to_str() + "` defined on line " + to_string(p->lineno);
     error(c->lineno, err_msg);
     ret_val = false; 
@@ -462,10 +499,15 @@ int TypeChecker::typecheck() {
   check_valid_class_parents();
 
   if (!check_inheritance_cycles()) {
-    //  cant continue to add methods/attrs to classes if there are inheritance cycles
+    /* cannot typecheck expressions if there are inheritance cycles */
     return semant_errors++;
   }
   populate_feature_tables();
+
+  if (semant_errors) {
+    /* cannot typecheck expressions if issues with methods/classes etc. */
+    return semant_errors;
+  }
 
   // scopetable.push_scope();
 
@@ -513,6 +555,10 @@ bool conforms_util(const string& a, const string& b) {
 
 /* Given two ptrs to Type_ objects, returns true if A conforms to B, false otherwise. */
 bool conforms(Type_ *a, Type_ *b) {
+  if (b->get_name() == Object) {
+    /* every class conforms to Object class */
+    return true;
+  }
 
   if (!conforms_util(a->get_name(), b->get_name())) {
     return false;
@@ -532,54 +578,6 @@ bool conforms(Type_ *a, Type_ *b) {
 }
 
 
-//////////////////////////////////////////////////////////////
-//
-// 
-// Inheritance Graph 
-//
-// 
-//////////////////////////////////////////////////////////////
-
-
-/*
-bool InheritanceGraph::dfs(const string& node, set<string>& visited, 
-          set<string>& stack, vector<string>& path) {
-  visited.insert(node);
-  stack.insert(node);
-  path.push_back(node);
-
-  for (const auto& child : children[node]) {
-    if (stack.find(child) != stack.end()) {
-      path.push_back(child);  // complete the cycle path
-      return true;
-    }
-    if (visited.find(child) == visited.end()) {
-      if (dfs(child, visited, stack, path)) {
-        return true;
-      }
-    }
-  }
-
-  stack.erase(node);
-  path.pop_back();
-  return false;
-}
-
-void InheritanceGraph::detect_cycles(vector<vector<string>>& cycle_paths) {
-  set<string> visited;
-  set<string> stack;
-  vector<string> path;
-  for (const auto& node : nodes) {
-    if (visited.find(node) == visited.end()) {
-      if (dfs(node, visited, stack, path)) {
-        // print_cycle(path);
-        cycle_paths.push_back(path);
-        path.clear();
-      }
-    }
-  }
-}
-*/
 
 //////////////////////////////////////////////////////////////
 //

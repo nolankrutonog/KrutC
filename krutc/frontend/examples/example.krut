@@ -1,6 +1,7 @@
 
 
 class A inherits B, C {
+  char z;
   int a;
   list<string> m() { return; }
 }
@@ -8,7 +9,7 @@ class A inherits B, C {
 class B {
   int b;
   int d;
-  list m() {}
+  object m(char c) {}
 }
 
 class C {
