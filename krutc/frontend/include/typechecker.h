@@ -24,9 +24,8 @@ public:
   void initialize_declared_classes();
   void check_valid_class_parents();
 
-  // InheritanceGraph *create_inheritance_graph();
   bool check_inheritance_cycles();
-  void populate_meth_attr_tables();
+  void populate_feature_tables();
   
 };
 

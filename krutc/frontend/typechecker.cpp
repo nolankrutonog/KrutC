@@ -8,7 +8,7 @@
 
 using namespace std;
 
-/* basic object names */
+/* basic class names */
 #define Void "void"
 #define Object "object"
 #define Int "int"
@@ -47,15 +47,21 @@ static string curr_filename;
 static int semant_errors = 0;
 static ScopeTable scopetable;
 
-static map<string, Type_*> class_type;
-static map<string, ClassStmt*> classes;
-static map<string, vector<string>> class_parents;
-// static map<string, int> class_tags;
-// static int next_class_tag = 0;
-static map<string, set<MethodStmt*>> class_methods;
-static map<string, set<AttrStmt*>> class_attrs;
+static vector<string> class_names;                    /* vector of class names */
+static map<string, Type_*> class_type;                /* map from class name to Type_* */
+static map<string, ClassStmt*> classes;               /* map from class name to ClassStmt* */
+static map<string, vector<string>> class_parents;     /* map from class name to vector of parents */
+static map<string, set<MethodStmt*>> class_methods;   /* map from class name to its MethodStmt* */
+static map<string, set<AttrStmt*>> class_attrs;       /* map from class name to its AttrStmt* */
+static map<string, set<MethodStmt*>> parent_methods;  /* intermediate map from class name to its parent methods */
+static map<string, set<AttrStmt*>> parent_attrs;      /* intermediate map from class name to its parent attrs */
 
-static set<MethodStmt*> global_methods;
+static set<MethodStmt*> global_methods;               /* set of global methods */
+
+
+static bool conforms(Type_ *a, Type_ *b);
+static void populate_parent_feature_tables(string& child, map<string, bool>& visited);
+bool check_method_sigs(MethodStmt *p, MethodStmt *c, const string& cname);
 
 void error(int lineno, std::string err_msg) {
   semant_errors++;
@@ -82,8 +88,8 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Void] = new Type_(Void, NULL);
   class_parents[Void] = {};
-  // class_tags[Void] = next_class_tag++;
-  // classes[Void] = new ClassStmt(Void, {}, {});
+  class_names.push_back(Void);
+  classes[Void] = new ClassStmt(Void, {}, {});
 
   /*
   object -> 
@@ -92,8 +98,8 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Object] = new Type_(Object, NULL);
   class_parents[Object] = {};
-  // class_tags[Object] = next_class_tag++;
-  // classes[Object] = new ClassStmt(Object, {}, {});
+  class_names.push_back(Object);
+  classes[Object] = new ClassStmt(Object, {}, {});
 
   /*
   bool -> 
@@ -102,8 +108,8 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Bool] = new Type_(Bool, NULL);
   class_parents[Bool].push_back(Object);
-  // class_tags[Bool] = next_class_tag++;
-  // classes[Bool] = new ClassStmt(Bool, {Object}, {});
+  class_names.push_back(Bool);
+  classes[Bool] = new ClassStmt(Bool, {Object}, {});
   
   /*
   int -> 
@@ -112,8 +118,8 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Int] = new Type_(Bool, NULL);
   class_parents[Int].push_back(Object);
-  // class_tags[Int] = next_class_tag++;
-  // classes[Int] = new ClassStmt(Int, {Object}, {});
+  class_names.push_back(Int);
+  classes[Int] = new ClassStmt(Int, {Object}, {});
 
   /*
   char ->
@@ -122,8 +128,8 @@ void TypeChecker::initialize_basic_classes() {
   */
   class_type[Char] = new Type_(Char, NULL);
   class_parents[Char].push_back(Object);
-  // class_tags[Char] = next_class_tag++;
-  // classes[Char] = new ClassStmt(Char, {Object}, {});
+  class_names.push_back(Char);
+  classes[Char] = new ClassStmt(Char, {Object}, {});
 
   /*
   string ->
@@ -153,8 +159,12 @@ void TypeChecker::initialize_basic_classes() {
     new MethodStmt(class_type[Char], Back, {}, {})
   };
   class_methods[String] = string_methods;
-  // class_tags[String] = next_class_tag++;
-  // classes[String] = new ClassStmt(String, {Object}, string_methods);
+  class_names.push_back(String);
+  FeatureList string_features;
+  for (MethodStmt *m: string_methods) {
+    string_features.push_back(m);
+  }
+  classes[String] = new ClassStmt(String, {Object}, string_features);
   
   /*
   list<object> ->
@@ -194,7 +204,12 @@ void TypeChecker::initialize_basic_classes() {
     new MethodStmt(class_type[Int], Contains, {new FormalStmt(class_type[Object], Object)}, {})
   };
   class_methods[List] = list_methods; 
-  // class_tags[List] = next_class_tag++;
+  class_names.push_back(List);
+  FeatureList list_features;
+  for (MethodStmt *m: list_methods) {
+    list_features.push_back(m);
+  }
+  classes[List] = new ClassStmt(String, {Object}, list_features);
 
   /*
   stack<object> ->
@@ -216,7 +231,12 @@ void TypeChecker::initialize_basic_classes() {
     new MethodStmt(class_type[Void], Pop, {}, {}),
   };
   class_methods[Stack] = stack_methods; 
-  // class_tags[Stack] = next_class_tag++;
+  class_names.push_back(Stack);
+  FeatureList stack_features;
+  for (MethodStmt *m: stack_methods) {
+    stack_features.push_back(m);
+  }
+  classes[Stack] = new ClassStmt(String, {Object}, stack_features);
 
 }
 
@@ -236,35 +256,36 @@ void TypeChecker::initialize_declared_classes() {
       continue;
     }
     class_type[name] = new Type_(name, NULL);
+    class_names.push_back(name);
 
-    // FeatureList feature_list = cs->get_feature_list();
-    // for (Feature *f: feature_list) {
-    //   if (f->is_method()) {
-    //     MethodStmt *m = static_cast<MethodStmt*>(f);
-    //     set<MethodStmt*> *existing_methods = &class_methods[cs->get_name()];
-    //     for (MethodStmt *em: *existing_methods) {
-    //       // check current method against existing methods
-    //       if (em->get_name() == m->get_name()) {
-    //         string err_msg = "Error: Method " + m->get_name() + " cannot be defined twice in class " + cs->get_name();
-    //         error(m->lineno, err_msg);
-    //         continue;
-    //       }
-    //     }
-    //     existing_methods->insert(m); // this should insert it in class_methods bc ptr
+    FeatureList feature_list = cs->get_feature_list();
+    for (Feature *f: feature_list) {
+      if (f->is_method()) {
+        MethodStmt *m = static_cast<MethodStmt*>(f);
+        set<MethodStmt*> *existing_methods = &class_methods[cs->get_name()];
+        for (MethodStmt *em: *existing_methods) {
+          // check current method against existing methods
+          if (em->get_name() == m->get_name()) {
+            string err_msg = "Error: Method " + m->get_name() + " cannot be defined twice in class " + cs->get_name();
+            error(m->lineno, err_msg);
+            continue;
+          }
+        }
+        existing_methods->insert(m); // this should insert it in class_methods bc ptr
 
-    //   } else {
-    //     AttrStmt *a = static_cast<AttrStmt*>(f);
-    //     set<AttrStmt*> *existing_attrs = &class_attrs[cs->get_name()];
-    //     for (AttrStmt *ea: *existing_attrs) {
-    //       if (ea->get_name() == a->get_name()) {
-    //         string err_msg = "Error: Attribute " + a->get_name() + " cannot be defined twice in class " + cs->get_name();
-    //         error(a->lineno, err_msg);
-    //         continue;
-    //       }
-    //     }
-    //     existing_attrs->insert(a); // this should insert it in class_attrs bc ptr
-    //   }
-    // }
+      } else {
+        AttrStmt *a = static_cast<AttrStmt*>(f);
+        set<AttrStmt*> *existing_attrs = &class_attrs[cs->get_name()];
+        for (AttrStmt *ea: *existing_attrs) {
+          if (ea->get_name() == a->get_name()) {
+            string err_msg = "Error: Attribute " + a->get_name() + " cannot be defined twice in class " + cs->get_name();
+            error(a->lineno, err_msg);
+            continue;
+          }
+        }
+        existing_attrs->insert(a); // this should insert it in class_attrs bc ptr
+      }
+    }
   }
 }
 
@@ -276,7 +297,7 @@ void TypeChecker::check_valid_class_parents() {
     ClassStmt *cs = dynamic_cast<ClassStmt*>(s);
     if (!cs)
       continue;
-    
+
     string name = cs->get_name();
     vector<string> parents = cs->get_parents();
     for (string parent: parents) {
@@ -340,9 +361,95 @@ bool TypeChecker::check_inheritance_cycles() {
   return true;
 }
 
+/* DFS to populate a set of meths/attrs that is the intersection of the child's parent's meths/attrs */
+void populate_parent_feature_tables(string& child, map<string, bool>& visited) {
+  visited[child] = true;
 
-void TypeChecker::populate_meth_attr_tables() {
+  for (string& parent: class_parents[child]) {
+    if (!visited[parent]) {
+      populate_parent_feature_tables(parent, visited);
+    }
+    for (MethodStmt *nmeth: class_methods[parent]) {
+      bool can_insert = true;
+      for (MethodStmt *emeth: parent_methods[child]) {
+        if (emeth->get_name() == nmeth->get_name()) {
+          can_insert = false;
+          break;
+        }
+      }
+      if (can_insert) {
+        parent_methods[child].insert(nmeth);
+      }
+    }
 
+    for (AttrStmt *nattr: class_attrs[parent]) {
+      bool can_insert = true;
+      for (AttrStmt *eattr: parent_attrs[child]) {
+        if (eattr->get_name() == nattr->get_name()) {
+          can_insert = false;
+          break;
+        }
+      }
+      if (can_insert) {
+        parent_attrs[child].insert(nattr);
+      }
+    }
+  }
+}
+
+/* Returns true if return type and formal list are consistent between inherited methods, otherwise false */
+bool check_method_sigs(MethodStmt *p, MethodStmt *c, const string& cname) {
+  bool ret_val = true;
+  if (!conforms(c->get_ret_type(), p->get_ret_type())) {
+    string err_msg = "Error: Return type `" + c->get_ret_type()->to_str() + "` of method `" + c->get_name() + "` in class `" + cname + "`";
+    err_msg += " does not conform to inherited return type `" + p->get_ret_type()->to_str() + "` defined on line " + to_string(p->lineno);
+    error(c->lineno, err_msg);
+    ret_val = false; 
+  }
+
+  return ret_val;
+}
+
+
+void TypeChecker::populate_feature_tables() {
+  map<string, bool> visited;
+  for (pair<string, vector<string>> entry: class_parents) {
+    if (!visited[entry.first]) {
+      populate_parent_feature_tables(entry.first, visited);
+    }
+  }
+
+  for (const string& cname: class_names) {
+    /* for every class */
+    for (MethodStmt *pmeth: parent_methods[cname]) {
+      bool can_insert = true;
+      for (MethodStmt *cmeth: class_methods[cname]) {
+        if (pmeth->get_name() == cmeth->get_name()) {
+          if (!check_method_sigs(pmeth, cmeth, cname)) {
+            can_insert = false;
+            break;
+          }
+        }
+      }
+      if (can_insert) {
+        class_methods[cname].insert(pmeth);
+      }
+    }
+
+    for (AttrStmt *pattr: parent_attrs[cname]) {
+      bool can_insert = true;
+      for (AttrStmt *cattr: class_attrs[cname]) {
+        if (pattr->get_name() == cattr->get_name()) {
+          string err_msg = "Error: Class " + cname + " cannot redefine inherited attribute `" + cattr->get_name() + "` defined by parent on line " + to_string(pattr->lineno);
+          error(cattr->lineno, err_msg);
+          can_insert = false;
+        }
+      }
+      if (can_insert) {
+        class_attrs[cname].insert(pattr);
+      }
+    }
+  }
 }
 
 /* entry point for type checking, called from main. */
@@ -354,42 +461,74 @@ int TypeChecker::typecheck() {
   initialize_declared_classes();
   check_valid_class_parents();
 
-  // InheritanceGraph *graph = create_inheritance_graph();
   if (!check_inheritance_cycles()) {
-    /* cant continue to add methods/attrs to classes if there are inheritance cycles */
+    //  cant continue to add methods/attrs to classes if there are inheritance cycles
     return semant_errors++;
   }
+  populate_feature_tables();
 
-  populate_meth_attr_tables();
+  // scopetable.push_scope();
 
-  scopetable.push_scope();
-
-  for (int i = 0; i < program.len(); i++) {
-    Stmt *s = program.ith(i);
-    s->typecheck();
-  }
+  // for (int i = 0; i < program.len(); i++) {
+  //   Stmt *s = program.ith(i);
+  //   s->typecheck();
+  // }
 
 
-  scopetable.pop_scope();
+  // scopetable.pop_scope();
+  
   return semant_errors;
   
 }
 
+/* returns true of a conforms to b, false otherwise */
+bool conforms_util(const string& a, const string& b) {
+  if (a == b) {
+    return true;
+  }
 
-/* Given two ptrs to Type_ objects, returns true if A and B are equivalent. */
-bool compare_type(Type_ *a, Type_ *b) {
-  if (a->get_name() != b->get_name())
+  stack<string> frontier;
+  frontier.push(a);
+  set<string> visited;
+
+  while (!frontier.empty()) {
+    string curr = frontier.top();
+    frontier.pop();
+
+    if (curr == b) {
+      return true;
+    }
+
+    visited.insert(curr);
+
+    for (string& parent: class_parents[curr]) {
+      if (visited.find(parent) == visited.end()) {
+        frontier.push(parent);
+      }
+    }
+  }
+  return false;
+
+}
+
+/* Given two ptrs to Type_ objects, returns true if A conforms to B, false otherwise. */
+bool conforms(Type_ *a, Type_ *b) {
+
+  if (!conforms_util(a->get_name(), b->get_name())) {
     return false;
+  }
 
   Type_ *a_nest = a->get_nested_type();
   Type_ *b_nest = b->get_nested_type();
 
+  if (a_nest == NULL && b_nest != NULL || a_nest != NULL && b_nest == NULL) {
+    return false;
+  }
   if (a_nest == NULL && b_nest == NULL)
     return true;
   if (a_nest != NULL && b_nest != NULL)
-    return compare_type(a_nest, b_nest);
+    return conforms(a_nest, b_nest);
   
-  return true;
 }
 
 
@@ -470,7 +609,7 @@ Type_ *ClassStmt::typecheck() {
 Type_ *ForStmt::typecheck() {}
 Type_ *AttrStmt::typecheck() {
   Type_ *init_type = init->typecheck();
-  if (!compare_type(type, init_type)) {
+  if (!conforms(type, init_type)) {
     string err_msg = "Error: type " + init_type->to_str() + " does not conform to declared type " + type->to_str();
     error(init->lineno, err_msg);
   }
@@ -505,7 +644,7 @@ Type_ *BinopExpr::typecheck() {
   Type_ *lhs_type = lhs->typecheck();
   Type_ *rhs_type = rhs->typecheck();
 
-  if (!compare_type(lhs_type, rhs_type)) {
+  if (!conforms(lhs_type, rhs_type)) {
 
   }
 }

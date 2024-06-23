@@ -46,6 +46,7 @@ typedef class std::vector<Stmt*> StmtList;
 class ClassStmt;
 class Feature;
 typedef class std::vector<Feature*> FeatureList;
+// class FeatureList;
 class AttrStmt;
 class MethodStmt;
 class FormalStmt;
@@ -127,6 +128,7 @@ class ClassStmt: public Stmt {
 public:
   ClassStmt(std::string name, std::vector<std::string> parents, FeatureList feature_list):
     name(name), parents(parents), feature_list(feature_list) {}
+  
   StmtType stmttype = CLASS_STMT; 
   std::string classname() { return "ClassStmt"; } 
   void dump(int indent); 

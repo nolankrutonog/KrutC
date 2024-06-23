@@ -1,8 +1,17 @@
 
 
-class A inherits F {}
-class B {}
-class C inherits A, B {}
-class D inherits B, C {}
-class E inherits A, D {}
-class F inherits E {}
+class A inherits B, C {
+  int a;
+  list<string> m() { return; }
+}
+
+class B {
+  int b;
+  int d;
+  list m() {}
+}
+
+class C {
+  int c;
+  int d;
+}
