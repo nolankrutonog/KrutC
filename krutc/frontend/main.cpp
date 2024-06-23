@@ -46,18 +46,17 @@ int main(int argc, char *argv[]) {
 
   Program program = parser.parse_program();
 
-  // if (parser.parser_errors) {
-  //   return -1;
-  // }
+  if (parser.parser_errors) {
+    return -1;
+  }
 
+  TypeChecker typechecker = TypeChecker(program, debug, filename);
 
-  // TypeChecker typechecker = TypeChecker(program, debug, filename);
+  int semant_errors = typechecker.typecheck();
 
-  // int semant_errors = typechecker.typecheck();
-
-  // if (semant_errors) {
-  //   return -1;
-  // }
+  if (semant_errors) {
+    return -1;
+  }
 
   if (tree) {
     program.dump();      

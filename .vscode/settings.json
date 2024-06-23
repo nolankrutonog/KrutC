@@ -76,6 +76,16 @@
     "variant": "cpp",
     "*.ipp": "cpp",
     "ostream": "cpp",
-    "system_error": "cpp"
+    "system_error": "cpp",
+    "__bits": "cpp",
+    "__config": "cpp",
+    "__debug": "cpp",
+    "__tuple": "cpp",
+    "atomic": "cpp",
+    "bit": "cpp",
+    "exception": "cpp",
+    "format": "cpp",
+    "tuple": "cpp",
+    "__threading_support": "cpp"
   }
 }

@@ -821,4 +821,5 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tree.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/typechecker.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/map
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/map \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/stack

@@ -237,7 +237,47 @@ void TypeChecker::initialize_declared_classes() {
     }
     class_type[name] = new Type_(name, NULL);
 
-    /* check that parents arent repeating and are not from base classes */
+    // FeatureList feature_list = cs->get_feature_list();
+    // for (Feature *f: feature_list) {
+    //   if (f->is_method()) {
+    //     MethodStmt *m = static_cast<MethodStmt*>(f);
+    //     set<MethodStmt*> *existing_methods = &class_methods[cs->get_name()];
+    //     for (MethodStmt *em: *existing_methods) {
+    //       // check current method against existing methods
+    //       if (em->get_name() == m->get_name()) {
+    //         string err_msg = "Error: Method " + m->get_name() + " cannot be defined twice in class " + cs->get_name();
+    //         error(m->lineno, err_msg);
+    //         continue;
+    //       }
+    //     }
+    //     existing_methods->insert(m); // this should insert it in class_methods bc ptr
+
+    //   } else {
+    //     AttrStmt *a = static_cast<AttrStmt*>(f);
+    //     set<AttrStmt*> *existing_attrs = &class_attrs[cs->get_name()];
+    //     for (AttrStmt *ea: *existing_attrs) {
+    //       if (ea->get_name() == a->get_name()) {
+    //         string err_msg = "Error: Attribute " + a->get_name() + " cannot be defined twice in class " + cs->get_name();
+    //         error(a->lineno, err_msg);
+    //         continue;
+    //       }
+    //     }
+    //     existing_attrs->insert(a); // this should insert it in class_attrs bc ptr
+    //   }
+    // }
+  }
+}
+
+/* check that parents arent repeating and are not from base classes */
+void TypeChecker::check_valid_class_parents() {
+  for (int i = 0; i < program.len(); i++) {
+    Stmt *s = program.ith(i);
+
+    ClassStmt *cs = dynamic_cast<ClassStmt*>(s);
+    if (!cs)
+      continue;
+    
+    string name = cs->get_name();
     vector<string> parents = cs->get_parents();
     for (string parent: parents) {
       if (class_type.find(parent) == class_type.end()) {
@@ -259,71 +299,9 @@ void TypeChecker::initialize_declared_classes() {
     if (parents.empty())
       parents.push_back(Object);
     class_parents[name] = parents;
-
-    FeatureList feature_list = cs->get_feature_list();
-    for (Feature *f: feature_list) {
-      if (f->is_method()) {
-        MethodStmt *m = static_cast<MethodStmt*>(f);
-        set<MethodStmt*> *existing_methods = &class_methods[cs->get_name()];
-        for (MethodStmt *em: *existing_methods) {
-          // check current method against existing methods
-          if (em->get_name() == m->get_name()) {
-            string err_msg = "Error: Method " + m->get_name() + " cannot be defined twice in class " + cs->get_name();
-            error(m->lineno, err_msg);
-            continue;
-          }
-        }
-        existing_methods->insert(m); // should insert it in class_methods bc ptr
-
-      } else {
-        AttrStmt *a = static_cast<AttrStmt*>(f);
-        set<AttrStmt*> *existing_attrs = &class_attrs[cs->get_name()];
-        for (AttrStmt *ea: *existing_attrs) {
-          if (ea->get_name() == a->get_name()) {
-            string err_msg = "Error: Attribute " + a->get_name() + " cannot be defined twice in class " + cs->get_name();
-            error(a->lineno, err_msg);
-            continue;
-          }
-        }
-        existing_attrs->insert(a); // should insert it in class_attrs bc ptr
-      }
-    }
+    
   }
-  // check_declared_classes_parents();
 }
-
-// /* make sure parents are real and are not basic classes. Has to be done after
-//    collecting all classes because they are global
-// */
-// void TypeChecker::check_valid_parents() {
-//   for (int i = 0; i < program.len(); i++) {
-//     /* have to iterate through program rather than classes to get lineno */
-//     ClassStmt *cs = dynamic_cast<ClassStmt*>(program.ith(i));
-//     if (!cs)
-//       continue;
-//     string name = cs->get_name();
-//     vector<string> parents = class_parents[name];
-//     for (string parent: parents) {
-//       if (class_type.find(parent) == class_type.end()) {
-//         // unknown parent
-//         string err_msg = "Error: Class " + name + " inheriting from unknown class " + parent;
-//         error(cs->lineno, err_msg);
-//         /* erase bad parents so we can typecheck as if they have good parents */
-//         class_parents[name].erase(remove(class_parents[name].begin(), class_parents[name].end(), parent), class_parents[name].end());
-//         continue;
-//       }
-//       if (basic_classes.find(parent) != basic_classes.end()) {
-//         string err_msg = "Error: Class " + name + " cannot inherit from base class " + parent;
-//         error(cs->lineno, err_msg);
-//         /* erase bad parents so we can typecheck as if they have good parents */
-//         class_parents[name].erase(remove(class_parents[name].begin(), class_parents[name].end(), parent), class_parents[name].end());
-//         continue;
-//       }
-//     }
-//     if (parents.empty())
-//       class_parents[cs->get_name()].push_back(Object);
-//   }
-// }
 
 /* prints class_parents */
 void print_class_parents() {
@@ -341,49 +319,35 @@ void print_class_parents() {
   }
 }
 
-/* creates graph where nodes are classes and edges are from parents to children. */
-InheritanceGraph TypeChecker::create_inheritance_graph() {
-  InheritanceGraph graph = InheritanceGraph();
-
-  for (pair<string, vector<string>> cp: class_parents) {
-    /* build graph */
-    string curr_class = cp.first;
-    if (basic_classes.find(curr_class) != basic_classes.end())
-      continue;
-    graph.add_node(curr_class);
-    for (string p: cp.second) {
-      graph.add_parent(curr_class, p);
-      graph.add_child(p, curr_class);
-    }
-  }
-
-  return graph;
-
-}
 
 /* 
   Returns false if graph contains inheritance cycles, true otherwise. 
 */
-bool TypeChecker::check_inheritance_cycles(InheritanceGraph& g) {
-
-  vector<vector<string>> cycle_paths;
-  g.detect_cycles(cycle_paths);
-  if (!cycle_paths.empty()) {
-    for (vector<string> cycle: cycle_paths) {
-      string err_msg = "Error: cycle in classes " + cycle[0];
+bool TypeChecker::check_inheritance_cycles() {
+  /* build children*/
+  InheritanceGraph *g = new InheritanceGraph(class_parents);
+  vector<vector<string>> cycles;
+  g->has_cycles(cycles);
+  if (!cycles.empty()) {
+    for (vector<string>& cycle: cycles) {
+      string err_msg = "Error: cycle detected in classes " + cycle[0];
       for (int i = 1; i < (int) cycle.size(); i++) {
         err_msg += ", " + cycle[i];
       }
       error(0, err_msg);
-
     }
+
     return false;
   }
+
   return true;
 }
 
-void TypeChecker::populate_meth_attr_tables(InheritanceGraph& g) {
 
+void TypeChecker::populate_meth_attr_tables() {
+  /* 
+  start at object, probogate methods/attrs to its children
+  */
 }
 
 /* entry point for type checking, called from main. */
@@ -393,15 +357,15 @@ int TypeChecker::typecheck() {
 
   initialize_basic_classes();
   initialize_declared_classes();
-  // check_valid_parents();
+  check_valid_class_parents();
 
-  InheritanceGraph graph = create_inheritance_graph();
-  if (!check_inheritance_cycles(graph)) {
+  // InheritanceGraph *graph = create_inheritance_graph();
+  if (!check_inheritance_cycles()) {
     /* cant continue to add methods/attrs to classes if there are inheritance cycles */
-    return semant_errors;
+    return semant_errors++;
   }
 
-  populate_meth_attr_tables(graph);
+  populate_meth_attr_tables();
 
   scopetable.push_scope();
 
@@ -433,9 +397,61 @@ bool compare_type(Type_ *a, Type_ *b) {
   return true;
 }
 
+
 //////////////////////////////////////////////////////////////
 //
-// Expression Typechecking 
+// 
+// Inheritance Graph 
+//
+// 
+//////////////////////////////////////////////////////////////
+
+
+/*
+bool InheritanceGraph::dfs(const string& node, set<string>& visited, 
+          set<string>& stack, vector<string>& path) {
+  visited.insert(node);
+  stack.insert(node);
+  path.push_back(node);
+
+  for (const auto& child : children[node]) {
+    if (stack.find(child) != stack.end()) {
+      path.push_back(child);  // complete the cycle path
+      return true;
+    }
+    if (visited.find(child) == visited.end()) {
+      if (dfs(child, visited, stack, path)) {
+        return true;
+      }
+    }
+  }
+
+  stack.erase(node);
+  path.pop_back();
+  return false;
+}
+
+void InheritanceGraph::detect_cycles(vector<vector<string>>& cycle_paths) {
+  set<string> visited;
+  set<string> stack;
+  vector<string> path;
+  for (const auto& node : nodes) {
+    if (visited.find(node) == visited.end()) {
+      if (dfs(node, visited, stack, path)) {
+        // print_cycle(path);
+        cycle_paths.push_back(path);
+        path.clear();
+      }
+    }
+  }
+}
+*/
+
+//////////////////////////////////////////////////////////////
+//
+// 
+// Statement Typechecking 
+// 
 // 
 //////////////////////////////////////////////////////////////
 

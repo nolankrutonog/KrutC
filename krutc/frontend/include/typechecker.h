@@ -22,10 +22,11 @@ public:
   int typecheck();
   void initialize_basic_classes();
   void initialize_declared_classes();
-  // void check_valid_parents();
-  InheritanceGraph create_inheritance_graph();
-  bool check_inheritance_cycles(InheritanceGraph& g);
-  void populate_meth_attr_tables(InheritanceGraph& g);
+  void check_valid_class_parents();
+
+  // InheritanceGraph *create_inheritance_graph();
+  bool check_inheritance_cycles();
+  void populate_meth_attr_tables();
   
 };
 

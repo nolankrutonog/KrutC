@@ -1,17 +1,8 @@
 
 
-class Person {
-  int age;
-  string name;
-
-  Person(int age, string name) {
-    while (true) {
-      -- print(i);
-    }
-  }
-}
-
-print(i);
-
-int i;
-
+class A inherits F {}
+class B {}
+class C inherits A, B {}
+class D inherits B, C {}
+class E inherits A, D {}
+class F inherits E {}
