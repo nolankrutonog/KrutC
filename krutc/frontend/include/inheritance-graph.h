@@ -40,7 +40,7 @@ public:
     InheritanceGraph(std::map<std::string, std::vector<std::string>> parents)
         : parents(parents) {}
 
-    void has_cycles(std::vector<std::vector<std::string>>& cycles) {
+    void check_for_cycles(std::vector<std::vector<std::string>>& cycles) {
         std::map<std::string, bool> visited;
         std::map<std::string, bool> recStack;
         std::vector<std::string> path;

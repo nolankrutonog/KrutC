@@ -324,10 +324,9 @@ void print_class_parents() {
   Returns false if graph contains inheritance cycles, true otherwise. 
 */
 bool TypeChecker::check_inheritance_cycles() {
-  /* build children*/
   InheritanceGraph *g = new InheritanceGraph(class_parents);
   vector<vector<string>> cycles;
-  g->has_cycles(cycles);
+  g->check_for_cycles(cycles);
   if (!cycles.empty()) {
     for (vector<string>& cycle: cycles) {
       string err_msg = "Error: cycle detected in classes " + cycle[0];
@@ -336,18 +335,14 @@ bool TypeChecker::check_inheritance_cycles() {
       }
       error(0, err_msg);
     }
-
     return false;
   }
-
   return true;
 }
 
 
 void TypeChecker::populate_meth_attr_tables() {
-  /* 
-  start at object, probogate methods/attrs to its children
-  */
+
 }
 
 /* entry point for type checking, called from main. */
