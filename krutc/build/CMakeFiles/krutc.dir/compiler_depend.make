@@ -1475,7 +1475,6 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: /Users/nolankrutonog/Desktop/workspace
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/limits.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/locale \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/locale.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/map \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/math.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/memory \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/mutex \
@@ -1484,7 +1483,6 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: /Users/nolankrutonog/Desktop/workspace
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/ostream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/ratio \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/set \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/stack \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/stdexcept \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/stdint.h \
@@ -1637,7 +1635,6 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: /Users/nolankrutonog/Desktop/workspace
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h \
@@ -4919,9 +4916,13 @@ CMakeFiles/krutc.dir/frontend/typechecker.cpp.o: /Users/nolankrutonog/Desktop/wo
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/typechecker.h
 
 
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h:
+
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/typechecker.cpp:
 
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp:
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/map:
 
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/scopetable.cpp:
 
@@ -4932,10 +4933,6 @@ CMakeFiles/krutc.dir/frontend/typechecker.cpp.o: /Users/nolankrutonog/Desktop/wo
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tokenbuffer.h:
 
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h:
-
-/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h:
-
-/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/map:
 
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h:
 

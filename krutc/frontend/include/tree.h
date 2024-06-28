@@ -16,13 +16,12 @@ enum StmtType {
   FOR_STMT = 505,
   IF_STMT = 506,
   WHILE_STMT = 507,
-};
 
-enum ExprType {
+
   EXPR_EXPR = 600,
   RETURN_EXPR = 601,
   INT_CONST_EXPR = 602,
-  VERSE_CONST_EXPR = 603,
+  STRING_CONST_EXPR = 603,
   LIST_CONST_EXPR = 604,
   OBJECTID_EXPR = 605,
   DISPATCH_EXPR = 606,
@@ -39,6 +38,27 @@ enum ExprType {
   TYPE_EXPR = 617
 };
 
+// enum ExprType {
+//   EXPR_EXPR = 600,
+//   RETURN_EXPR = 601,
+//   INT_CONST_EXPR = 602,
+//   STRING_CONST_EXPR = 603,
+//   LIST_CONST_EXPR = 604,
+//   OBJECTID_EXPR = 605,
+//   DISPATCH_EXPR = 606,
+//   OP_EXPR = 607,
+//   THIS_EXPR = 608,
+//   BOOL_CONST_EXPR = 609,
+//   BINOP_EXPR = 610,
+//   CONT_EXPR = 611,
+//   BREAK_EXPR = 612,
+//   NONE_EXPR = 613,
+//   KILL_EXPR = 614,
+//   NEW_EXPR = 615,
+//   LIST_ELEM_REF = 616,
+//   TYPE_EXPR = 617
+// };
+
 class Program;
 class Stmt;
 typedef class std::vector<Stmt*> StmtList; 
@@ -46,7 +66,6 @@ typedef class std::vector<Stmt*> StmtList;
 class ClassStmt;
 class Feature;
 typedef class std::vector<Feature*> FeatureList;
-// class FeatureList;
 class AttrStmt;
 class MethodStmt;
 class FormalStmt;
@@ -81,12 +100,11 @@ class Type_;
 */
 class Stmt {
 public:
-  StmtType stmttype = STMT;
+  virtual StmtType get_stmttype() = 0;
   int lineno = 0;
   virtual ~Stmt() = default;
   virtual void dump(int indent) = 0;
   virtual std::string classname() { return "Stmt"; };
-
   virtual Type_ *typecheck() = 0;
 };
 
@@ -103,12 +121,10 @@ public:
 
 class ExprStmt : public Stmt {
 public:
+  StmtType get_stmttype() { return EXPR_EXPR; }
   int lineno = 0;
-  ExprType exprtype = EXPR_EXPR;
-  // ExprStmt *type;
   virtual std::string classname() { return "ExprStmt";}
   virtual void dump(int indent);
-  // virtual Type_ *typecheck();
   
 };
 
@@ -129,7 +145,7 @@ public:
   ClassStmt(std::string name, std::vector<std::string> parents, FeatureList feature_list):
     name(name), parents(parents), feature_list(feature_list) {}
   
-  StmtType stmttype = CLASS_STMT; 
+  StmtType get_stmttype() { return CLASS_STMT; }
   std::string classname() { return "ClassStmt"; } 
   void dump(int indent); 
 
@@ -154,7 +170,7 @@ class AttrStmt : public Feature {
 public:
   AttrStmt(Type_ *type, std::string name, ExprStmt *init) : 
     type(type), name(name), init(init) {}
-  StmtType stmttype = ATTR_STMT;
+  StmtType get_stmttype() { return ATTR_STMT; }
   void dump(int indent);
   bool is_method() { return false; } 
   std::string classname()  { return "AttrStmt"; } 
@@ -171,7 +187,7 @@ class FormalStmt : public Stmt {
 
 public:
   FormalStmt(Type_ *type, std::string name) : type(type), name(name) {}
-  StmtType stmttype = FORMAL_STMT;
+  StmtType get_stmttype() { return FORMAL_STMT; }
   void dump(int indent);
   std::string classname()  { return "FORMAL_STMT"; } 
   std::string get_name() { return name; } 
@@ -190,7 +206,7 @@ class MethodStmt : public Feature {
 public:
   MethodStmt(Type_ *ret_type, std::string name, FormalList formal_list, StmtList stmt):
     ret_type(ret_type), name(name), formal_list(formal_list), stmt_list(stmt) {}
-  StmtType stmttype = METHOD_STMT;
+  StmtType get_stmttype() { return METHOD_STMT; }
   std::string classname() { return "MethodStmt"; } 
   void dump(int indent);
 
@@ -215,7 +231,7 @@ public:
           ExprStmt *repeat, StmtList stmt_list)
     : stmt(stmt), cond(cond), 
       repeat(repeat), stmt_list(stmt_list) {}
-  StmtType stmttype = FOR_STMT;
+  StmtType get_stmttype() { return FOR_STMT; }
   void dump(int indent);
   std::string classname() { return "ForStmt"; }
 
@@ -235,7 +251,7 @@ class IfStmt : public Stmt {
 public:
   IfStmt(ExprStmt *pred, StmtList then_branch, StmtList else_branch) :
     pred(pred), then_branch(then_branch), else_branch(else_branch) {}
-  StmtType stmttype = IF_STMT;
+  StmtType get_stmttype() { return IF_STMT; }
   void dump(int indent);
   std::string classname() { return "IfStmt";}
   std::string get_name() { return "IfStmt"; }
@@ -251,7 +267,7 @@ class WhileStmt : public Stmt {
   StmtList stmt_list;
 public: 
   WhileStmt(ExprStmt *pred, StmtList stmt_list) : pred(pred), stmt_list(stmt_list) {}
-  StmtType stmttype = WHILE_STMT;
+  StmtType get_stmttype() { return WHILE_STMT; }
   void dump(int indent);
   std::string classname() { return "WhileStmt";}
   std::string get_name() { return "WhileStmt"; }
@@ -277,7 +293,7 @@ class BinopExpr : public ExprStmt {
 public:
   BinopExpr(ExprStmt *lhs, std::string op, ExprStmt *rhs)
     : lhs(lhs), op(op), rhs(rhs) {}
-  ExprType exprtype = BINOP_EXPR;
+  StmtType get_stmttype() { return BINOP_EXPR; }
   std::string classname() { return "BinopExpr"; }
   void dump(int indent);
 
@@ -296,7 +312,7 @@ class DispatchExpr : public ExprStmt {
 public:
   DispatchExpr(ExprStmt *calling_expr, std::string name, ExprList args) 
     : calling_expr(calling_expr), name(name), args(args) {}
-  ExprType exprtype = DISPATCH_EXPR;
+  StmtType get_stmttype() { return DISPATCH_EXPR; }
   void dump(int indent);
   std::string classname() { return "DispatchExpr"; }
 
@@ -314,7 +330,7 @@ class ReturnExpr : public ExprStmt {
 public:
   ReturnExpr(ExprStmt *expr) : expr(expr) {}
   // ReturnExpr() {}
-  ExprType exprtype = RETURN_EXPR;
+  StmtType get_stmttype() { return RETURN_EXPR; }
   void dump(int indent);
   std::string classname() { return "ReturnExpr";}
 
@@ -327,7 +343,7 @@ class IntConstExpr : public ExprStmt {
   long val;
 public:
   IntConstExpr(long val) : val(val) {}
-  ExprType exprtype = INT_CONST_EXPR;
+  StmtType get_stmttype() { return INT_CONST_EXPR; }
   void dump(int indent);
   std::string classname() { return "IntConstExpr"; }
 
@@ -339,7 +355,7 @@ class StrConstExpr : public ExprStmt {
   const std::string str;
 public: 
   StrConstExpr(std::string str) : str(str) {}
-  ExprType exprtype = VERSE_CONST_EXPR;
+  StmtType get_stmttype() { return STRING_CONST_EXPR; }
   void dump(int indent);
   std::string classname() { return "StrConstExpr";}
 
@@ -351,7 +367,7 @@ class BoolConstExpr : public ExprStmt {
   int val;
 public:
   BoolConstExpr(std::string bool_val) { val = bool_val == "true" ? 1 : 0; }
-  ExprType exprtype = BOOL_CONST_EXPR;
+  StmtType get_stmttype() { return BOOL_CONST_EXPR; }
   void dump(int indent);
   std::string classname() { return "BoolConstExpr";}
 
@@ -363,7 +379,7 @@ class ListConstExpr : public ExprStmt {
   ExprList exprlist;
 public:
   ListConstExpr(ExprList exprlist) : exprlist(exprlist) {}
-  ExprType exprtype = LIST_CONST_EXPR;
+  StmtType get_stmttype() { return LIST_CONST_EXPR; }
   void dump(int indent);
   std::string classname() { return "ListConstExpr"; }
 
@@ -372,12 +388,13 @@ public:
 };
 
 class ListElemRef: public ExprStmt {
+  // TODO: why is this an exprstmt instead of a string?
   ExprStmt *list_name;
   ExprStmt *index;
 public:
   ListElemRef(ExprStmt *list_name, ExprStmt *index) 
     : list_name(list_name), index(index) {}
-  ExprType exprtype = LIST_ELEM_REF;
+  StmtType get_stmttype() { return LIST_ELEM_REF; }
   void dump(int indent);
   std::string classname() { return "ListElemRef"; }
 
@@ -391,7 +408,7 @@ class ThisExpr : public ExprStmt {
   std::string name = "THIS";
 public:
   ThisExpr() {}
-  ExprType exprtype = THIS_EXPR;
+  StmtType get_stmttype() { return THIS_EXPR; }
   std::string classname() { return "ThisExpr"; }
   void dump(int indent);
   Type_ *typecheck();
@@ -401,7 +418,7 @@ class ContExpr : public ExprStmt {
   std::string name = "CONTINUE";
 public:
   ContExpr() {}
-  ExprType exprtype = CONT_EXPR;
+  StmtType get_stmttype() { return CONT_EXPR; }
   std::string classname() { return "ContExpr"; }
   void dump(int indent);
   Type_ *typecheck();
@@ -411,7 +428,7 @@ class BreakExpr: public ExprStmt {
   std::string name = "BREAK";
 public:
   BreakExpr() {}
-  ExprType exprtype = BREAK_EXPR;
+  StmtType get_stmttype() { return BREAK_EXPR; }
   std::string classname() { return "BreakExpr"; }
   void dump(int indent);
   Type_ *typecheck();
@@ -421,7 +438,7 @@ class ObjectIdExpr : public ExprStmt {
   std::string name;
 public:
   ObjectIdExpr(std::string name) : name(name) {}
-  ExprType exprtype = OBJECTID_EXPR;
+  StmtType get_stmttype() { return OBJECTID_EXPR; }
   std::string classname() { return "ObjectIdStmt"; }
   void dump(int indent);
 
@@ -433,7 +450,7 @@ class NoneExpr : public ExprStmt {
   std::string name = "NONE";
 public:
   NoneExpr() {}
-  ExprType exprtype = NONE_EXPR;
+  StmtType get_stmttype() { return NONE_EXPR; }
   std::string classname() { return "NoneExpr"; }
   void dump(int indent);
 
@@ -443,14 +460,15 @@ public:
 };
 
 class NewExpr : public ExprStmt {
-  ExprStmt *expr;
+  // ExprStmt *expr;
+  std::string newclass;
 public:
-  NewExpr(ExprStmt *expr) : expr(expr) {}
-  ExprType exprtype = NEW_EXPR;
+  NewExpr(std::string newclass) : newclass(newclass) {}
+  StmtType get_stmttype() { return NEW_EXPR; }
   std::string classname() { return "NewExpr"; }
   void dump(int indent);
 
-  ExprStmt *get_expr() { return expr; }
+  std::string get_newclass() { return newclass; }
   Type_ *typecheck();
 
 };
@@ -461,7 +479,7 @@ class KillExpr: public ExprStmt {
 public:
   // KillExpr() {}
   KillExpr(ExprStmt *expr) : expr(expr) {}
-  ExprType exprtype = KILL_EXPR;
+  StmtType get_stmttype() { return KILL_EXPR; }
   std::string classname() { return "KillExpr"; }
   void dump(int indent);
 

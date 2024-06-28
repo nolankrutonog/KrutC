@@ -12,7 +12,8 @@ class ScopeTable {
   std::vector<std::map<std::string, Type_ *>> table;
 
 public:
-  Type_ *lookup(std::string);
+  Type_ *lookup(std::string s);
+
   Type_ *check_current_scope(std::string);
   void add_elem(std::string, Type_*);
   void push_scope();

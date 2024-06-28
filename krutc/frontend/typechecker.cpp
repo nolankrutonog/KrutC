@@ -2,9 +2,9 @@
 #include <cassert>
 #include <map>
 #include <set>
-#include <bitset>
 #include "include/typechecker.h"
 #include "include/scopetable.h"
+#include "include/inheritance-graph.h"
 
 using namespace std;
 
@@ -19,6 +19,7 @@ using namespace std;
 #define Stack "stack"
 
 /* basic classes methods */
+#define Constructor "constructor"
 #define Length "length"
 #define Clear "clear"
 #define Is_Emtpy "is_emtpy"
@@ -43,9 +44,10 @@ static const set<string> basic_classes = {
   "stack" 
 };
 
-static string curr_filename;
-static int semant_errors = 0;
-static ScopeTable scopetable;
+static string curr_filename;                          /* current filename */
+static int semant_errors = 0;                         /* semant errors */
+static int warnings = 0;                              /* warnings */
+static ScopeTable scopetable;                         /* scope table */
 
 static vector<string> class_names;                    /* vector of class names */
 static map<string, Type_*> class_type;                /* map from class name to Type_* */
@@ -67,7 +69,15 @@ bool check_method_sigs(MethodStmt *p, MethodStmt *c, const string& cname);
 void error(int lineno, std::string err_msg) {
   semant_errors++;
   std::cout << curr_filename + ":" + std::to_string(lineno) + ": ";
-  std::cout << err_msg << std::endl;
+  // TODO: can I make the 'ERROR' text red?? 
+  std::cout << "ERROR: " + err_msg << std::endl;
+}
+
+void warning(int lineno, std::string warn_msg) {
+  warnings++;
+  std::cout << curr_filename + ":" + std::to_string(lineno) + ": ";
+  // TODO: can I make the 'WARNING' text pink/other?? 
+  std::cout << "WARNING: " + warn_msg << std::endl;
 }
 
 //////////////////////////////////////////////////////////////
@@ -238,10 +248,9 @@ void TypeChecker::initialize_basic_classes() {
     stack_features.push_back(m);
   }
   classes[Stack] = new ClassStmt(String, {Object}, stack_features);
-
 }
 
-/* check return types and formals are valid types. ex: list, char<string> are invalid */ 
+/* Returns false if T is invalid. ex: list, char<string> are invalid */ 
 bool check_valid_type_(Type_ *t) {
   Type_ *nested = t->get_nested_type();
   if (t->get_name() == List || t->get_name() == Stack) {
@@ -268,7 +277,7 @@ void TypeChecker::initialize_declared_classes() {
     string name = cs->get_name();
     // if class defined twice
     if (class_type.find(name) != class_type.end()) {
-      string err_msg = "Error: Class " + name + " cannot be defined twice.";
+      string err_msg = "Class " + name + " cannot be defined twice.";
       error(cs->lineno, err_msg);
       continue;
     }
@@ -279,11 +288,15 @@ void TypeChecker::initialize_declared_classes() {
     for (Feature *f: feature_list) {
       if (f->is_method()) {
         MethodStmt *m = static_cast<MethodStmt*>(f);
+        if (m->get_name() == Constructor) {
+          string err_msg = "Redefined constructor in class " + name + ", or method named `constructor`. A method `constructor` is builtin for every class.";
+          error(m->lineno, err_msg);
+        }
         set<MethodStmt*> *existing_methods = &class_methods[cs->get_name()];
         for (MethodStmt *em: *existing_methods) {
           // check current method against existing methods
           if (em->get_name() == m->get_name()) {
-            string err_msg = "Error: Method " + m->get_name() + " cannot be defined twice in class " + cs->get_name();
+            string err_msg = "Method " + m->get_name() + " cannot be defined twice in class " + cs->get_name();
             error(m->lineno, err_msg);
             continue;
           }
@@ -291,17 +304,15 @@ void TypeChecker::initialize_declared_classes() {
         }
         existing_methods->insert(m); // this should insert it in class_methods bc ptr
 
-        bool valid_ret_type = check_valid_type_(m->get_ret_type());
-        if (!valid_ret_type) {
-          string err_msg = "Error: Method `" + m->get_name() + "` has invalid return type `" + m->get_ret_type()->to_str() + "`";
+        if (!check_valid_type_(m->get_ret_type())) {
+          string err_msg = "Method `" + m->get_name() + "` has invalid return type `" + m->get_ret_type()->to_str() + "`";
           error(m->lineno, err_msg);
         }
 
         FormalList formal_list = m->get_formal_list();
         for (FormalStmt *f: formal_list) {
-          bool valid_formal_type = check_valid_type_(f->get_type());
-          if (!valid_formal_type) {
-            string err_msg = "Error: Formal `" + f->get_name() + "` has invalid type `" + f->get_type()->to_str() + "`";
+          if (!check_valid_type_(f->get_type())) {
+            string err_msg = "Formal `" + f->get_name() + "` has invalid type `" + f->get_type()->to_str() + "`";
             error(f->lineno, err_msg);
           }
         }
@@ -311,13 +322,13 @@ void TypeChecker::initialize_declared_classes() {
         set<AttrStmt*> *existing_attrs = &class_attrs[cs->get_name()];
         for (AttrStmt *ea: *existing_attrs) {
           if (ea->get_name() == a->get_name()) {
-            string err_msg = "Error: Attribute " + a->get_name() + " cannot be defined twice in class " + cs->get_name();
+            string err_msg = "Attribute " + a->get_name() + " cannot be defined twice in class " + cs->get_name();
             error(a->lineno, err_msg);
             continue;
           }
         }
         if (!check_valid_type_(a->get_type())) {
-          string err_msg = "Error: Attribute `" + a->get_name() + "` in class `" + name + "` has invalid type `" + a->get_type()->to_str() + "`";
+          string err_msg = "Attribute `" + a->get_name() + "` in class `" + name + "` has invalid type `" + a->get_type()->to_str() + "`";
           error(a->lineno, err_msg);
         }
         existing_attrs->insert(a); // this should insert it in class_attrs bc ptr
@@ -340,14 +351,14 @@ void TypeChecker::check_valid_class_parents() {
     for (string parent: parents) {
       if (class_type.find(parent) == class_type.end()) {
         // unknown parent
-        string err_msg = "Error: Class " + name + " inheriting from unknown class " + parent;
+        string err_msg = "Class " + name + " inheriting from unknown class " + parent;
         error(cs->lineno, err_msg);
         /* erase bad parents so we can typecheck as if they have good parents */
         parents.erase(remove(parents.begin(), parents.end(), parent), parents.end());
         continue;
       }
       if (basic_classes.find(parent) != basic_classes.end()) {
-        string err_msg = "Error: Class " + name + " cannot inherit from base class " + parent;
+        string err_msg = "Class " + name + " cannot inherit from base class " + parent;
         error(cs->lineno, err_msg);
         /* erase bad parents so we can typecheck as if they have good parents */
         parents.erase(remove(parents.begin(), parents.end(), parent), parents.end());
@@ -387,7 +398,7 @@ bool TypeChecker::check_inheritance_cycles() {
   g->check_for_cycles(cycles);
   if (!cycles.empty()) {
     for (vector<string>& cycle: cycles) {
-      string err_msg = "Error: cycle detected in classes " + cycle[0];
+      string err_msg = "Cycle detected in classes " + cycle[0];
       for (int i = 1; i < (int) cycle.size(); i++) {
         err_msg += ", " + cycle[i];
       }
@@ -438,7 +449,7 @@ void populate_parent_feature_tables(string& child, map<string, bool>& visited) {
 bool check_method_sigs(MethodStmt *p, MethodStmt *c, const string& cname) {
   bool ret_val = true;
   if (!conforms(c->get_ret_type(), p->get_ret_type())) {
-    string err_msg = "Error: Return type `" + c->get_ret_type()->to_str() + "`"; //  of method `" + c->get_name() + "` in class `" + cname + "`";
+    string err_msg = "Return type `" + c->get_ret_type()->to_str() + "`"; //  of method `" + c->get_name() + "` in class `" + cname + "`";
     err_msg += " does not conform to inherited return type `" + p->get_ret_type()->to_str() + "` defined on line " + to_string(p->lineno);
     error(c->lineno, err_msg);
     ret_val = false; 
@@ -477,7 +488,7 @@ void TypeChecker::populate_feature_tables() {
       bool can_insert = true;
       for (AttrStmt *cattr: class_attrs[cname]) {
         if (pattr->get_name() == cattr->get_name()) {
-          string err_msg = "Error: Class " + cname + " cannot redefine inherited attribute `" + cattr->get_name() + "` defined by parent on line " + to_string(pattr->lineno);
+          string err_msg = "Class " + cname + " cannot redefine inherited attribute `" + cattr->get_name() + "` defined by parent on line " + to_string(pattr->lineno);
           error(cattr->lineno, err_msg);
           can_insert = false;
         }
@@ -487,6 +498,60 @@ void TypeChecker::populate_feature_tables() {
       }
     }
   }
+}
+
+bool TypeChecker::check_global_features() {
+  bool ret_val = true;
+  for (int i = 0; i < program.len(); i++) {
+    Stmt *s = program.ith(i);
+    Feature *f = dynamic_cast<Feature*>(s);
+    if (!f)
+      continue;
+
+    if (f->is_method()) {
+      MethodStmt *m = static_cast<MethodStmt*>(f);
+      /* check return type is valid */
+      if (!check_valid_type_(m->get_ret_type())) {
+        string err_msg = "Method `" + m->get_name() + "` has invalid return type `" + m->get_ret_type()->to_str() + "`";
+        error(m->lineno, err_msg);
+        ret_val = false;
+      }
+
+      /* check formal type is valid */
+      FormalList formal_list = m->get_formal_list();
+      for (FormalStmt *f: formal_list) {
+        if (!check_valid_type_(f->get_type())) {
+          string err_msg = "Formal `" + f->get_name() + "` has invalid type `" + f->get_type()->to_str() + "`";
+          error(f->lineno, err_msg);
+          ret_val = false;
+        }
+      }
+
+      /* check if method is already defined */
+      bool can_insert = true;
+      for (MethodStmt *gm: global_methods) {
+        if (gm->get_name() == m->get_name()) {
+          string err_msg = "Method `" + m->get_name() + "` cannot be defined twice";
+          error(m->lineno, err_msg);
+          ret_val = false;
+          can_insert = false;
+        }
+      }
+      if (can_insert) {
+        global_methods.insert(m);
+      }
+    } else {
+      AttrStmt *a = static_cast<AttrStmt*>(f);
+      if (!check_valid_type_(a->get_type())) {
+        string err_msg = "Attribute `" + a->get_name() + "` has invalid type `" + a->get_type()->to_str() + "`";
+        error(a->lineno, err_msg);
+        ret_val = false;
+      }
+    }
+
+  }
+  return ret_val;
+
 }
 
 /* entry point for type checking, called from main. */
@@ -499,29 +564,37 @@ int TypeChecker::typecheck() {
   check_valid_class_parents();
 
   if (!check_inheritance_cycles()) {
-    /* cannot typecheck expressions if there are inheritance cycles */
+    /* cannot continue typechecking if there are inheritance cycles */
     return semant_errors++;
-  }
+  } 
+
   populate_feature_tables();
 
-  if (semant_errors) {
-    /* cannot typecheck expressions if issues with methods/classes etc. */
+  if (!check_global_features()) {
+    /* cannot continue typechecking if global features have type declaration errors */
     return semant_errors;
   }
+  scopetable.push_scope();
 
-  // scopetable.push_scope();
+  for (int i = 0; i < program.len(); i++) {
+    Stmt *s = program.ith(i);
+    s->typecheck();
+  }
 
-  // for (int i = 0; i < program.len(); i++) {
-  //   Stmt *s = program.ith(i);
-  //   s->typecheck();
-  // }
-
-
-  // scopetable.pop_scope();
+  scopetable.pop_scope();
   
   return semant_errors;
   
 }
+
+
+//////////////////////////////////////////////////////////////
+//
+// 
+// TYPE EXPRESSIONS  
+// 
+// 
+//////////////////////////////////////////////////////////////
 
 /* returns true of a conforms to b, false otherwise */
 bool conforms_util(const string& a, const string& b) {
@@ -587,63 +660,164 @@ bool conforms(Type_ *a, Type_ *b) {
 // 
 //////////////////////////////////////////////////////////////
 
-Type_ *FormalStmt::typecheck() {}
+/* 
+  STATEMENTS should return NULL on every typecheck
+*/
+
+Type_ *FormalStmt::typecheck() {
+  scopetable.add_elem(name, type);
+  return NULL;
+}
+
 Type_ *MethodStmt::typecheck() {
   scopetable.push_scope();
-  for (FormalStmt *fml: formal_list) {
-    scopetable.add_elem(fml->get_name(), fml->get_type());
-  }
-
-  scopetable.pop_scope();
-}
-Type_ *IfStmt::typecheck() {}
-
-Type_ *ClassStmt::typecheck() {
-  for (Feature *f: feature_list) {
+  /* add all formals */
+  for (FormalStmt *f: formal_list) {
     f->typecheck();
   }
+
+  /* typecheck every expression, save the last one for RETURN possibility */
+  int i;
+  for (i = 0; i < (int) stmt_list.size() - 1; i++) {
+    stmt_list[i]->typecheck();
+  }
+
+  if (!stmt_list.empty()) {
+    Stmt *last_stmt = stmt_list[i];
+
+    Type_ *last_type = last_stmt->typecheck();
+    if (!last_type)
+      goto done;
+
+    if (!conforms(class_type[Void], ret_type)) {
+      /* if method expects a return value */
+      if (last_stmt->get_stmttype() != RETURN_EXPR) {
+        // TODO: is there a way to get lineno here to work? last_stmt is generic and we wont know the error...
+        string err_msg = "Method `" + name + "` expects return expression, with type `" + ret_type->to_str() + "`";
+        error(last_stmt->lineno, err_msg);
+      } else {
+        ReturnExpr *retexpr = static_cast<ReturnExpr*>(last_stmt);
+        if (!conforms(last_type, ret_type)) {
+          /* if return type and decl ret type do not match */
+          string err_msg = "Return expression type `" + last_type->to_str() + "` does not conform to declared return type `" + ret_type->to_str() + "`";
+          error(retexpr->lineno, err_msg);
+        }
+      }
+    } else { // ret_type == class_type[Void]
+      if (last_stmt->get_stmttype() == RETURN_EXPR) {
+        ReturnExpr *retexpr = static_cast<ReturnExpr*>(last_stmt);
+        if (last_type != NULL) {
+          string warn_msg = "Method `" + name + "` (declared as void) returns a non-void value.";
+          warning(retexpr->lineno, warn_msg);
+        }
+      }
+    }
+
+  }
+
+done: 
+  scopetable.pop_scope();
+  return NULL;
 }
 
-Type_ *ForStmt::typecheck() {}
+Type_ *IfStmt::typecheck() {
+  Type_ *pred_type = pred->typecheck();
+  if (pred_type && !conforms(pred_type, class_type[Bool])) {
+    string err_msg = "Expected bool in predicate, instead got `" + pred_type->to_str() + "`";
+    error(pred->lineno, err_msg);
+  }
+
+  for (Stmt *s: then_branch) {
+    s->typecheck();
+  }
+
+  for (Stmt *s: else_branch) {
+    s->typecheck();
+  }
+
+  return NULL;
+}
+Type_ *ClassStmt::typecheck() {
+
+  return NULL;
+}
+Type_ *ForStmt::typecheck() {
+
+  return NULL;
+}
+
+/* checks if init expr type conforms to declared, adds to scopetable */
 Type_ *AttrStmt::typecheck() {
   Type_ *init_type = init->typecheck();
-  if (!conforms(type, init_type)) {
-    string err_msg = "Error: type " + init_type->to_str() + " does not conform to declared type " + type->to_str();
-    error(init->lineno, err_msg);
-  }
-}
-Type_ *WhileStmt::typecheck() {}
+  if (init_type && !conforms(init_type, type)) {
+    // string err_msg = "Type `" + init_type->to_str() + "` of attribute `" + name;
+    // err_msg += "` does not conform to declared type `" + type->to_str() + "`";
 
-Type_ *ReturnExpr::typecheck() {}
-Type_ *ListElemRef::typecheck() {}
-Type_ *DispatchExpr::typecheck() {}
+    string err_msg = "Attribute `" + name + "` (declared as " + type->to_str() + ") is initialized to a value of type " + init_type->to_str();
+    error(lineno, err_msg);
+  }
+  /* give declared type precedence on error, else they are the same */
+  scopetable.add_elem(name, type);
+  return NULL;
+}
+
+Type_ *WhileStmt::typecheck() {
+
+  return NULL;
+}
+
+
+
+
+/* 
+  EXPRESSIONS must return their type
+*/
+Type_ *ReturnExpr::typecheck() {
+  /* possible that RETURN has no expression */
+  return expr ? expr->typecheck() : NULL;  
+}
+Type_ *ListElemRef::typecheck() {
+  /* should return T = list<object> */
+  Type_ *name_type = list_name->typecheck();
+
+  if (!name_type) 
+    return NULL;
+
+  return name_type->get_nested_type();
+}
+
+Type_ *DispatchExpr::typecheck() {
+  Type_ *calling_type = calling_expr->typecheck(); 
+}
 Type_ *IntConstExpr::typecheck() {
-  return new Type_("int", NULL);
+  return new Type_(Int, NULL);
 }
+
 Type_ *ObjectIdExpr::typecheck() {
-  return scopetable.lookup(name);
+  Type_ *type_ = scopetable.lookup(name);
+  if (!type_) {
+    string err_msg = "Unknown reference: `" + name + "`";
+    error(lineno, err_msg);
+  }
+  return type_; 
 }
+
 Type_ *BoolConstExpr::typecheck() {
-  return new Type_("bool", NULL);
+  return new Type_(Bool, NULL);
 }
 Type_ *ListConstExpr::typecheck() {
-  return new Type_("list", new Type_("object", NULL));
+  return new Type_(List, new Type_("object", NULL));
 }
 Type_ *StrConstExpr::typecheck() {
-  return new Type_("string", NULL);
+  return new Type_(String, NULL);
 }
 Type_ *NewExpr::typecheck() {
-  return expr->typecheck();
+  return class_type[newclass];
 }
 Type_ *ContExpr::typecheck() {}
 Type_ *KillExpr::typecheck() {}
 Type_ *ThisExpr::typecheck() {}
-Type_ *BinopExpr::typecheck() {
-  Type_ *lhs_type = lhs->typecheck();
-  Type_ *rhs_type = rhs->typecheck();
-
-  if (!conforms(lhs_type, rhs_type)) {
-
-  }
+Type_ *BinopExpr::typecheck() {}
+Type_ *BreakExpr::typecheck() {
+  return new Type_("break", NULL);
 }
-Type_ *BreakExpr::typecheck() {}

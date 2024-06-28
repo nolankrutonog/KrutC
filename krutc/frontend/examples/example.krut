@@ -1,9 +1,14 @@
 
-
 class A inherits B, C {
   char z;
   int a;
-  list<string> m() { return; }
+  list<string> m(int i) { 
+    z = i;
+    return new ["hi"]; 
+  }
+  A() {}
+
+  list<string> l = ["hi"];
 }
 
 class B {
@@ -16,3 +21,22 @@ class C {
   int c;
   int d;
 }
+
+
+void method1(list<list<string>> x) {
+  
+}
+
+/*
+list<string> my_list = [];
+my_list += ["hi"];
+
+
+int main(list<string> args) {
+  print(my_list);
+  method1([my_list]);
+}
+
+list<int> l = [1, 2, 3, 4, 5];
+*/
+

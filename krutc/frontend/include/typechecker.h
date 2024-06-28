@@ -3,11 +3,6 @@
 
 #include "tree.h"
 #include "parser.h"
-#include "inheritance-graph.h"
-#include <map>
-#include <set>
-
-class Graph;
 
 class TypeChecker {
   Program program;
@@ -26,6 +21,7 @@ public:
 
   bool check_inheritance_cycles();
   void populate_feature_tables();
+  bool check_global_features();
   
 };
 

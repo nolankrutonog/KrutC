@@ -114,7 +114,6 @@ void WhileStmt::dump(int n) {
 void IfStmt::dump(int n) {
   indent(n); cout << "if" << endl;
   pred->dump(n + 1);
-  indent(n); cout << "then" << endl;
   for (Stmt *s: then_branch) {
     s->dump(n + 1);
   }
@@ -141,7 +140,9 @@ void ForStmt::dump(int n) {
 void DispatchExpr::dump(int n) {
   if (calling_expr)
     calling_expr->dump(n);
-  indent(n); cout << "." + name << endl;
+
+  // if ()
+  // indent(n); cout << "." + name << endl;
   for (ExprStmt *a: args) {
     a->dump(n + 1);
   }
@@ -166,7 +167,7 @@ string Type_::to_str() {
 
 void FormalStmt::dump(int n) {
   // indent(n); 
-  cout <<  type->get_name() + " " + name + ", ";
+  cout <<  type->to_str() + " " + name + ", ";
 }
 
 void ObjectIdExpr::dump(int n) {
@@ -191,8 +192,7 @@ void BinopExpr::dump(int n) {
 void NoneExpr::dump(int n) {}
 void NewExpr::dump(int n) {
   indent(n);
-  cout << "new" << endl;
-  expr->dump(n + 1);
+  cout << "new " + newclass << endl;
 }
 void KillExpr::dump(int n) {
   indent(n);

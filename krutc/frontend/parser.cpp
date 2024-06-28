@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cctype>
 #include <cassert>
 #include <stack>
 #include <set>
@@ -84,33 +85,34 @@ FormalList Parser::parse_formallist() {
 MethodStmt *Parser::parse_methodstmt(Type_ *type) {
   debug_msg("BEGIN parse_method_stmt()");
   int methodstmt_lineno = tbuff.lookahead(0).get_lineno();
-  // TypeExpr *type;
   string name;
   FormalList formal_list;  
   StmtList stmt_list;
 
-  // assert(tbuff.lookahead(0).get_type() == TYPEID);
-  // type = parse_typeexpr();
-
-  if (tbuff.lookahead(0).get_str() == "(") {
-    name = "constructor";
+  Token next = tbuff.lookahead(0);
+  if (next.get_type() != OBJECTID) {
+    error_blank(next.get_lineno(), "Error: expected a name for the method.");
+    name = "";
   } else {
-    Token next = tbuff.get_next();
-    if (next.get_type() != OBJECTID) {
-      error_blank(next.get_lineno(), "Error: expected an identifier.");
-    }
-    name = next.get_str();
+    name = tbuff.get_next().get_str();
   }
+
+
+  // TODO: what happens when these cases fail?
+  /*
+  ex:
+  int n() 
+  */
 
   parse_check_and_pop("("); // pop leading "("
 
   formal_list = parse_formallist();
-  // doing_formals = false;
+
   parse_check_and_pop(")"); // pop closing ')'
 
   parse_check_and_pop("{"); // parse opening {
 
-  while (tbuff.lookahead(0).get_str() != "}") {
+  while (tbuff.lookahead(0).get_str() != "}" && tbuff.has_next()) {
     Stmt *stmt = parse_stmt();
     stmt_list.push_back(stmt);
   }
@@ -179,14 +181,16 @@ Type_ *Parser::parse_typeexpr() {
   } else {
     name = name_tok.get_str();
   }
-  tbuff.get_next();
+  tbuff.get_next(); // pop outer Type_
 
   if (tbuff.lookahead(0).get_str() == "<") {
-    tbuff.get_next();
+    tbuff.get_next(); // pop opening '<'
     nested = parse_typeexpr();
     if (tbuff.lookahead(0).get_str() == ">") {
-      tbuff.get_next();
-    } 
+      tbuff.get_next(); // pop closing '>'
+    } else {
+      error_blank(tbuff.lookahead(0).get_lineno(), "Error: Expected closing carrot '>'.");
+    }
   } else {
     nested = NULL;
   } 
@@ -202,6 +206,10 @@ Type_ *Parser::parse_typeexpr() {
 Feature *Parser::parse_feature() {
   debug_msg("BEGIN parse_feature()");
   assert(tbuff.lookahead(0).get_type() == TYPEID);
+
+  if (tbuff.lookahead(1).get_str() == "(") {
+
+  }
 
   Type_ *type = parse_typeexpr();
 
@@ -232,6 +240,10 @@ Feature *Parser::parse_feature() {
 
 
 int Parser::parse_check_and_pop(string s) {
+  if (!tbuff.has_next()) {
+    error_blank(0, "Error: Expected '" + s + "', instead got EOF");
+    return -1;
+  }
   Token t = tbuff.lookahead(0);
   if (t.get_str() != s) {
     error_blank(t.get_lineno(), "Error: Expected '" + s + "', instead got '" + t.get_str() + "'.");
@@ -632,6 +644,7 @@ ExprStmt *Parser::parse_exprstmt() {
   } else if (t.get_type() == STR_CONST) {
     expr = parse_str_const_expr();
   } else if (t.get_type() == CONTINUE) {
+    /* TODO: ensure works after cont/break that nothing follows */
     expr = new ContExpr();
     expr_tq.tq.pop_front();
   } else if (t.get_type() == BREAK) {
@@ -652,11 +665,14 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_dispexpr();
   } else if (expr_tq.tq.back().get_str() == "]") {
     expr = parse_list_elem_ref_expr();
-  }
+  } 
+  // else if (t.get_type() == TYPEID && expr_tq.tq.size() == 1) {
+  //   expr = parse_dispexpr();
+  // }
 
-  if (expr_tq.tq.back().get_str() == ")") {
-    expr = parse_dispexpr();
-  }
+  // if (expr_tq.tq.back().get_str() == ")") {
+  //   expr = parse_dispexpr();
+  // }
 
 
   if (!expr_tq.tq.empty()) {
@@ -807,9 +823,7 @@ DispatchExpr *Parser::parse_dispexpr() {
   string name;
   ExprList args;
 
-  // find index of last '.'
   int dot_index = get_str_idx_expr_tq(".");
-
   ExprTQ original = expr_tq;
   expr_tq.tq.clear();
   for (int i = 0; i < dot_index; i++) {
@@ -881,18 +895,18 @@ NewExpr *Parser::parse_newexpr() {
   assert(expr_tq.tq.front().get_type() == NEW);
 
   expr_tq.tq.pop_front();
-  if (expr_tq.tq.empty()) {
-    string err_msg = "Error: There must be an expression following keyword NEW.";
+  if (expr_tq.tq.empty() || expr_tq.tq.front().get_type() != TYPEID) {
+    string err_msg = "Error: There must be a class constructor following keyword NEW.";
     error_blank(lineno, err_msg);
     panic_recover({";"});
     return NULL;
   }
-  // if (!build_expr_tq(";"))
-  //   expr = NULL;
-  // else
-  calibrate_expr_tq();
-  expr = parse_exprstmt();
-  NewExpr *newexpr = new NewExpr(expr);
+
+  // calibrate_expr_tq();
+  // expr = parse_exprstmt();
+
+  NewExpr *newexpr = new NewExpr(expr_tq.tq.front().get_str());
+  expr_tq.tq.pop_front();
   newexpr->lineno = lineno;
   debug_msg("END parse_newexpr()");
   return newexpr;
@@ -935,12 +949,14 @@ BinopExpr *Parser::parse_binopexpr() {
 }
 
 IntConstExpr *Parser::parse_int_const_expr() {
+  debug_msg("BEGIN: parse_int_const_expr()");
   Token t = expr_tq.tq.front();
   expr_tq.tq.pop_front();
   int lineno = t.get_lineno();
   long val = stol(t.get_str());
   IntConstExpr *icstmt = new IntConstExpr(val);
   icstmt->lineno = lineno;
+  debug_msg("END: parse_int_const_expr()");
   return icstmt; 
 }
 BoolConstExpr *Parser::parse_bool_const_expr() {
@@ -977,7 +993,7 @@ Stmt *Parser::parse_stmt() {
   debug_msg("BEGIN parse_stmt()");
   Stmt *stmt;
   Token t = tbuff.lookahead(0);
-  if (t.get_type() == TYPEID) {
+  if (t.get_type() == TYPEID && tbuff.lookahead(1).get_str() != "(") {
     stmt = parse_feature();
   } else if (t.get_type() == FOR) {
     stmt = parse_for_stmt();
@@ -987,14 +1003,12 @@ Stmt *Parser::parse_stmt() {
     stmt = parse_if_stmt();
   } else if (t.get_type() == WHILE) {
     stmt = parse_while_stmt();
-  } else if (t.get_type() == OBJECTID && tbuff.lookahead(1).get_type() == OBJECTID) {
-    // error case here
-  }
-  else {
+  } else {
     if (!build_expr_tq(";"))
       stmt = NULL;
-    else 
+    else  {
       stmt = parse_exprstmt();
+    }
     if (parse_check_and_pop(";") == -1) {
       return NULL;
     }

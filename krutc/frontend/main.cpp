@@ -23,11 +23,11 @@ int main(int argc, char *argv[]) {
   if (argc >= 3) {
     for (int i = 2; i < argc; i++) {
       string flag = argv[i];
-      if (strncmp(flag.c_str(), "-debug", 6) == 0) {
+      if (flag == "-debug") {
         debug = true;
-      } else if (strncmp(flag.c_str(), "-tdump", 6) == 0) {
+      } else if (flag == "-tdump") {
         token_dump = true;
-      } else if (strncmp(flag.c_str(), "-tree", 5) == 0) {
+      } else if (flag == "-tree") {
         tree = true;
       }
       else {
@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
   Program program = parser.parse_program();
 
   if (parser.parser_errors) {
+    /* cannot typecheck if the parser has errors */
     return -1;
   }
 
