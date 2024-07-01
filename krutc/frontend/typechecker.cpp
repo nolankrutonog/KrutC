@@ -748,6 +748,13 @@ Type_ *ForStmt::typecheck() {
 
 /* checks if init expr type conforms to declared, adds to scopetable */
 Type_ *AttrStmt::typecheck() {
+
+  if (!class_type[type->get_name()]) {
+    string err_msg = "Undefined type `" + type->get_name() + "`";
+    error(lineno, err_msg);
+    return NULL;
+  }
+
   Type_ *init_type = init->typecheck();
   if (init_type && !conforms(init_type, type)) {
     // string err_msg = "Type `" + init_type->to_str() + "` of attribute `" + name;
@@ -789,6 +796,7 @@ Type_ *ListElemRef::typecheck() {
 Type_ *DispatchExpr::typecheck() {
   Type_ *calling_type = calling_expr->typecheck(); 
 }
+
 Type_ *IntConstExpr::typecheck() {
   return new Type_(Int, NULL);
 }

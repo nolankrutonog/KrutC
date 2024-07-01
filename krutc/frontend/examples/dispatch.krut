@@ -1,18 +1,16 @@
 
 
 
-/*
 class A {
   void m() {
 
   }
 }
-*/
 
 A a = new A;
 
 n();
-bet_bet(1, 3, 5);
+-- bet_bet(1, 3, 5);
 -- void n = void();
 
 

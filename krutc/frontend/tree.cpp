@@ -138,14 +138,19 @@ void ForStmt::dump(int n) {
   }
 }
 void DispatchExpr::dump(int n) {
-  if (calling_expr)
+  if (calling_expr) {
     calling_expr->dump(n);
+    indent(n); cout << ".";
+  } else {
+    indent(n);
+  }
+  cout << name + "(";
 
-  // if ()
-  // indent(n); cout << "." + name << endl;
   for (ExprStmt *a: args) {
     a->dump(n + 1);
   }
+
+  cout << ")" << endl;
 
 }
 

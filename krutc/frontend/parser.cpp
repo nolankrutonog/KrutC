@@ -98,11 +98,6 @@ MethodStmt *Parser::parse_methodstmt(Type_ *type) {
   }
 
 
-  // TODO: what happens when these cases fail?
-  /*
-  ex:
-  int n() 
-  */
 
   parse_check_and_pop("("); // pop leading "("
 
