@@ -87,5 +87,6 @@
     "format": "cpp",
     "tuple": "cpp",
     "__threading_support": "cpp"
-  }
+  },
+  "git.ignoreLimitWarning": true
 }

@@ -1,16 +1,43 @@
 
 
-
 class A {
-  void m() {
+  int n(int i) {
 
   }
 }
 
+string n;
+
+list<int> l_ints = [1, 2, 3];
+
+int n;
+
+l_ints[n];
+
+for (int i = 0; i < l_ints.length(); i += 1) {
+   
+}
+
+
+
+/*
 A a = new A;
 
-n();
+a.n(1);
+
+int i = l_ints[a.n(1)];
+
+
+bool f = func();
+
 -- bet_bet(1, 3, 5);
--- void n = void();
+void n = void();
+
+bool func() {
+
+}
+*/
+
+
 
 

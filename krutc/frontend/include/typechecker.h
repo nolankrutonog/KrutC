@@ -16,6 +16,7 @@ public:
 
   int typecheck();
   void initialize_basic_classes();
+  void initialize_builtin_methods();
   void initialize_declared_classes();
   void check_valid_class_parents();
 

@@ -50,7 +50,7 @@ FormalList Parser::parse_formallist() {
 
     next = tbuff.lookahead(0);
     if (next.get_type() != OBJECTID) {
-      error_blank(lineno, "Error: Expected OBJECTID to follow TYPEID in formal definition. Instead got " + next.get_str());
+      error_blank(lineno, "Error: Variable name required for formal parameter definition.");
       if (next.get_str() == ")") {
         break;
       }

@@ -33,6 +33,16 @@ using namespace std;
 #define Push "push"
 #define Contains "contains"
 
+/* global builtin methods */
+#define Print "print"
+#define To_str "to_str"
+#define Type "type"
+#define Abs "abs"
+#define Sum "sum"
+#define Min "min"
+#define Max "max"
+#define Input "input"
+
 static const set<string> basic_classes = {
   "void", 
   "object", 
@@ -127,7 +137,7 @@ void TypeChecker::initialize_basic_classes() {
     parent: object
     no member attrs/methods
   */
-  class_type[Int] = new Type_(Bool, NULL);
+  class_type[Int] = new Type_(Int, NULL);
   class_parents[Int].push_back(Object);
   class_names.push_back(Int);
   classes[Int] = new ClassStmt(Int, {Object}, {});
@@ -264,6 +274,38 @@ bool check_valid_type_(Type_ *t) {
   }
   return true;
     
+}
+
+/* defines KrutC builtin methods */
+void TypeChecker::initialize_builtin_methods() {
+  /* 
+  void print(string s); -- prints s to console
+  string to_str(int i); -- returns string representation of i
+  object type(object o); -- returns type of object
+  int abs(int x); -- returns abs value of x
+  int sum(list<object> l); -- returns sum of l
+  int min(list<object> l); -- returns min val of l
+  int max(list<object> l); -- returns max val of l
+  string input(string prompt); -- returns input from console/terminal
+
+
+
+  TODO:
+    dec (decimal type), int-->dec & dec-->int
+    file object?? how does that work?
+
+
+
+  */
+  global_methods.insert(new MethodStmt(class_type[Void], Print, {new FormalStmt(class_type[String], "s")}, {}));
+  global_methods.insert(new MethodStmt(class_type[String], Input, {new FormalStmt(class_type[String], "prompt")}, {}));
+  global_methods.insert(new MethodStmt(class_type[String], To_str, {new FormalStmt(class_type[Int], "i")}, {}));
+  global_methods.insert(new MethodStmt(class_type[Object], Type, {new FormalStmt(class_type[Object], "o")}, {}));
+  global_methods.insert(new MethodStmt(class_type[Int], Abs, {new FormalStmt(class_type[Int], "x")}, {}));
+  global_methods.insert(new MethodStmt(class_type[Int], Sum, {new FormalStmt(class_type[List], "l")}, {}));
+  global_methods.insert(new MethodStmt(class_type[Int], Min, {new FormalStmt(class_type[List], "l")}, {}));
+  global_methods.insert(new MethodStmt(class_type[Int], Max, {new FormalStmt(class_type[List], "l")}, {}));
+
 }
 
 /* Declared classes (of the form class ClassName {...}) can only be decalared in outer scope */
@@ -560,6 +602,7 @@ int TypeChecker::typecheck() {
   curr_filename = filename;
 
   initialize_basic_classes();
+  initialize_builtin_methods();
   initialize_declared_classes();
   check_valid_class_parents();
 
@@ -574,6 +617,7 @@ int TypeChecker::typecheck() {
     /* cannot continue typechecking if global features have type declaration errors */
     return semant_errors;
   }
+
   scopetable.push_scope();
 
   for (int i = 0; i < program.len(); i++) {
@@ -746,23 +790,62 @@ Type_ *ForStmt::typecheck() {
   return NULL;
 }
 
+
+
 /* checks if init expr type conforms to declared, adds to scopetable */
 Type_ *AttrStmt::typecheck() {
+  Type_ *init_type;
+
+  if (conforms(type, class_type[Void])) {
+    string err_msg = "Variable " + name + " cannot be declared as Void";
+    error(lineno, err_msg);
+    goto done;
+  }
 
   if (!class_type[type->get_name()]) {
     string err_msg = "Undefined type `" + type->get_name() + "`";
     error(lineno, err_msg);
-    return NULL;
+    goto done;
   }
 
-  Type_ *init_type = init->typecheck();
-  if (init_type && !conforms(init_type, type)) {
-    // string err_msg = "Type `" + init_type->to_str() + "` of attribute `" + name;
-    // err_msg += "` does not conform to declared type `" + type->to_str() + "`";
+  if (!init) 
+    goto done;
 
-    string err_msg = "Attribute `" + name + "` (declared as " + type->to_str() + ") is initialized to a value of type " + init_type->to_str();
+  init_type = init->typecheck();
+  if (!init_type) {
+    goto done;
+  }
+
+  if (init_type->get_nested_type() && type->get_nested_type()) {
+    // if there is a nested type, check all the elems in the nested ExprList
+    ListConstExpr *lce = dynamic_cast<ListConstExpr*>(init);
+    if (!lce) {
+      // TODO: lce = dynamic_cast<StackConstExpr*>(init);
+    }
+    ExprList exprlist = lce->get_exprlist();
+    bool can_change = true;
+    for (int i = 0; i < (int) exprlist.size(); i++) {
+      ExprStmt *expr = exprlist[i];
+      Type_ *et = expr->typecheck();
+      if (!conforms(et, type->get_nested_type())) {
+        string err_msg = "Element " + to_string(i) + " in variable " + name + " is of type " + et->to_str() + " and should be of type " + type->get_nested_type()->to_str();
+        error(lineno, err_msg);
+        can_change = false;
+      }
+    }
+    if (can_change) {
+      init_type = new Type_(init_type->get_name(), type->get_nested_type());
+    } else {
+      goto done;
+    }
+  }
+
+  if (init_type && !conforms(init_type, type)) {
+    string err_msg = "Variable `" + name + "` (declared as " + type->to_str() + ") is initialized to a value of type " + init_type->to_str();
     error(lineno, err_msg);
   }
+
+done:
   /* give declared type precedence on error, else they are the same */
   scopetable.add_elem(name, type);
   return NULL;
@@ -785,8 +868,14 @@ Type_ *ReturnExpr::typecheck() {
 }
 Type_ *ListElemRef::typecheck() {
   /* should return T = list<object> */
-  Type_ *name_type = list_name->typecheck();
+  Type_ *index_type = index->typecheck();
 
+  if (!conforms(index_type, class_type[Int])) {
+    string err_msg = "When indexing a list, the index expression must be of type Int";
+    error(lineno, err_msg);
+  }
+
+  Type_ *name_type = list_name->typecheck();
   if (!name_type) 
     return NULL;
 
@@ -794,32 +883,105 @@ Type_ *ListElemRef::typecheck() {
 }
 
 Type_ *DispatchExpr::typecheck() {
-  Type_ *calling_type = calling_expr->typecheck(); 
+  MethodStmt *cmp_meth;
+  bool exists = false;
+  if (calling_expr) {
+    Type_ *calling_type = calling_expr->typecheck(); 
+    // check method exists for calling type
+    string class_name = calling_type->get_name();
+    set<MethodStmt*>& meths = class_methods[class_name];
+    for (MethodStmt* m: meths) {
+      if (m->get_name() == name) {
+        exists = true;
+        cmp_meth = m;
+        break;
+      }
+    }
+    if (!exists) {
+      string err_msg = "Class " + class_type[class_name]->to_str() + " has no method " + name;
+      error(lineno, err_msg);
+    }
+  } else {
+    // check global methods
+    for (MethodStmt *m: global_methods) {
+      if (m->get_name() == name) {
+        exists = true;
+        cmp_meth = m;
+        break;
+      }
+    }
+    if (!exists) {
+      string err_msg = "Method " + name + " does not exist";
+      error(lineno, err_msg);
+    }
+  }
+  if (exists) {
+    FormalList fl = cmp_meth->get_formal_list();
+
+    for (int i = 0; i < (int) args.size(); i++) {
+      ExprStmt *arg = args[i];
+      Type_ *arg_type = arg->typecheck();
+      if (i > (int) fl.size() - 1) {
+        string warn_msg = "Method " + cmp_meth->get_name() + " has " + to_string(fl.size()) + " arguments, so any more will be ignored.";
+        warning(lineno, warn_msg);
+      } else if (!conforms(arg_type, fl[i]->get_type())) {
+        string suffix;
+        switch ((i + 1) % 10) {
+          case 1: 
+            suffix = i == 11 ? "th" : "st";
+            break;
+          case 2:
+            suffix = i == 12 ? "th" : "nd";
+            break;
+          case 3:
+            suffix = i == 13 ? "th" : "rd";
+            break;
+          default:
+            suffix = "th";
+            break;
+        }
+        string err_msg = "The " + to_string(i + 1) + suffix + " argument of function call " + name + " needs to be of type " + fl[i]->get_type()->to_str() + " instead of type " + arg_type->to_str();
+        error(lineno, err_msg);
+      }
+    }
+  }
+  return cmp_meth->get_ret_type();
 }
 
 Type_ *IntConstExpr::typecheck() {
-  return new Type_(Int, NULL);
+  return class_type[Int];
 }
 
 Type_ *ObjectIdExpr::typecheck() {
   Type_ *type_ = scopetable.lookup(name);
   if (!type_) {
-    string err_msg = "Unknown reference: `" + name + "`";
+    string err_msg = "Unknown variable: `" + name + "`";
     error(lineno, err_msg);
   }
   return type_; 
 }
 
 Type_ *BoolConstExpr::typecheck() {
-  return new Type_(Bool, NULL);
+  return class_type[Bool];
 }
+
+
+
 Type_ *ListConstExpr::typecheck() {
-  return new Type_(List, new Type_("object", NULL));
+  return class_type[List];
 }
+
 Type_ *StrConstExpr::typecheck() {
   return new Type_(String, NULL);
 }
+
 Type_ *NewExpr::typecheck() {
+  Type_ *type_ = class_type[newclass];
+  if (!type_) {
+    string err_msg = "Unknown type " + newclass + " in new expression";
+    error(lineno, err_msg);
+    return NULL;
+  }
   return class_type[newclass];
 }
 Type_ *ContExpr::typecheck() {}
