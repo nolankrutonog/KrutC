@@ -35,29 +35,9 @@ enum StmtType {
   KILL_EXPR = 614,
   NEW_EXPR = 615,
   LIST_ELEM_REF = 616,
-  TYPE_EXPR = 617
+  TYPE_EXPR = 617,
 };
 
-// enum ExprType {
-//   EXPR_EXPR = 600,
-//   RETURN_EXPR = 601,
-//   INT_CONST_EXPR = 602,
-//   STRING_CONST_EXPR = 603,
-//   LIST_CONST_EXPR = 604,
-//   OBJECTID_EXPR = 605,
-//   DISPATCH_EXPR = 606,
-//   OP_EXPR = 607,
-//   THIS_EXPR = 608,
-//   BOOL_CONST_EXPR = 609,
-//   BINOP_EXPR = 610,
-//   CONT_EXPR = 611,
-//   BREAK_EXPR = 612,
-//   NONE_EXPR = 613,
-//   KILL_EXPR = 614,
-//   NEW_EXPR = 615,
-//   LIST_ELEM_REF = 616,
-//   TYPE_EXPR = 617
-// };
 
 class Program;
 class Stmt;
@@ -81,10 +61,11 @@ class IntConstExpr;
 class StrConstExpr;
 class BoolConstExpr;
 class ListConstExpr;
+class ListElemRef;
+class StackConstExpr;
 class ObjectIdExpr;
 class DispatchExpr;
 class BinopExpr;
-class ThisExpr; 
 class ContExpr;
 class BreakExpr;
 class NoneExpr;
@@ -220,10 +201,9 @@ public:
 };
 
 class ForStmt : public Stmt {
-  Stmt *stmt;
-  // ExprStmt *start;
-  ExprStmt *cond;
-  ExprStmt *repeat;
+  Stmt *stmt;         /* stmt is executed one time */
+  ExprStmt *cond;     /* the loop repeats until condition is false */
+  ExprStmt *repeat;   /* repeat is executed on every loop */
   StmtList stmt_list;
 
 public:
@@ -401,16 +381,6 @@ public:
   ExprStmt *get_list_name() { return list_name; }
   ExprStmt *get_index() { return index; }
 
-  Type_ *typecheck();
-};
-
-class ThisExpr : public ExprStmt {
-  std::string name = "THIS";
-public:
-  ThisExpr() {}
-  StmtType get_stmttype() { return THIS_EXPR; }
-  std::string classname() { return "ThisExpr"; }
-  void dump(int indent);
   Type_ *typecheck();
 };
 

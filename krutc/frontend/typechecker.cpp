@@ -16,7 +16,7 @@ using namespace std;
 #define Char "char"
 #define String "string"
 #define List "list"
-#define Stack "stack"
+// #define Stack "stack"
 
 /* basic classes methods */
 #define Constructor "constructor"
@@ -29,8 +29,8 @@ using namespace std;
 #define Pop_Back "pop_back"
 #define Push_Front "push_front"
 #define Pop_Front "pop_front"
-#define Pop "pop"
-#define Push "push"
+// #define Pop "pop"
+// #define Push "push"
 #define Contains "contains"
 
 /* global builtin methods */
@@ -51,7 +51,6 @@ static const set<string> basic_classes = {
   "char", 
   "string", 
   "list", 
-  "stack" 
 };
 
 static string curr_filename;                          /* current filename */
@@ -98,7 +97,7 @@ void warning(int lineno, std::string warn_msg) {
 
 
 void TypeChecker::initialize_basic_classes() {
-  /* bool, char, int, string, list, stack, void, object 
+  /* bool, char, int, string, list, void, object 
   defined below are the basic types and their methods
   */
 
@@ -232,38 +231,13 @@ void TypeChecker::initialize_basic_classes() {
   }
   classes[List] = new ClassStmt(String, {Object}, list_features);
 
-  /*
-  stack<object> ->
-    parent: object
-    int length() -- returns num objects in stack
-    void clear() -- empties the stack
-    bool is_empty() -- returns true on length == 0, false otherwise
-    void push(object o) -- pushes object on stack
-    void pop() -- pops last object 
-    object top() -- returns top object
-  */
-  class_type[Stack] = new Type_(Stack, class_type[Object]);
-  class_parents[Stack].push_back(Object);
-  set<MethodStmt*> stack_methods = {
-    new MethodStmt(class_type[Int], Length, {}, {}),
-    new MethodStmt(class_type[Void], Clear, {}, {}),
-    new MethodStmt(class_type[Bool], Is_Emtpy, {}, {}),
-    new MethodStmt(class_type[Void], Push, {new FormalStmt(class_type[Object], Object)}, {}),
-    new MethodStmt(class_type[Void], Pop, {}, {}),
-  };
-  class_methods[Stack] = stack_methods; 
-  class_names.push_back(Stack);
-  FeatureList stack_features;
-  for (MethodStmt *m: stack_methods) {
-    stack_features.push_back(m);
-  }
-  classes[Stack] = new ClassStmt(String, {Object}, stack_features);
 }
 
 /* Returns false if T is invalid. ex: list, char<string> are invalid */ 
 bool check_valid_type_(Type_ *t) {
   Type_ *nested = t->get_nested_type();
-  if (t->get_name() == List || t->get_name() == Stack) {
+  // if (t->get_name() == List || t->get_name() == Stack) {
+  if (t->get_name() == List) {
     if (nested == NULL) {
       return false; 
     } else {
@@ -858,7 +832,6 @@ Type_ *WhileStmt::typecheck() {
 
 
 
-
 /* 
   EXPRESSIONS must return their type
 */
@@ -957,6 +930,7 @@ Type_ *ObjectIdExpr::typecheck() {
   if (!type_) {
     string err_msg = "Unknown variable: `" + name + "`";
     error(lineno, err_msg);
+    return NULL;
   }
   return type_; 
 }
@@ -964,8 +938,6 @@ Type_ *ObjectIdExpr::typecheck() {
 Type_ *BoolConstExpr::typecheck() {
   return class_type[Bool];
 }
-
-
 
 Type_ *ListConstExpr::typecheck() {
   return class_type[List];
@@ -986,8 +958,31 @@ Type_ *NewExpr::typecheck() {
 }
 Type_ *ContExpr::typecheck() {}
 Type_ *KillExpr::typecheck() {}
-Type_ *ThisExpr::typecheck() {}
-Type_ *BinopExpr::typecheck() {}
+Type_ *BinopExpr::typecheck() {
+  Type_ *lhs_type = lhs->typecheck();
+  Type_ *rhs_type = rhs->typecheck();
+
+  cout << op << endl;
+
+  if (OP_PRECEDENCE[op] >= 4) {
+    ObjectIdExpr *lval = dynamic_cast<ObjectIdExpr*>(lhs);
+    if (!lval) {
+      string err_msg = "Left side of operator `" + op + "` must be a variable name";
+      error(lineno, err_msg);
+    }
+  }
+
+  if (!conforms(lhs_type, rhs_type)) {
+    string err_msg = "Left side type (" + lhs_type->to_str() + ") of operator `" + op + "` is not the same as right side type (" + rhs_type->to_str() + ")";
+    error(lineno, err_msg);
+  }
+
+  if (OP_PRECEDENCE[op] == 2 || OP_PRECEDENCE[op] == 3) {
+    return class_type[Bool];
+  }
+
+
+}
 Type_ *BreakExpr::typecheck() {
   return new Type_("break", NULL);
 }

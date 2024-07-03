@@ -4,9 +4,8 @@ class A inherits B, C {
   int a;
   list<string> m(int i) { 
     z = i;
-    return new ["hi"]; 
+    return ["hi"]; 
   }
-  A() {}
 
   list<string> l = ["hi"];
 }
@@ -26,7 +25,6 @@ class C {
 void method1(list<list<string>> x) {
   
 }
-
 /*
 list<string> my_list = [];
 my_list += ["hi"];

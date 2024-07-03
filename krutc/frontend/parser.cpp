@@ -645,10 +645,12 @@ ExprStmt *Parser::parse_exprstmt() {
   } else if (t.get_type() == BREAK) {
     expr = new BreakExpr();
     expr_tq.tq.pop_front();
-  } else if (t.get_type() == THIS) {
-    expr = new ThisExpr();
-    expr_tq.tq.pop_front();
-  } else if (t.get_type() == OBJECTID && expr_tq.tq.size() == 1) {
+  } 
+  // else if (t.get_type() == THIS) {
+  //   expr = new ThisExpr();
+  //   expr_tq.tq.pop_front();
+  // } 
+  else if (t.get_type() == OBJECTID && expr_tq.tq.size() == 1) {
     expr = parse_objectid_expr();
   } else if (t.get_str() == "[" && expr_tq.tq.back().get_str() == "]") {
     expr = parse_list_const_expr();
@@ -661,13 +663,6 @@ ExprStmt *Parser::parse_exprstmt() {
   } else if (expr_tq.tq.back().get_str() == "]") {
     expr = parse_list_elem_ref_expr();
   } 
-  // else if (t.get_type() == TYPEID && expr_tq.tq.size() == 1) {
-  //   expr = parse_dispexpr();
-  // }
-
-  // if (expr_tq.tq.back().get_str() == ")") {
-  //   expr = parse_dispexpr();
-  // }
 
 
   if (!expr_tq.tq.empty()) {

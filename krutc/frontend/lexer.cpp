@@ -29,9 +29,7 @@ unordered_set<string> BASIC_TYPES = {
   "string",
   "bool",
   "void",
-  // "none",
   "list",
-  "stack",
   "object",
   "char"
 };

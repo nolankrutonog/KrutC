@@ -58,10 +58,6 @@ void MethodStmt::dump(int n) {
   }
 }
 
-void ThisExpr::dump(int n) {
-  indent(n); cout << name << endl;
-}
-
 void ContExpr::dump(int n) {
   indent(n); cout << name << endl;
 }
