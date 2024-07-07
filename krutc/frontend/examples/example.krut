@@ -3,7 +3,7 @@ class A inherits B, C {
   char z;
   int a;
   list<string> m(int i) { 
-    z = i;
+    z = 'c';
     return ["hi"]; 
   }
 
@@ -25,16 +25,14 @@ class C {
 void method1(list<list<string>> x) {
   
 }
-/*
 list<string> my_list = [];
 my_list += ["hi"];
 
 
 int main(list<string> args) {
-  print(my_list);
+  print(my_list[0]);
   method1([my_list]);
 }
 
 list<int> l = [1, 2, 3, 4, 5];
-*/
 

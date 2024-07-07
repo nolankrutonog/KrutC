@@ -19,6 +19,7 @@ public:
   void initialize_builtin_methods();
   void initialize_declared_classes();
   void check_valid_class_parents();
+  void populate_class_ancestors();
 
   bool check_inheritance_cycles();
   void populate_feature_tables();

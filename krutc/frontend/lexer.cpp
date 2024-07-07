@@ -124,7 +124,7 @@ int Lexer::get_string() {
       continue;
     } else if (char_buff_size >= MAX_STRING_LEN) {
       char_buff_size = -1;
-      string_err_buff = filepath + ":" + to_string(string_start_lineno) + ": " + "Lexer Error. Verse too long. Maximum string length is " + to_string(MAX_STRING_LEN);
+      string_err_buff = filepath + ":" + to_string(string_start_lineno) + ": " + "Lexer Error: Verse too long. Maximum string length is " + to_string(MAX_STRING_LEN);
     } else if (curr == '\"') {
       break;
     } else {
@@ -198,6 +198,18 @@ Token Lexer::get_next_token() {
         t = Token(curr_lineno, STR_CONST, "\"" + str + "\"");
       } else {
         t = Token(curr_lineno, ERROR, string_err_buff);
+      }
+      break;
+    }
+
+    if (curr == "\'") {
+      string c;
+      c += buff.get_next();
+      if (buff.lookahead(0) != '\'') {
+        t = Token(curr_lineno, ERROR, filepath + ":" + to_string(curr_lineno) + ": Lexer Error: missing closing single quote ");
+      } else {
+        buff.get_next();
+        t = Token(curr_lineno, CHAR_CONST, "\'" + c + "\'");
       }
       break;
     }

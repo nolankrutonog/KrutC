@@ -79,6 +79,12 @@ void StrConstExpr::dump(int n) {
   indent(n);
   cout << str << endl;
 }
+void CharConstExpr::dump(int n) {
+  indent(n);
+  cout << c << endl;
+}
+
+
 
 void ListConstExpr::dump(int n) {
   indent(n); cout << "[" << endl;

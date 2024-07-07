@@ -109,6 +109,7 @@ private:
     IntConstExpr* parse_int_const_expr();
     BoolConstExpr* parse_bool_const_expr();
     StrConstExpr* parse_str_const_expr();
+    CharConstExpr* parse_char_const_expr();
     ReturnExpr *parse_returnexpr();
     NewExpr *parse_newexpr();
     KillExpr *parse_killexpr();

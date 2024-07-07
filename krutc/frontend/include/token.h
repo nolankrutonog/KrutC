@@ -28,6 +28,7 @@ enum TokenType {
   NONE = 289,
   KILL = 290,
   NEW = 291,
+  CHAR_CONST = 292,
 
 
   EMPTY = 468,

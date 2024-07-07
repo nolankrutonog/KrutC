@@ -62,6 +62,7 @@ static vector<string> class_names;                    /* vector of class names *
 static map<string, Type_*> class_type;                /* map from class name to Type_* */
 static map<string, ClassStmt*> classes;               /* map from class name to ClassStmt* */
 static map<string, vector<string>> class_parents;     /* map from class name to vector of parents */
+static map<string, set<string>> class_ancestors;      /* map from class name to set of all ancestors */
 static map<string, set<MethodStmt*>> class_methods;   /* map from class name to its MethodStmt* */
 static map<string, set<AttrStmt*>> class_attrs;       /* map from class name to its AttrStmt* */
 static map<string, set<MethodStmt*>> parent_methods;  /* intermediate map from class name to its parent methods */
@@ -474,6 +475,32 @@ bool check_method_sigs(MethodStmt *p, MethodStmt *c, const string& cname) {
   return ret_val;
 }
 
+set<string> get_ancestors(string t) {
+  set<string> ancs;
+  deque<string> frontier;
+  frontier.push_front(t);
+
+  while (!frontier.empty()) {
+    string curr = frontier.front();
+    frontier.pop_front();
+
+    for (const string& parent: class_parents[curr]) {
+      if (ancs.find(parent) == ancs.end()) {
+        ancs.insert(parent);
+        frontier.push_back(parent);
+      }
+    }
+  }
+
+  return ancs;
+}
+
+void TypeChecker::populate_class_ancestors() {
+  for (const string& name: class_names) {
+    class_ancestors[name] = get_ancestors(name);
+  }
+}
+
 
 void TypeChecker::populate_feature_tables() {
   map<string, bool> visited;
@@ -585,6 +612,8 @@ int TypeChecker::typecheck() {
     return semant_errors++;
   } 
 
+  populate_class_ancestors();
+
   populate_feature_tables();
 
   if (!check_global_features()) {
@@ -694,46 +723,68 @@ Type_ *MethodStmt::typecheck() {
     f->typecheck();
   }
 
-  /* typecheck every expression, save the last one for RETURN possibility */
-  int i;
-  for (i = 0; i < (int) stmt_list.size() - 1; i++) {
-    stmt_list[i]->typecheck();
-  }
+//   /* typecheck every expression, save the last one for RETURN possibility */
+//   int i;
+//   for (i = 0; i < (int) stmt_list.size() - 1; i++) {
+//     stmt_list[i]->typecheck();
+//   }
 
-  if (!stmt_list.empty()) {
-    Stmt *last_stmt = stmt_list[i];
+//   if (!stmt_list.empty()) {
+//     Stmt *last_stmt = stmt_list[i];
 
-    Type_ *last_type = last_stmt->typecheck();
-    if (!last_type)
-      goto done;
+//     Type_ *last_type = last_stmt->typecheck();
+//     if (!last_type)
+//       goto done;
 
-    if (!conforms(class_type[Void], ret_type)) {
-      /* if method expects a return value */
-      if (last_stmt->get_stmttype() != RETURN_EXPR) {
-        // TODO: is there a way to get lineno here to work? last_stmt is generic and we wont know the error...
-        string err_msg = "Method `" + name + "` expects return expression, with type `" + ret_type->to_str() + "`";
-        error(last_stmt->lineno, err_msg);
-      } else {
-        ReturnExpr *retexpr = static_cast<ReturnExpr*>(last_stmt);
-        if (!conforms(last_type, ret_type)) {
-          /* if return type and decl ret type do not match */
-          string err_msg = "Return expression type `" + last_type->to_str() + "` does not conform to declared return type `" + ret_type->to_str() + "`";
-          error(retexpr->lineno, err_msg);
-        }
+//     if (!conforms(class_type[Void], ret_type)) {
+//       /* if method expects a return value */
+//       if (last_stmt->get_stmttype() != RETURN_EXPR) {
+//         // TODO: is there a way to get lineno here to work? last_stmt is generic and we wont know the error...
+//         string err_msg = "Method `" + name + "` expects return expression, with type `" + ret_type->to_str() + "`";
+//         error(last_stmt->lineno, err_msg);
+//       } else {
+//         ReturnExpr *retexpr = static_cast<ReturnExpr*>(last_stmt);
+//         if (!conforms(last_type, ret_type)) {
+//           /* if return type and decl ret type do not match */
+//           string err_msg = "Return expression type `" + last_type->to_str() + "` does not conform to declared return type `" + ret_type->to_str() + "`";
+//           error(retexpr->lineno, err_msg);
+//         }
+//       }
+//     } else { // ret_type == class_type[Void]
+//       if (last_stmt->get_stmttype() == RETURN_EXPR) {
+//         ReturnExpr *retexpr = static_cast<ReturnExpr*>(last_stmt);
+//         if (last_type != NULL) {
+//           string warn_msg = "Method `" + name + "` (declared as void) returns a non-void value.";
+//           warning(retexpr->lineno, warn_msg);
+//         }
+//       }
+//     }
+
+//   }
+
+// done: 
+  for (int i = 0; i < (int) stmt_list.size(); i++) {
+    Stmt *s = stmt_list[i];
+    Type_ *t = s->typecheck();
+
+    ReturnExpr *rex = dynamic_cast<ReturnExpr*>(s);
+    if (!rex)
+      continue;
+    
+    if (conforms(ret_type, class_type[Void])) {
+      // if return type of method is void
+      if (!conforms(t, class_type[Void])) {
+        // if return value is not void
+        string warn_msg = "Void method " + name + " returning " + t->to_str() + " will be ignored";
+        warning(lineno, warn_msg);
       }
-    } else { // ret_type == class_type[Void]
-      if (last_stmt->get_stmttype() == RETURN_EXPR) {
-        ReturnExpr *retexpr = static_cast<ReturnExpr*>(last_stmt);
-        if (last_type != NULL) {
-          string warn_msg = "Method `" + name + "` (declared as void) returns a non-void value.";
-          warning(retexpr->lineno, warn_msg);
-        }
-      }
+    } else if (!conforms(t, ret_type)) {
+      string err_msg = "Method " + name + " cannot return a " + t->to_str() + " when its declared return type is " + ret_type->to_str();
+      error(lineno, err_msg);
     }
-
+      
   }
 
-done: 
   scopetable.pop_scope();
   return NULL;
 }
@@ -755,7 +806,22 @@ Type_ *IfStmt::typecheck() {
 
   return NULL;
 }
+
 Type_ *ClassStmt::typecheck() {
+  scopetable.push_scope();
+
+  for (Feature *f: feature_list) {
+    if (f->is_method()) {
+      MethodStmt *m = static_cast<MethodStmt*>(f);
+      m->typecheck();
+    } else {
+      AttrStmt *a = static_cast<AttrStmt*>(f);
+      a->typecheck();
+    }
+
+  }
+
+  scopetable.pop_scope();
 
   return NULL;
 }
@@ -771,12 +837,14 @@ Type_ *AttrStmt::typecheck() {
   Type_ *init_type;
 
   if (conforms(type, class_type[Void])) {
+    /* variable cannot be void */
     string err_msg = "Variable " + name + " cannot be declared as Void";
     error(lineno, err_msg);
     goto done;
   }
 
   if (!class_type[type->get_name()]) {
+    /* unknown type */
     string err_msg = "Undefined type `" + type->get_name() + "`";
     error(lineno, err_msg);
     goto done;
@@ -787,31 +855,8 @@ Type_ *AttrStmt::typecheck() {
 
   init_type = init->typecheck();
   if (!init_type) {
+    /* if there's no initializing of variable */
     goto done;
-  }
-
-  if (init_type->get_nested_type() && type->get_nested_type()) {
-    // if there is a nested type, check all the elems in the nested ExprList
-    ListConstExpr *lce = dynamic_cast<ListConstExpr*>(init);
-    if (!lce) {
-      // TODO: lce = dynamic_cast<StackConstExpr*>(init);
-    }
-    ExprList exprlist = lce->get_exprlist();
-    bool can_change = true;
-    for (int i = 0; i < (int) exprlist.size(); i++) {
-      ExprStmt *expr = exprlist[i];
-      Type_ *et = expr->typecheck();
-      if (!conforms(et, type->get_nested_type())) {
-        string err_msg = "Element " + to_string(i) + " in variable " + name + " is of type " + et->to_str() + " and should be of type " + type->get_nested_type()->to_str();
-        error(lineno, err_msg);
-        can_change = false;
-      }
-    }
-    if (can_change) {
-      init_type = new Type_(init_type->get_name(), type->get_nested_type());
-    } else {
-      goto done;
-    }
   }
 
   if (init_type && !conforms(init_type, type)) {
@@ -939,12 +984,63 @@ Type_ *BoolConstExpr::typecheck() {
   return class_type[Bool];
 }
 
+
+Type_ *lub(Type_ *a, Type_ *b) {
+  if (!a || !b) {
+    return class_type[Object];
+  }
+
+  if (a->get_name() == b->get_name()) {
+    if (!a->get_nested_type() && !b->get_nested_type()) {
+      return a;
+    }
+    return lub(a->get_nested_type(), b->get_nested_type());
+  }
+
+  set<string> a_ancs = class_ancestors[a->get_name()];
+  set<string> b_ancs = class_ancestors[b->get_name()];
+
+  for (const string& aa: a_ancs) {
+    if (b_ancs.find(aa) != b_ancs.end()) {
+      return class_type[aa];
+    }
+  }
+
+  return class_type[Object];
+
+}
+
 Type_ *ListConstExpr::typecheck() {
-  return class_type[List];
+  if (exprlist.empty()) {
+    // return NULL if empty list
+    return NULL;
+  }
+
+
+  Type_ *lca = exprlist[0]->typecheck();
+  cout << lca->to_str() << endl;
+  for (int i = 1; i < (int) exprlist.size(); i++) {
+    Type_ *curr_t = exprlist[i]->typecheck();
+    if (conforms(curr_t, lca)) {
+      continue;
+    }
+    lca = lub(lca, curr_t);
+    if (conforms(class_type[Object], lca)) {
+      break;
+    }
+  }
+
+
+  return new Type_(List, lca);
+
 }
 
 Type_ *StrConstExpr::typecheck() {
-  return new Type_(String, NULL);
+  return class_type[String];
+}
+
+Type_ *CharConstExpr::typecheck() {
+  return class_type[Char];
 }
 
 Type_ *NewExpr::typecheck() {
@@ -956,13 +1052,17 @@ Type_ *NewExpr::typecheck() {
   }
   return class_type[newclass];
 }
-Type_ *ContExpr::typecheck() {}
+
+Type_ *ContExpr::typecheck() {
+  return NULL;
+}
+
 Type_ *KillExpr::typecheck() {}
 Type_ *BinopExpr::typecheck() {
   Type_ *lhs_type = lhs->typecheck();
   Type_ *rhs_type = rhs->typecheck();
 
-  cout << op << endl;
+  // cout << op << endl;
 
   if (OP_PRECEDENCE[op] >= 4) {
     ObjectIdExpr *lval = dynamic_cast<ObjectIdExpr*>(lhs);

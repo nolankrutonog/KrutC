@@ -638,7 +638,10 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_bool_const_expr();
   } else if (t.get_type() == STR_CONST) {
     expr = parse_str_const_expr();
-  } else if (t.get_type() == CONTINUE) {
+  } else if (t.get_type() == CHAR_CONST) {
+    expr = parse_char_const_expr();
+  }
+  else if (t.get_type() == CONTINUE) {
     /* TODO: ensure works after cont/break that nothing follows */
     expr = new ContExpr();
     expr_tq.tq.pop_front();
@@ -966,6 +969,16 @@ StrConstExpr *Parser::parse_str_const_expr() {
   StrConstExpr *strstmt = new StrConstExpr(val);
   strstmt->lineno = lineno;
   return strstmt; 
+}
+
+CharConstExpr *Parser::parse_char_const_expr() {
+  Token t = expr_tq.tq.front();
+  expr_tq.tq.pop_front();
+  int lineno = t.get_lineno();
+  string c = t.get_str();
+  CharConstExpr *charexpr = new CharConstExpr(c);
+  charexpr->lineno = lineno;
+  return charexpr;
 }
 
 ObjectIdExpr *Parser::parse_objectid_expr() {

@@ -36,6 +36,7 @@ enum StmtType {
   NEW_EXPR = 615,
   LIST_ELEM_REF = 616,
   TYPE_EXPR = 617,
+  CHAR_CONST_EXPR = 618,
 };
 
 
@@ -59,6 +60,7 @@ typedef class std::vector<ExprStmt*> ExprList;
 class ReturnExpr;
 class IntConstExpr;
 class StrConstExpr;
+class CharConstExpr;
 class BoolConstExpr;
 class ListConstExpr;
 class ListElemRef;
@@ -70,6 +72,7 @@ class ContExpr;
 class BreakExpr;
 class NoneExpr;
 class KillExpr;
+
 class Type_;
 
 
@@ -340,6 +343,18 @@ public:
   std::string classname() { return "StrConstExpr";}
 
   std::string get_str() { return str; }
+  Type_ *typecheck();
+};
+
+class CharConstExpr : public ExprStmt {
+  const std::string c;
+public: 
+  CharConstExpr(std::string c) : c(c) {}
+  StmtType get_stmttype() { return CHAR_CONST_EXPR; }
+  void dump(int indent);
+  std::string classname() { return "CharConstExpr";}
+
+  std::string get_str() { return c; }
   Type_ *typecheck();
 };
 

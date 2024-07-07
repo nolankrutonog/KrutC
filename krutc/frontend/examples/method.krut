@@ -1,0 +1,25 @@
+/*
+class A {
+  int a = 1;
+
+  int m() {
+    return a;
+  }
+}
+
+-- A a = new A;
+-- int a = a.m();
+*/
+
+
+class Vehicle {}
+
+class Car inherits Vehicle {}
+class Truck inherits Vehicle {}
+class Boat inherits Vehicle {}
+
+list<Vehicle> lv = [new Car, new Truck, new Boat];
+
+
+
+
