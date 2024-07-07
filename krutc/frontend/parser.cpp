@@ -270,16 +270,12 @@ ForStmt *Parser::parse_for_stmt() {
   if (next.get_str() == ";") {
     stmt = NULL;
     parse_check_and_pop(";"); // pop ';'
-    
   } else {
-    if (next.get_type() == TYPEID) {
-      stmt = parse_feature();
-    } else {
-      if (!build_expr_tq(";"))
-        stmt = NULL;
-      else 
-        stmt = parse_exprstmt();
-      parse_check_and_pop(";"); // pop ';'
+    stmt = parse_stmt();
+
+    if (tbuff.lookahead(0).get_str() == ";") {
+      /* if stmt is of type Stmt */
+      parse_check_and_pop(";");
     }
   }
 

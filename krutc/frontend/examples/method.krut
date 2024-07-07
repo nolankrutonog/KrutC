@@ -19,7 +19,3 @@ class Truck inherits Vehicle {}
 class Boat inherits Vehicle {}
 
 list<Vehicle> lv = [new Car, new Truck, new Boat];
-
-
-
-

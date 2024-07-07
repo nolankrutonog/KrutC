@@ -29,13 +29,11 @@ using namespace std;
 #define Pop_Back "pop_back"
 #define Push_Front "push_front"
 #define Pop_Front "pop_front"
-// #define Pop "pop"
-// #define Push "push"
 #define Contains "contains"
 
 /* global builtin methods */
 #define Print "print"
-#define To_str "to_str"
+#define To_String "to_string"
 #define Type "type"
 #define Abs "abs"
 #define Sum "sum"
@@ -274,7 +272,7 @@ void TypeChecker::initialize_builtin_methods() {
   */
   global_methods.insert(new MethodStmt(class_type[Void], Print, {new FormalStmt(class_type[String], "s")}, {}));
   global_methods.insert(new MethodStmt(class_type[String], Input, {new FormalStmt(class_type[String], "prompt")}, {}));
-  global_methods.insert(new MethodStmt(class_type[String], To_str, {new FormalStmt(class_type[Int], "i")}, {}));
+  global_methods.insert(new MethodStmt(class_type[String], To_String, {new FormalStmt(class_type[Int], "i")}, {}));
   global_methods.insert(new MethodStmt(class_type[Object], Type, {new FormalStmt(class_type[Object], "o")}, {}));
   global_methods.insert(new MethodStmt(class_type[Int], Abs, {new FormalStmt(class_type[Int], "x")}, {}));
   global_methods.insert(new MethodStmt(class_type[Int], Sum, {new FormalStmt(class_type[List], "l")}, {}));
@@ -723,46 +721,6 @@ Type_ *MethodStmt::typecheck() {
     f->typecheck();
   }
 
-//   /* typecheck every expression, save the last one for RETURN possibility */
-//   int i;
-//   for (i = 0; i < (int) stmt_list.size() - 1; i++) {
-//     stmt_list[i]->typecheck();
-//   }
-
-//   if (!stmt_list.empty()) {
-//     Stmt *last_stmt = stmt_list[i];
-
-//     Type_ *last_type = last_stmt->typecheck();
-//     if (!last_type)
-//       goto done;
-
-//     if (!conforms(class_type[Void], ret_type)) {
-//       /* if method expects a return value */
-//       if (last_stmt->get_stmttype() != RETURN_EXPR) {
-//         // TODO: is there a way to get lineno here to work? last_stmt is generic and we wont know the error...
-//         string err_msg = "Method `" + name + "` expects return expression, with type `" + ret_type->to_str() + "`";
-//         error(last_stmt->lineno, err_msg);
-//       } else {
-//         ReturnExpr *retexpr = static_cast<ReturnExpr*>(last_stmt);
-//         if (!conforms(last_type, ret_type)) {
-//           /* if return type and decl ret type do not match */
-//           string err_msg = "Return expression type `" + last_type->to_str() + "` does not conform to declared return type `" + ret_type->to_str() + "`";
-//           error(retexpr->lineno, err_msg);
-//         }
-//       }
-//     } else { // ret_type == class_type[Void]
-//       if (last_stmt->get_stmttype() == RETURN_EXPR) {
-//         ReturnExpr *retexpr = static_cast<ReturnExpr*>(last_stmt);
-//         if (last_type != NULL) {
-//           string warn_msg = "Method `" + name + "` (declared as void) returns a non-void value.";
-//           warning(retexpr->lineno, warn_msg);
-//         }
-//       }
-//     }
-
-//   }
-
-// done: 
   for (int i = 0; i < (int) stmt_list.size(); i++) {
     Stmt *s = stmt_list[i];
     Type_ *t = s->typecheck();
@@ -825,12 +783,29 @@ Type_ *ClassStmt::typecheck() {
 
   return NULL;
 }
+
+
 Type_ *ForStmt::typecheck() {
+  if (stmt)
+    stmt->typecheck();
+
+  if (cond) {
+    Type_ * c_type = cond->typecheck();
+    if (!conforms(class_type[Bool], c_type)) {
+      string err_str = "For loop conditional must be of type Bool";
+      error(lineno, err_str);
+    }
+  }
+
+  if (repeat)
+    repeat->typecheck();
+
+  for (Stmt *s: stmt_list) {
+    s->typecheck();
+  }
 
   return NULL;
 }
-
-
 
 /* checks if init expr type conforms to declared, adds to scopetable */
 Type_ *AttrStmt::typecheck() {
@@ -871,11 +846,19 @@ done:
 }
 
 Type_ *WhileStmt::typecheck() {
+  Type_ *pred_t = pred->typecheck();
+
+  if (!conforms(class_type[Bool], pred_t)) {
+    string err_str = "Predicate in while loop must be of type bool";
+    error(lineno, err_str);
+  }
+
+  for (Stmt *s: stmt_list) {
+    s->typecheck();
+  }
 
   return NULL;
 }
-
-
 
 /* 
   EXPRESSIONS must return their type
@@ -1018,7 +1001,6 @@ Type_ *ListConstExpr::typecheck() {
 
 
   Type_ *lca = exprlist[0]->typecheck();
-  cout << lca->to_str() << endl;
   for (int i = 1; i < (int) exprlist.size(); i++) {
     Type_ *curr_t = exprlist[i]->typecheck();
     if (conforms(curr_t, lca)) {
@@ -1062,8 +1044,6 @@ Type_ *BinopExpr::typecheck() {
   Type_ *lhs_type = lhs->typecheck();
   Type_ *rhs_type = rhs->typecheck();
 
-  // cout << op << endl;
-
   if (OP_PRECEDENCE[op] >= 4) {
     ObjectIdExpr *lval = dynamic_cast<ObjectIdExpr*>(lhs);
     if (!lval) {
@@ -1081,6 +1061,7 @@ Type_ *BinopExpr::typecheck() {
     return class_type[Bool];
   }
 
+  return lhs_type;
 
 }
 Type_ *BreakExpr::typecheck() {

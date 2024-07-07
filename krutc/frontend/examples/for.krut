@@ -3,19 +3,19 @@
 
 -- attr, cond, repeat 
 for (int x = 0; x != 5; x += 1) {
-  -- print(x);
+  print(to_string(x));
 }
 
 -- start, end, step
 int x;
 for (; x != 5; x += 1) {
-  -- print(x);
+  print(to_string(x));
 }
 
 -- end, step
 int x = 0;
 for (; x < 5; x += 1) {
-  -- print(x);
+  print(to_string(x));
 }
 
 int x = 0;
@@ -26,10 +26,10 @@ for (;; x += 1) {
     break;
   }
    
-  -- print(x);
+  print(to_string(x));
 }
 
-for (verse v; v != "Hello, world!"; ) {
+for (string v; v != "Hello, world!"; ) {
 
 };
 
@@ -38,4 +38,30 @@ for (;;) {
   if (y == 1) {
     break;
   }
+}
+
+int i;
+int n;
+
+for (
+  class MyClass {} ;
+  
+  i < 5; i += 1
+) {
+
+}
+
+int i; 
+int k;
+for (
+  for (
+    for (int n = 0; n < 5; n += 1) {};
+    k < 5; k += 1
+  ) 
+  {
+
+  };
+  i < 5; i += 1
+) {
+
 }
