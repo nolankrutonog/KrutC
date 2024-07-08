@@ -109,6 +109,10 @@ MethodStmt *Parser::parse_methodstmt(Type_ *type) {
 
   while (tbuff.lookahead(0).get_str() != "}" && tbuff.has_next()) {
     Stmt *stmt = parse_stmt();
+    if (dynamic_cast<ClassStmt*>(stmt)) {
+      string err_msg = "Error: Class can only be defined in outer scope.";
+      error_blank(stmt->lineno, err_msg);
+    }
     stmt_list.push_back(stmt);
   }
 
@@ -303,6 +307,10 @@ ForStmt *Parser::parse_for_stmt() {
 
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "}") {
     Stmt *stmt = parse_stmt();
+    if (dynamic_cast<ClassStmt*>(stmt)) {
+      string err_msg = "Error: Class can only be defined in outer scope";
+      error_blank(stmt->lineno, err_msg);
+    }
     stmt_list.push_back(stmt);
   }
 
@@ -425,8 +433,15 @@ IfStmt *Parser::parse_if_stmt() {
       break;
     }
     Stmt *stmt = parse_stmt();
-    if (stmt)
+    if (stmt) {
+      if (dynamic_cast<ClassStmt*>(stmt)) {
+        string err_msg = "Error: Class can only be defined in outer scope";
+        error_blank(stmt->lineno, err_msg);
+      }
+
       then_branch.push_back(stmt);
+
+    }
   }
 
   parse_check_and_pop("}");
@@ -440,8 +455,13 @@ IfStmt *Parser::parse_if_stmt() {
         break;
       }
       Stmt *stmt = parse_stmt();
-      if (stmt) 
+      if (stmt) {
+        if (dynamic_cast<ClassStmt*>(stmt)) {
+          string err_msg = "Error: Class can only be defined in outer scope";
+          error_blank(stmt->lineno, err_msg);
+        }
         else_branch.push_back(stmt);
+      }
     }
 
     parse_check_and_pop("}");
@@ -477,8 +497,13 @@ WhileStmt *Parser::parse_while_stmt() {
       break;
     }
     Stmt *stmt = parse_stmt();
-    if (stmt)
+    if (stmt) {
+      if (dynamic_cast<ClassStmt*>(stmt)) {
+        string err_msg = "Error: Class can only be defined in outer scope";
+        error_blank(stmt->lineno, err_msg);
+      }
       stmt_list.push_back(stmt);
+    }
   }
 
   parse_check_and_pop("}");
@@ -755,7 +780,6 @@ SublistExpr *Parser::parse_sublist_expr(int colon_idx, ExprStmt *list_name) {
   ExprTQ original = expr_tq;
   expr_tq.tq.clear();
   for (int i = 0; i < colon_idx; i++) {
-    cout << original.tq[i].get_str() << endl;
     expr_tq.tq.push_back(original.tq[i]);
   }
 

@@ -19,11 +19,12 @@ class B {
 class C {
   int c;
   int d;
+
 }
 
 
 void method1(list<list<string>> x) {
-  
+  return [["a", "b"], ["c", "d"]];
 }
 list<string> my_list = [];
 my_list += ["hi"];
@@ -37,4 +38,8 @@ int main(list<string> args) {
 list<int> l = [1, 2];
 
 list<int> l2 = l[l.length() - 1:l.length()];
+
+
+string s = "hello there";
+string sub = s[4:7];
 
