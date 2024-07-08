@@ -37,6 +37,7 @@ enum StmtType {
   LIST_ELEM_REF = 616,
   TYPE_EXPR = 617,
   CHAR_CONST_EXPR = 618,
+  SUBLIST_EXPR = 619
 };
 
 
@@ -64,14 +65,16 @@ class CharConstExpr;
 class BoolConstExpr;
 class ListConstExpr;
 class ListElemRef;
+class SublistExpr;
 class StackConstExpr;
 class ObjectIdExpr;
 class DispatchExpr;
 class BinopExpr;
 class ContExpr;
 class BreakExpr;
-class NoneExpr;
+// class NoneExpr;
 class KillExpr;
+
 
 class Type_;
 
@@ -383,7 +386,6 @@ public:
 };
 
 class ListElemRef: public ExprStmt {
-  // TODO: why is this an exprstmt instead of a string?
   ExprStmt *list_name;
   ExprStmt *index;
 public:
@@ -395,6 +397,23 @@ public:
 
   ExprStmt *get_list_name() { return list_name; }
   ExprStmt *get_index() { return index; }
+
+  Type_ *typecheck();
+};
+
+class SublistExpr: public ListElemRef {
+  ExprStmt *end_idx;
+
+public:
+  SublistExpr(ExprStmt *list_name, ExprStmt *start_idx, ExprStmt *end_idx)
+    : ListElemRef(list_name, start_idx), 
+    end_idx(end_idx) {}
+  StmtType get_stmttype() { return SUBLIST_EXPR; }
+  void dump(int indent);
+  std::string classname() { return "SublistExpr"; }
+
+  ExprStmt *get_st_idx() { return get_index(); }
+  ExprStmt *get_end_idx() { return end_idx; }
 
   Type_ *typecheck();
 };
@@ -431,18 +450,18 @@ public:
   Type_ *typecheck();
 };
 
-class NoneExpr : public ExprStmt {
-  std::string name = "NONE";
-public:
-  NoneExpr() {}
-  StmtType get_stmttype() { return NONE_EXPR; }
-  std::string classname() { return "NoneExpr"; }
-  void dump(int indent);
+// class NoneExpr : public ExprStmt {
+//   std::string name = "NONE";
+// public:
+//   NoneExpr() {}
+//   StmtType get_stmttype() { return NONE_EXPR; }
+//   std::string classname() { return "NoneExpr"; }
+//   void dump(int indent);
 
-  std::string get_name() { return name; }
-  // Type_ *typecheck();
+//   std::string get_name() { return name; }
+//   // Type_ *typecheck();
 
-};
+// };
 
 class NewExpr : public ExprStmt {
   // ExprStmt *expr;

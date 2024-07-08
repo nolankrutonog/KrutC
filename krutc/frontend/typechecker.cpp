@@ -195,7 +195,7 @@ void TypeChecker::initialize_basic_classes() {
     void push_front(object o) -- adds object to front
     void pop_front() -- pops first object
     void pop_back() -- pops last object
-    object front() -- returns first object (None on empty)
+    object front() -- returns first object (Runtime error on empty)
     object back() -- returns last object
     int contains(object o) -- returns idx if o in list, else -1
     binary operators -- in the form `list1 op list2`
@@ -793,7 +793,7 @@ Type_ *ForStmt::typecheck() {
     Type_ * c_type = cond->typecheck();
     if (!conforms(class_type[Bool], c_type)) {
       string err_str = "For loop conditional must be of type Bool";
-      error(lineno, err_str);
+      error(cond->lineno, err_str);
     }
   }
 
@@ -850,7 +850,7 @@ Type_ *WhileStmt::typecheck() {
 
   if (!conforms(class_type[Bool], pred_t)) {
     string err_str = "Predicate in while loop must be of type bool";
-    error(lineno, err_str);
+    error(pred->lineno, err_str);
   }
 
   for (Stmt *s: stmt_list) {
@@ -881,6 +881,28 @@ Type_ *ListElemRef::typecheck() {
     return NULL;
 
   return name_type->get_nested_type();
+}
+
+Type_ *SublistExpr::typecheck() {
+  Type_ *st_idx_t = get_st_idx()->typecheck();
+
+  if (!conforms(st_idx_t, class_type[Int])) {
+    string err_msg = "When creating sublist l[a:b], both a and b must be ints";
+    error(lineno, err_msg);
+  }
+
+  Type_ *end_idx_t = end_idx->typecheck();
+  if (!conforms(end_idx_t, class_type[Int])) {
+    string err_msg = "When creating sublist l[a:b], both a and b must be ints";
+    error(lineno, err_msg);
+  }
+
+  Type_ *name_type = get_list_name()->typecheck();
+  if (!name_type) {
+    return NULL;
+  }
+
+  return name_type;
 }
 
 Type_ *DispatchExpr::typecheck() {

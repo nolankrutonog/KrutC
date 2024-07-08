@@ -45,7 +45,7 @@ static const unordered_set<string> SPECIAL_CHARS = {
   ".",
   ",",
   // TODO: list[i:j]
-  // ":"
+  ":"
 };
 
 static const unordered_set<string> BINOPM {

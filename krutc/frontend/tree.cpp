@@ -68,7 +68,7 @@ void BreakExpr::dump(int n) {
 void ExprStmt::dump(int n) {}
 void IntConstExpr::dump(int n) {
   indent(n);
-  cout << to_string(val) << endl;
+  cout << to_string(val) + " ";
 }
 void BoolConstExpr::dump(int n) {
   string out = val == 1 ? "true" : "false";
@@ -196,7 +196,12 @@ void BinopExpr::dump(int n) {
   
 }
 
-void NoneExpr::dump(int n) {}
+void SublistExpr::dump(int n) {
+  get_list_name()->dump(n);
+  cout << "["; get_st_idx()->dump(0); cout << ":"; get_end_idx()->dump(0); cout << "]" << endl;
+}
+
+// void NoneExpr::dump(int n) {}
 void NewExpr::dump(int n) {
   indent(n);
   cout << "new " + newclass << endl;

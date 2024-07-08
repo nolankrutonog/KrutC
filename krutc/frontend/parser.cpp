@@ -748,6 +748,29 @@ ListConstExpr *Parser::parse_list_const_expr() {
   return list_const_expr;
 }
 
+SublistExpr *Parser::parse_sublist_expr(int colon_idx, ExprStmt *list_name) {
+  ExprStmt *st_idx;
+  ExprStmt *end_idx;
+
+  ExprTQ original = expr_tq;
+  expr_tq.tq.clear();
+  for (int i = 0; i < colon_idx; i++) {
+    cout << original.tq[i].get_str() << endl;
+    expr_tq.tq.push_back(original.tq[i]);
+  }
+
+  st_idx = parse_exprstmt();
+
+  expr_tq.tq.clear();
+  for (int i = colon_idx + 1; i < (int) original.tq.size(); i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
+  end_idx = parse_exprstmt();
+
+  SublistExpr *sle = new SublistExpr(list_name, st_idx, end_idx);
+  return sle;
+}
+
 ListElemRef *Parser::parse_list_elem_ref_expr() {
   int lineno = expr_tq.tq[0].get_lineno();
   ExprStmt *list_name;
@@ -764,14 +787,36 @@ ListElemRef *Parser::parse_list_elem_ref_expr() {
   list_name = parse_exprstmt();
 
   assert(expr_tq.tq.empty());
+
+  // also need to check for ":" in case it's SublistExpr
+  int stk = -1; // starts at -1 because the first char is '['
+  bool is_sublist_expr = false;
+  int colon_idx = -1;
   for (int i = open_brack_idx; i < (int) original.tq.size(); i++) {
+    if (original.tq[i].get_str() == "(" || original.tq[i].get_str() == "[") {
+      stk++;
+    } else if (original.tq[i].get_str() == ")" || original.tq[i].get_str() == "]") {
+      stk--;
+    }
+    if (stk == 0 && original.tq[i].get_str() == ":") {
+      colon_idx = i - open_brack_idx - 1;
+      is_sublist_expr = true;
+    }
+    
     expr_tq.tq.push_back(original.tq[i]);
   }
+
 
   assert(expr_tq.tq[0].get_str() == "[" && expr_tq.tq[expr_tq.tq.size() - 1].get_str() == "]");
 
   expr_tq.tq.pop_front();
   expr_tq.tq.pop_back();
+
+  if (is_sublist_expr) {
+    SublistExpr *sl = parse_sublist_expr(colon_idx, list_name);
+    sl->lineno = lineno;
+    return sl;
+  }
 
   index = parse_exprstmt();
 

@@ -34,5 +34,7 @@ int main(list<string> args) {
   method1([my_list]);
 }
 
-list<int> l = [1, 2, 3, 4, 5];
+list<int> l = [1, 2];
+
+list<int> l2 = l[l.length() - 1:l.length()];
 

@@ -104,6 +104,7 @@ private:
     ExprList parse_comma_separated_exprlist();
     DispatchExpr *parse_dispexpr();
     ListElemRef *parse_list_elem_ref_expr();
+    SublistExpr *parse_sublist_expr(int, ExprStmt *);
     int get_str_idx_expr_tq(std::string);
 
     IntConstExpr* parse_int_const_expr();
