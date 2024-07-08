@@ -66,13 +66,11 @@ class BoolConstExpr;
 class ListConstExpr;
 class ListElemRef;
 class SublistExpr;
-class StackConstExpr;
 class ObjectIdExpr;
 class DispatchExpr;
 class BinopExpr;
 class ContExpr;
 class BreakExpr;
-// class NoneExpr;
 class KillExpr;
 
 

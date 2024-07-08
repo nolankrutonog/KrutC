@@ -277,6 +277,10 @@ ForStmt *Parser::parse_for_stmt() {
   } else {
     stmt = parse_stmt();
 
+    if (dynamic_cast<ClassStmt*>(stmt)) {
+      cout << "You found a lil easter egg hehehe congrats! email me nolankrutonog@gmail.com and you'll get a prize" << endl;
+    }
+
     if (tbuff.lookahead(0).get_str() == ";") {
       /* if stmt is of type Stmt */
       parse_check_and_pop(";");
@@ -782,14 +786,20 @@ SublistExpr *Parser::parse_sublist_expr(int colon_idx, ExprStmt *list_name) {
   for (int i = 0; i < colon_idx; i++) {
     expr_tq.tq.push_back(original.tq[i]);
   }
-
-  st_idx = parse_exprstmt();
+  if (!expr_tq.tq.empty())
+    st_idx = parse_exprstmt();
+  else  // need to be set to NULL because they are optional
+    st_idx = NULL;
 
   expr_tq.tq.clear();
   for (int i = colon_idx + 1; i < (int) original.tq.size(); i++) {
     expr_tq.tq.push_back(original.tq[i]);
+    cout << original.tq[i].get_str() << endl;
   }
-  end_idx = parse_exprstmt();
+  if (!expr_tq.tq.empty())
+    end_idx = parse_exprstmt();
+  else  // need to be set to NULL because they are optional 
+    end_idx = NULL;
 
   SublistExpr *sle = new SublistExpr(list_name, st_idx, end_idx);
   return sle;

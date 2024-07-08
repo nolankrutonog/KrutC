@@ -884,18 +884,40 @@ Type_ *ListElemRef::typecheck() {
 }
 
 Type_ *SublistExpr::typecheck() {
-  Type_ *st_idx_t = get_st_idx()->typecheck();
+  ExprStmt *st_idx = get_st_idx();
+  Type_ *st_idx_type_;
+  if (st_idx) {
+    st_idx_type_ = st_idx->typecheck();
+  } else {
+    st_idx_type_ = NULL;
+  }
 
-  if (!conforms(st_idx_t, class_type[Int])) {
-    string err_msg = "When creating sublist l[a:b], both a and b must be ints";
+  ExprStmt *end_idx = get_end_idx();
+  // bool b = end_idx == NULL;
+  // cout << b << endl;
+  // end_idx->dump(0);
+  Type_ *end_idx_type_;
+  if (end_idx) {
+    // cout << "here" << endl;
+    end_idx_type_ = end_idx->typecheck();
+  } else {
+    end_idx_type_ = NULL;
+  }
+
+
+  if ((
+    st_idx_type_ && 
+    !conforms(st_idx_type_, class_type[Int])) || (
+      end_idx_type_ && 
+      !conforms(end_idx_type_, class_type[Int]))) {
+    string err_msg = "When creating sublist list[a:b], both a and b must be ints";
     error(lineno, err_msg);
   }
 
-  Type_ *end_idx_t = end_idx->typecheck();
-  if (!conforms(end_idx_t, class_type[Int])) {
-    string err_msg = "When creating sublist l[a:b], both a and b must be ints";
-    error(lineno, err_msg);
-  }
+  // if (!conforms(end_idx_t, class_type[Int])) {
+  //   string err_msg = "When creating sublist l[a:b], both a and b must be ints";
+  //   error(lineno, err_msg);
+  // }
 
   Type_ *name_type = get_list_name()->typecheck();
   if (!name_type) {

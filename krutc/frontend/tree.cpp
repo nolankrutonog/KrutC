@@ -198,7 +198,13 @@ void BinopExpr::dump(int n) {
 
 void SublistExpr::dump(int n) {
   get_list_name()->dump(n);
-  cout << "["; get_st_idx()->dump(0); cout << ":"; get_end_idx()->dump(0); cout << "]" << endl;
+  cout << "["; 
+  if (get_st_idx())
+    get_st_idx()->dump(0); 
+  cout << ":"; 
+  if (get_end_idx()) 
+    get_end_idx()->dump(0); 
+  cout << "]" << endl;
 }
 
 // void NoneExpr::dump(int n) {}

@@ -1,4 +1,4 @@
-
+/*
 class A inherits B, C {
   char z;
   int a;
@@ -38,8 +38,10 @@ int main(list<string> args) {
 list<int> l = [1, 2];
 
 list<int> l2 = l[l.length() - 1:l.length()];
-
+*/
 
 string s = "hello there";
-string sub = s[4:7];
+-- string sub = s[4:7];
+string sub2 = s[1:];
+string sub3 = s[:4];
 
