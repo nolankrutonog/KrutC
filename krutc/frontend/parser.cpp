@@ -794,7 +794,6 @@ SublistExpr *Parser::parse_sublist_expr(int colon_idx, ExprStmt *list_name) {
   expr_tq.tq.clear();
   for (int i = colon_idx + 1; i < (int) original.tq.size(); i++) {
     expr_tq.tq.push_back(original.tq[i]);
-    cout << original.tq[i].get_str() << endl;
   }
   if (!expr_tq.tq.empty())
     end_idx = parse_exprstmt();
@@ -933,6 +932,7 @@ ReturnExpr *Parser::parse_returnexpr() {
   expr_tq.tq.pop_front();
   calibrate_expr_tq();
   expr = parse_exprstmt();
+
   ReturnExpr *retexpr = new ReturnExpr(expr);
   retexpr->lineno = lineno;
   debug_msg("END parse_returnexpr()");

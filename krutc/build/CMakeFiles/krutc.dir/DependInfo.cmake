@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/main.cpp" "CMakeFiles/krutc.dir/frontend/main.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/main.cpp.o.d"
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/parser.cpp" "CMakeFiles/krutc.dir/frontend/parser.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/parser.cpp.o.d"
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/scopetable.cpp" "CMakeFiles/krutc.dir/frontend/scopetable.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/scopetable.cpp.o.d"
+  "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/token.cpp" "CMakeFiles/krutc.dir/frontend/token.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/token.cpp.o.d"
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/tree.cpp" "CMakeFiles/krutc.dir/frontend/tree.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/tree.cpp.o.d"
   "/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/typechecker.cpp" "CMakeFiles/krutc.dir/frontend/typechecker.cpp.o" "gcc" "CMakeFiles/krutc.dir/frontend/typechecker.cpp.o.d"
   )

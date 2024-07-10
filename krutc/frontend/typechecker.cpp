@@ -32,6 +32,7 @@ using namespace std;
 #define Contains "contains"
 
 /* global builtin methods */
+#define Main "main"
 #define Print "print"
 #define To_String "to_string"
 #define Type "type"
@@ -52,6 +53,7 @@ static const set<string> basic_classes = {
 };
 
 static string curr_filename;                          /* current filename */
+static bool in_method = false;                        /* to ensure ReturnExpr* only occur in methods */
 static int semant_errors = 0;                         /* semant errors */
 static int warnings = 0;                              /* warnings */
 static ScopeTable scopetable;                         /* scope table */
@@ -572,13 +574,30 @@ bool TypeChecker::check_global_features() {
       bool can_insert = true;
       for (MethodStmt *gm: global_methods) {
         if (gm->get_name() == m->get_name()) {
-          string err_msg = "Method `" + m->get_name() + "` cannot be defined twice";
+          string err_msg = "method `" + m->get_name() + "` cannot be defined twice";
           error(m->lineno, err_msg);
           ret_val = false;
           can_insert = false;
         }
       }
       if (can_insert) {
+        if (m->get_name() == Main) {
+          if (!conforms(class_type[Void], m->get_ret_type())) {
+            string err_msg = "method 'main' must return void";
+            error(m->lineno, err_msg);
+          }
+          if (formal_list.size() != 1) {
+            string err_msg = "method 'main' must have one argument: list<string> args";
+            error(m->lineno, err_msg);
+          } else {
+            FormalStmt *f = formal_list[0];
+            Type_ *ft = f->get_type();
+            if (!conforms(ft, new Type_(List, class_type[String]))) {
+              string err_msg = "method 'main' must have one argument: list<string> args";
+              error(m->lineno, err_msg);
+            }
+          }
+        }
         global_methods.insert(m);
       }
     } else {
@@ -622,7 +641,7 @@ int TypeChecker::typecheck() {
   scopetable.push_scope();
 
   for (int i = 0; i < program.len(); i++) {
-    Stmt *s = program.ith(i);
+    Stmt *s = program.ith(i); 
     s->typecheck();
   }
 
@@ -688,13 +707,12 @@ bool conforms(Type_ *a, Type_ *b) {
   if (a_nest == NULL && b_nest != NULL || a_nest != NULL && b_nest == NULL) {
     return false;
   }
-  if (a_nest == NULL && b_nest == NULL)
+  else if (a_nest == NULL && b_nest == NULL)
     return true;
-  if (a_nest != NULL && b_nest != NULL)
+  // if (a_nest != NULL && b_nest != NULL)
+  else
     return conforms(a_nest, b_nest);
-  
 }
-
 
 
 //////////////////////////////////////////////////////////////
@@ -716,6 +734,7 @@ Type_ *FormalStmt::typecheck() {
 
 Type_ *MethodStmt::typecheck() {
   scopetable.push_scope();
+  in_method = true;
   /* add all formals */
   for (FormalStmt *f: formal_list) {
     f->typecheck();
@@ -733,16 +752,27 @@ Type_ *MethodStmt::typecheck() {
       // if return type of method is void
       if (!conforms(t, class_type[Void])) {
         // if return value is not void
-        string warn_msg = "Void method " + name + " returning " + t->to_str() + " will be ignored";
-        warning(lineno, warn_msg);
+        string warn_msg = "the method " + name + " has return type of void but may return " + t->to_str();
+        warning(rex->lineno, warn_msg);
       }
-    } else if (!conforms(t, ret_type)) {
-      string err_msg = "Method " + name + " cannot return a " + t->to_str() + " when its declared return type is " + ret_type->to_str();
-      error(lineno, err_msg);
-    }
+    } else {
+      // return type is not void
+      if (!t) {
+        // but returning void value 
+        string err_msg = "method " + name + " has return type of " + ret_type->to_str() + " and may return a void value";
+        error(rex->lineno, err_msg);
+      } else if (!conforms(t, ret_type)) {
+        // returning wrong type
+        string err_msg = "method " + name + " cannot return a " + t->to_str() + " when its declared return type is " + ret_type->to_str();
+        error(rex->lineno, err_msg);
+      }
+
+    } 
+    
       
   }
 
+  in_method = false;
   scopetable.pop_scope();
   return NULL;
 }
@@ -864,9 +894,14 @@ Type_ *WhileStmt::typecheck() {
   EXPRESSIONS must return their type
 */
 Type_ *ReturnExpr::typecheck() {
+  if (!in_method) {
+    string err_msg = "return expression must be inside method";
+    error(lineno, err_msg);
+  }
   /* possible that RETURN has no expression */
   return expr ? expr->typecheck() : NULL;  
 }
+
 Type_ *ListElemRef::typecheck() {
   /* should return T = list<object> */
   Type_ *index_type = index->typecheck();
@@ -893,12 +928,8 @@ Type_ *SublistExpr::typecheck() {
   }
 
   ExprStmt *end_idx = get_end_idx();
-  // bool b = end_idx == NULL;
-  // cout << b << endl;
-  // end_idx->dump(0);
   Type_ *end_idx_type_;
   if (end_idx) {
-    // cout << "here" << endl;
     end_idx_type_ = end_idx->typecheck();
   } else {
     end_idx_type_ = NULL;
@@ -1080,10 +1111,18 @@ Type_ *NewExpr::typecheck() {
 }
 
 Type_ *ContExpr::typecheck() {
-  return NULL;
+  return new Type_("continue", NULL);
 }
 
-Type_ *KillExpr::typecheck() {}
+Type_ *KillExpr::typecheck() {
+  Type_ *t = expr->typecheck();
+  if (!conforms(t, class_type[String])) {
+    string err_msg = "kill error must be a string";
+    error(lineno, err_msg);
+  }
+  return t;
+}
+
 Type_ *BinopExpr::typecheck() {
   Type_ *lhs_type = lhs->typecheck();
   Type_ *rhs_type = rhs->typecheck();

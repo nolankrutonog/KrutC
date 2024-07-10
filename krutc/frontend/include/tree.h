@@ -91,6 +91,7 @@ public:
   virtual void dump(int indent) = 0;
   virtual std::string classname() { return "Stmt"; };
   virtual Type_ *typecheck() = 0;
+  // virtual Value *codegen() = 0;
 };
 
 class Program {
@@ -447,19 +448,6 @@ public:
   std::string get_name() { return name; }
   Type_ *typecheck();
 };
-
-// class NoneExpr : public ExprStmt {
-//   std::string name = "NONE";
-// public:
-//   NoneExpr() {}
-//   StmtType get_stmttype() { return NONE_EXPR; }
-//   std::string classname() { return "NoneExpr"; }
-//   void dump(int indent);
-
-//   std::string get_name() { return name; }
-//   // Type_ *typecheck();
-
-// };
 
 class NewExpr : public ExprStmt {
   // ExprStmt *expr;

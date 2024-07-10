@@ -206,7 +206,8 @@ Token Lexer::get_next_token() {
       string c;
       c += buff.get_next();
       if (buff.lookahead(0) != '\'') {
-        t = Token(curr_lineno, ERROR, filepath + ":" + to_string(curr_lineno) + ": Lexer Error: missing closing single quote ");
+        // TODO: on char error, need to panic parse until... or include warning?
+        t = Token(curr_lineno, ERROR, filepath + ":" + to_string(curr_lineno) + ": Lexer Error: char's must be enclosed in single quotes and only one character long ");
       } else {
         buff.get_next();
         t = Token(curr_lineno, CHAR_CONST, "\'" + c + "\'");
