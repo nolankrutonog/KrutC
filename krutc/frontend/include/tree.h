@@ -5,59 +5,58 @@
 #include <vector>
 #include <set>
 
-
-
 enum StmtType {
-  STMT = 500,
-  CLASS_STMT = 501,
-  ATTR_STMT = 502,
-  METHOD_STMT = 503,
-  FORMAL_STMT = 504,
-  FOR_STMT = 505,
-  IF_STMT = 506,
-  WHILE_STMT = 507,
-
-
-  EXPR_EXPR = 600,
-  RETURN_EXPR = 601,
-  INT_CONST_EXPR = 602,
-  STRING_CONST_EXPR = 603,
-  LIST_CONST_EXPR = 604,
-  OBJECTID_EXPR = 605,
-  DISPATCH_EXPR = 606,
-  OP_EXPR = 607,
-  THIS_EXPR = 608,
-  BOOL_CONST_EXPR = 609,
-  BINOP_EXPR = 610,
-  CONT_EXPR = 611,
-  BREAK_EXPR = 612,
-  NONE_EXPR = 613,
-  KILL_EXPR = 614,
-  NEW_EXPR = 615,
-  LIST_ELEM_REF = 616,
-  TYPE_EXPR = 617,
-  CHAR_CONST_EXPR = 618,
-  SUBLIST_EXPR = 619
+    STMT = 500,
+    CLASS_STMT,
+    ATTR_STMT,
+    METHOD_STMT,
+    FORMAL_STMT,
+    FOR_STMT,
+    IF_STMT,
+    WHILE_STMT,
+    EXPR_EXPR = 600,
+    RETURN_EXPR,
+    INT_CONST_EXPR,
+    STRING_CONST_EXPR,
+    LIST_CONST_EXPR,
+    OBJECTID_EXPR,
+    DISPATCH_EXPR,
+    OP_EXPR,
+    THIS_EXPR,
+    BOOL_CONST_EXPR,
+    BINOP_EXPR,
+    CONT_EXPR,
+    BREAK_EXPR,
+    NONE_EXPR,
+    KILL_EXPR,
+    NEW_EXPR,
+    LIST_ELEM_REF,
+    TYPE_EXPR,
+    CHAR_CONST_EXPR,
+    SUBLIST_EXPR
 };
 
-
+// Forward declarations
 class Program;
 class Stmt;
-typedef class std::vector<Stmt*> StmtList; 
+typedef std::vector<Stmt*> StmtList;
 
 class ClassStmt;
 class Feature;
-typedef class std::vector<Feature*> FeatureList;
+typedef std::vector<Feature*> FeatureList;
+
 class AttrStmt;
 class MethodStmt;
 class FormalStmt;
-typedef class std::vector<FormalStmt*> FormalList;
+typedef std::vector<FormalStmt*> FormalList;
+
 class ForStmt;
 class IfStmt;
 class WhileStmt;
 
 class ExprStmt;
-typedef class std::vector<ExprStmt*> ExprList;
+typedef std::vector<ExprStmt*> ExprList;
+
 class ReturnExpr;
 class IntConstExpr;
 class StrConstExpr;
@@ -72,7 +71,6 @@ class BinopExpr;
 class ContExpr;
 class BreakExpr;
 class KillExpr;
-
 
 class Type_;
 

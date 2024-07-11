@@ -277,30 +277,6 @@ frontend/scopetable.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/scopetable.cpp.s
 .PHONY : frontend/scopetable.cpp.s
 
-frontend/token.o: frontend/token.cpp.o
-.PHONY : frontend/token.o
-
-# target to build an object file
-frontend/token.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/token.cpp.o
-.PHONY : frontend/token.cpp.o
-
-frontend/token.i: frontend/token.cpp.i
-.PHONY : frontend/token.i
-
-# target to preprocess a source file
-frontend/token.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/token.cpp.i
-.PHONY : frontend/token.cpp.i
-
-frontend/token.s: frontend/token.cpp.s
-.PHONY : frontend/token.s
-
-# target to generate assembly for a file
-frontend/token.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/token.cpp.s
-.PHONY : frontend/token.cpp.s
-
 frontend/tree.o: frontend/tree.cpp.o
 .PHONY : frontend/tree.o
 
@@ -374,9 +350,6 @@ help:
 	@echo "... frontend/scopetable.o"
 	@echo "... frontend/scopetable.i"
 	@echo "... frontend/scopetable.s"
-	@echo "... frontend/token.o"
-	@echo "... frontend/token.i"
-	@echo "... frontend/token.s"
 	@echo "... frontend/tree.o"
 	@echo "... frontend/tree.i"
 	@echo "... frontend/tree.s"

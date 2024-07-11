@@ -47,3 +47,14 @@ string sub = s[4:7];
 string sub2 = s[1:];
 string sub3 = s[:4];
 
+
+/*
+class Test {
+  void m1() {}
+
+  void m2() {m1();}
+}
+*/
+
+list<int> my_list = [1, 2, 3];
+my_list.push_back(4);

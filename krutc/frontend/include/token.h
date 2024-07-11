@@ -2,7 +2,7 @@
 #define TOKEN_H
 
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <set>
 
 
@@ -36,9 +36,33 @@ enum TokenType {
 };
 
 
-extern const std::map<TokenType, std::string> TOKEN_TYPE_TO_STR; 
-extern const std::set<TokenType> KEYWORDS_TTYPE; 
-extern const std::map<std::string, TokenType> KEYWORDS_STR_TO_TTYPE;
+
+static std::unordered_map<TokenType, std::string> TOKEN_TYPE_TO_STR = {
+    {CLASS, "CLASS"},
+    {INHERITS, "INHERITS"},
+    {FOR, "FOR"},
+    {IF, "IF"},
+    {ELSE, "ELSE"},
+    {WHILE, "WHILE"},
+    {RETURN, "RETURN"},
+    {INT_CONST, "INT_CONST"},
+    {BOOL_CONST, "BOOL_CONST"},
+    {STR_CONST, "STR_CONST"},
+    {SPECIAL_CHAR, "SPECIAL_CHAR"},
+    {BINOP, "BINOP"},
+    {TYPEID, "TYPEID"},
+    {OBJECTID, "OBJECTID"},
+    {CONTINUE, "CONTINUE"},
+    {BREAK, "BREAK"},
+    {NONE, "NONE"},
+    {KILL, "KILL"},
+    {NEW, "NEW"},
+
+    {EMPTY, "EMPTY"},
+    {ERROR, "ERROR"}
+
+};
+
 
 
 class Token {
@@ -47,20 +71,44 @@ class Token {
   std::string str;
 public:
   // Token();
-  Token(TokenType type);
-  Token(int lineno, TokenType type, std::string str);
+  Token(TokenType type) : type(type) {}
+  Token(int lineno, TokenType type, std::string str):
+    lineno(lineno), type(type), str(str) {}
 
-  int get_lineno();
-  TokenType get_type();
-  std::string get_type_str();
-  std::string get_str();
+  int get_lineno() { return lineno; }
+  TokenType get_type() { return type; }
+  std::string get_type_str() {
+    return TOKEN_TYPE_TO_STR[type];
+  }
+  std::string get_str() { return str; }
 
-  void set_lineno(int n);
-  void set_type(TokenType t);
-  void set_str(std::string s);
+  void set_lineno(int n) { lineno = n; }
+  void set_type(TokenType t) { type = t; }
+  void set_str(std::string s) { str = s; }
 
-  void dump();
+  void dump() {
+    std::cout << "#" << lineno << " " << TOKEN_TYPE_TO_STR[type] << " " << str << std::endl;
+  }
+
 };
 
+static std::set<TokenType> KEYWORDS_TTYPE {
+  CLASS, INHERITS, FOR, /* START, END, STEP,*/ IF, ELSE, WHILE, RETURN, // THIS
+};
+
+static std::unordered_map<std::string, TokenType> KEYWORDS_STR_TO_TTYPE {
+  {"CLASS", CLASS},
+  {"INHERITS", INHERITS},
+  {"FOR", FOR},
+  {"IF", IF},
+  {"ELSE", ELSE},
+  {"WHILE", WHILE},
+  {"RETURN", RETURN},
+  {"CONTINUE", CONTINUE},
+  {"BREAK", BREAK},
+  {"NONE", NONE},
+  {"NEW", NEW},
+  {"KILL", KILL}
+};
 
 #endif // TOKEN_H

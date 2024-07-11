@@ -1,6 +1,7 @@
 #include <iostream>
 #include "include/parser.h"
 #include "include/typechecker.h"
+#include "include/codegen.h"
 
 using namespace std;
 
@@ -62,6 +63,16 @@ int main(int argc, char *argv[]) {
   if (tree) {
     program.dump();      
   }
+
+  
+  // CodeGen cgen = CodeGen(program, filename);
+
+  // // TODO: are there going to be CGen errors?
+  // int cgen_errors = cgen.codegen();
+
+  // if (cgen_errors) {
+  //   return -1;
+  // }
 
   return 1;
 

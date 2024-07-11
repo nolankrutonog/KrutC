@@ -1629,10 +1629,12 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: /Users/nolankrutonog/Desktop/workspace
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/xlocale/_time.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/xlocale/_wchar.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/xlocale/_wctype.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/__stddef_max_align_t.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/limits.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdarg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/codegen.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
@@ -4932,6 +4934,8 @@ CMakeFiles/krutc.dir/frontend/typechecker.cpp.o: /Users/nolankrutonog/Desktop/wo
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tokenbuffer.h:
 
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h:
+
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/codegen.h:
 
 /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h:
 

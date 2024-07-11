@@ -958,11 +958,49 @@ Type_ *SublistExpr::typecheck() {
   return name_type;
 }
 
+/* when dispatching to methods of nested classes like lists, the 'matched' 
+   existing method needs to be de-generalized from object to the type of the call. For 
+   example, without this funciton, code like this is allowed:
+
+   list<int> my_list = [1, 2, 3];
+   my_list.push_back("string");
+
+*/
+MethodStmt *update_cmp_meth(Type_ *calling_type, MethodStmt *orig) {
+  Type_ *ret_type;
+  string name;
+  FormalList formal_list;
+  
+  Type_ *nested_type = calling_type->get_nested_type();
+  if (conforms(class_type[Object], orig->get_ret_type())) {
+    ret_type = nested_type;
+  } else {
+    ret_type = orig->get_ret_type(); 
+  }
+
+  name = orig->get_name();
+  FormalList orig_formal_list = orig->get_formal_list();
+
+  for (FormalStmt *f: orig_formal_list) {
+    FormalStmt *new_f;
+    if (conforms(class_type[Object], f->get_type())) {
+      new_f = new FormalStmt(nested_type, Object);
+    } else {
+      new_f = f;
+    }
+    formal_list.push_back(new_f);
+  }
+
+  MethodStmt *m = new MethodStmt(ret_type, name, formal_list, {}); 
+  return m; 
+}
+
 Type_ *DispatchExpr::typecheck() {
   MethodStmt *cmp_meth;
+  Type_ *calling_type;
   bool exists = false;
   if (calling_expr) {
-    Type_ *calling_type = calling_expr->typecheck(); 
+    calling_type = calling_expr->typecheck(); 
     // check method exists for calling type
     string class_name = calling_type->get_name();
     set<MethodStmt*>& meths = class_methods[class_name];
@@ -992,6 +1030,10 @@ Type_ *DispatchExpr::typecheck() {
     }
   }
   if (exists) {
+    if (calling_type->get_nested_type()) {
+      cmp_meth = update_cmp_meth(calling_type, cmp_meth);
+    }
+
     FormalList fl = cmp_meth->get_formal_list();
 
     for (int i = 0; i < (int) args.size(); i++) {
