@@ -1,11 +1,11 @@
-#include <iostream>
-#include <fstream>
 #include <deque>
+#include <fstream>
+#include <iostream>
 
 #define BUFFER_SIZE 256
 
 class FileStreamBuffer {
-public:
+ public:
   FileStreamBuffer(const std::string filepath) : file(filepath) {
     if (!file) {
       std::cerr << "Error: Unable to open file " << filepath << std::endl;
@@ -15,9 +15,7 @@ public:
   }
 
   char get_next() {
-    if (buffer.empty()) {
-      return '\0' ;
-    }
+    if (buffer.empty()) { return '\0'; }
     char c = buffer.front();
     buffer.pop_front();
     fill_buffer();
@@ -25,17 +23,13 @@ public:
   }
 
   char lookahead(int index) {
-    if (index >= buffer.size()) {
-      return '\0';
-    }
+    if (index >= buffer.size()) { return '\0'; }
     return buffer[index];
   }
 
-  bool has_next() {
-    return !buffer.empty();
-  }
+  bool has_next() { return !buffer.empty(); }
 
-private:
+ private:
   std::ifstream file;
   std::deque<char> buffer;
 
@@ -45,7 +39,7 @@ private:
       file.get(c);
       if (file)
         buffer.push_back(c);
-      else 
+      else
         break;
     }
   }

@@ -23,8 +23,13 @@ class C {
 
 
 list<list<string>> method1(list<list<string>> x) {
+  for (int i = 0; i < x.length(); i+=1) {
+    int z = 1 * 4 - 3;
+    print(to_string(i));
+  }
   return [["a", "b"], ["c", "d"]];
 }
+
 list<string> my_list = [];
 my_list += ["hi"];
 
@@ -57,4 +62,4 @@ class Test {
 */
 
 list<int> my_list = [1, 2, 3];
-my_list.push_back(4);
+my_list.push_back(1);

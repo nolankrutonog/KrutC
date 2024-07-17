@@ -1,5 +1,7 @@
 CMakeFiles/krutc.dir/frontend/main.cpp.o: \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/main.cpp \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/codegen.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tree.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/iostream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__assert \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__config \
@@ -791,9 +793,11 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/_types/_nl_item.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__bsd_locale_defaults.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cstdarg \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/set \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__tree \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/constants.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/unordered_set \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tokenbuffer.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/deque \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
@@ -818,6 +822,4 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/recursive_directory_iterator.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/u8path.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tree.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/typechecker.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/codegen.h
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/typechecker.h

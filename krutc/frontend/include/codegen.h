@@ -7,12 +7,10 @@ class CodeGen {
   Program program;
   std::string filename;
 
-public:
-  CodeGen(Program program, std::string filename)
-    : program(program), filename(filename) {}
+ public:
+  CodeGen(Program program, std::string filename) : program(program), filename(filename) {}
 
   int codegen();
 };
 
-
-#endif // CODEGEN_H
+#endif  // CODEGEN_H

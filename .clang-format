@@ -1,0 +1,17 @@
+# Base style
+BasedOnStyle: Google
+
+# Basic formatting
+IndentWidth: 2
+ColumnLimit: 120
+UseTab: Never
+
+# Options you specifically requested
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: true 
+AlignConsecutiveDeclarations: false 
+AllowShortBlocksOnASingleLine: true
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+IncludeBlocks: Regroup
+SortIncludes: true

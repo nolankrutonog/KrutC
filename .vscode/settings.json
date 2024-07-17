@@ -88,5 +88,7 @@
     "tuple": "cpp",
     "__threading_support": "cpp"
   },
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "editor.defaultFormatter": "xaver.clang-format",
+  "C_Cpp.clang_format_style": "file"
 }

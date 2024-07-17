@@ -1,8 +1,7 @@
-#include <iostream>
 #include "include/codegen.h"
+
+#include <iostream>
 
 using namespace std;
 
-int CodeGen::codegen() {
-  
-}
+int CodeGen::codegen() {}

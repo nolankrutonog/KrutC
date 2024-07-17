@@ -1,18 +1,16 @@
-#ifndef TYPECHECKER_H 
-#define TYPECHECKER_H 
+#ifndef TYPECHECKER_H
+#define TYPECHECKER_H
 
-#include "tree.h"
 #include "parser.h"
+#include "tree.h"
 
 class TypeChecker {
   Program program;
   std::string filename;
 
-public: 
+ public:
   bool debug = false;
-  TypeChecker(Program program, bool debug, std::string filename) 
-    : program(program), debug(debug), filename(filename) {}
-
+  TypeChecker(Program program, bool debug, std::string filename) : program(program), debug(debug), filename(filename) {}
 
   int typecheck();
   void initialize_basic_classes();
@@ -24,8 +22,6 @@ public:
   bool check_inheritance_cycles();
   void populate_feature_tables();
   bool check_global_features();
-  
 };
 
-
-#endif // TYPECHECKER_H 
+#endif  // TYPECHECKER_H
