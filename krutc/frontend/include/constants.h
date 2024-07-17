@@ -22,7 +22,7 @@ inline bool is_basic_class(std::string &cname) {
   return cname == Void || cname == Object || cname == Int || cname == Bool || cname == String || cname == Char ||
          cname == List || cname == Set || cname == Deci || cname == Dict;
 }
-}  // namespace basic_classes
+} // namespace basic_classes
 
 namespace lexing {
 const std::string Class    = "CLASS";
@@ -85,7 +85,7 @@ inline bool is_binop(std::string &b) {
          b == GEQ || b == Equal || b == NotEqual || b == And || b == Or || b == PlusEquals || b == MinusEquals ||
          b == TimesEquals || b == DivideEquals || b == Define;
 }
-}  // namespace lexing
+} // namespace lexing
 
 namespace typechecking {
 /* basic class methods */
@@ -113,7 +113,7 @@ const std::string Sum       = "Sum";
 const std::string Min       = "min";
 const std::string Max       = "max";
 const std::string Input     = "input";
-}  // namespace typechecking
+} // namespace typechecking
 
 enum TokenType {
   CLASS        = 256,
@@ -187,4 +187,4 @@ static std::unordered_map<std::string, int> BINOP_PRECEDENCE = {
     {"=", 6},
 };
 
-#endif  // CONSTANTS_H
+#endif // CONSTANTS_H

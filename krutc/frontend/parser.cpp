@@ -11,7 +11,9 @@ using namespace std;
 void Parser::panic_recover(set<string> ss) {
   while (true) {
     Token t = tbuff.lookahead(0);
-    if ((ss.find(t.get_str()) != ss.end()) || t.get_type() == EMPTY) { break; }
+    if ((ss.find(t.get_str()) != ss.end()) || t.get_type() == EMPTY) {
+      break;
+    }
     tbuff.get_next();
   }
 }
@@ -35,7 +37,9 @@ FormalList Parser::parse_formallist() {
     int lineno = next.get_lineno();
     if (next.get_type() != TYPEID) {
       error_blank(lineno, "Error: Expected type in formal definition.");
-      if (next.get_str() == ")") { break; }
+      if (next.get_str() == ")") {
+        break;
+      }
     } else {
       type = parse_typeexpr();
     }
@@ -43,7 +47,9 @@ FormalList Parser::parse_formallist() {
     next = tbuff.lookahead(0);
     if (next.get_type() != OBJECTID) {
       error_blank(lineno, "Error: Variable name required for formal parameter definition.");
-      if (next.get_str() == ")") { break; }
+      if (next.get_str() == ")") {
+        break;
+      }
     } else {
       name = next.get_str();
     }
@@ -87,13 +93,13 @@ MethodStmt *Parser::parse_methodstmt(Type_ *type) {
     name = tbuff.get_next().get_str();
   }
 
-  parse_check_and_pop("(");  // pop leading "("
+  parse_check_and_pop("("); // pop leading "("
 
   formal_list = parse_formallist();
 
-  parse_check_and_pop(")");  // pop closing ')'
+  parse_check_and_pop(")"); // pop closing ')'
 
-  parse_check_and_pop("{");  // parse opening {
+  parse_check_and_pop("{"); // parse opening {
 
   while (tbuff.lookahead(0).get_str() != "}" && tbuff.has_next()) {
     Stmt *stmt = parse_stmt();
@@ -129,10 +135,10 @@ AttrStmt *Parser::parse_attrstmt(Type_ *type) {
 
   Token decider_tok = tbuff.lookahead(0);
   if (decider_tok.get_str() == ";") {
-    tbuff.get_next();  // pop ';'
+    tbuff.get_next(); // pop ';'
     init = NULL;
   } else if (decider_tok.get_str() == "=") {
-    tbuff.get_next();  // pop "="
+    tbuff.get_next(); // pop "="
     if (tbuff.lookahead(0).get_str() == ";") {
       error_blank(tbuff.lookahead(0).get_lineno(), "Error: expected expression after attribute definition.");
       init = NULL;
@@ -143,9 +149,8 @@ AttrStmt *Parser::parse_attrstmt(Type_ *type) {
     parse_check_and_pop(";");
   } else {
     /* this should never hit because its checked in parse_features() */
-    error_blank(decider_tok.get_lineno(),
-                "Error: Expected either ';' or expression following attribute "
-                "declaration.");
+    error_blank(decider_tok.get_lineno(), "Error: Expected either ';' or expression following attribute "
+                                          "declaration.");
   }
 
   AttrStmt *attrstmt = new AttrStmt(type, name, init);
@@ -168,13 +173,13 @@ Type_ *Parser::parse_typeexpr() {
   } else {
     name = name_tok.get_str();
   }
-  tbuff.get_next();  // pop outer Type_
+  tbuff.get_next(); // pop outer Type_
 
   if (tbuff.lookahead(0).get_str() == "<") {
-    tbuff.get_next();  // pop opening '<'
+    tbuff.get_next(); // pop opening '<'
     nested = parse_typeexpr();
     if (tbuff.lookahead(0).get_str() == ">") {
-      tbuff.get_next();  // pop closing '>'
+      tbuff.get_next(); // pop closing '>'
     } else {
       error_blank(tbuff.lookahead(0).get_lineno(), "Error: Expected closing carrot '>'.");
     }
@@ -200,7 +205,9 @@ Feature *Parser::parse_feature() {
     error_blank(tbuff.lookahead(0).get_lineno(), "Error: unbalanced '<' '>' in type declaration.");
     tbuff.get_next();
 
-    while (tbuff.lookahead(0).get_str() == ">") { tbuff.get_next(); }
+    while (tbuff.lookahead(0).get_str() == ">") {
+      tbuff.get_next();
+    }
   }
 
   Feature *f;
@@ -227,10 +234,10 @@ int Parser::parse_check_and_pop(string s) {
   if (t.get_str() != s) {
     error_blank(t.get_lineno(), "Error: Expected '" + s + "', instead got '" + t.get_str() + "'.");
     panic_recover({s});
-    tbuff.get_next();  // pop t
+    tbuff.get_next(); // pop t
     return -1;
   }
-  tbuff.get_next();  // pop t
+  tbuff.get_next(); // pop t
   return 1;
 }
 
@@ -244,14 +251,14 @@ ForStmt *Parser::parse_for_stmt() {
 
   Token for_tok = tbuff.lookahead(0);
   assert(for_tok.get_type() == FOR);
-  tbuff.get_next();  // pop 'FOR'
+  tbuff.get_next(); // pop 'FOR'
 
   parse_check_and_pop("(");
 
   Token next = tbuff.lookahead(0);
   if (next.get_str() == ";") {
     stmt = NULL;
-    parse_check_and_pop(";");  // pop ';'
+    parse_check_and_pop(";"); // pop ';'
   } else {
     stmt = parse_stmt();
 
@@ -275,7 +282,7 @@ ForStmt *Parser::parse_for_stmt() {
   } else {
     cond = NULL;
   }
-  parse_check_and_pop(";");  // pop ';'
+  parse_check_and_pop(";"); // pop ';'
 
   if (tbuff.lookahead(0).get_str() != ")") {
     if (!build_expr_tq(")"))
@@ -285,7 +292,7 @@ ForStmt *Parser::parse_for_stmt() {
   } else {
     repeat = NULL;
   }
-  parse_check_and_pop(")");  // pop ')'
+  parse_check_and_pop(")"); // pop ')'
 
   parse_check_and_pop("{");
 
@@ -307,7 +314,7 @@ ForStmt *Parser::parse_for_stmt() {
 }
 
 vector<string> Parser::get_parents() {
-  tbuff.get_next();  // pop keyword INHERITS
+  tbuff.get_next(); // pop keyword INHERITS
 
   vector<string> parents;
   while (tbuff.has_next() && tbuff.lookahead(0).get_str() != "{") {
@@ -325,12 +332,12 @@ vector<string> Parser::get_parents() {
         parents.push_back(parent.get_str());
       }
     }
-    tbuff.get_next();  // pop parent token
+    tbuff.get_next(); // pop parent token
 
     Token next = tbuff.lookahead(0);
-    if (next.get_str() == "{")  // dont pop '{'
+    if (next.get_str() == "{") // dont pop '{'
       break;
-    if (next.get_str() == ",") {  // pop ','
+    if (next.get_str() == ",") { // pop ','
       tbuff.get_next();
       continue;
     } else {
@@ -352,7 +359,7 @@ ClassStmt *Parser::parse_class_stmt() {
 
   Token class_tok = tbuff.lookahead(0);
   assert(class_tok.get_type() == CLASS);
-  tbuff.get_next();  // pop CLASS
+  tbuff.get_next(); // pop CLASS
 
   Token next = tbuff.lookahead(0);
   if (next.get_type() != TYPEID) {
@@ -366,9 +373,8 @@ ClassStmt *Parser::parse_class_stmt() {
   if (next.get_type() == INHERITS) {
     parents = get_parents();
     if (parents.size() == 0) {
-      string err_msg =
-          "Error: Every CLASS must have one or more parent if "
-          "keyword INHERITS is present";
+      string err_msg = "Error: Every CLASS must have one or more parent if "
+                       "keyword INHERITS is present";
       error_blank(next.get_lineno(), err_msg);
     }
   }
@@ -402,7 +408,7 @@ IfStmt *Parser::parse_if_stmt() {
   ExprStmt *pred;
   StmtList then_branch;
   StmtList else_branch;
-  tbuff.get_next();  // pop if
+  tbuff.get_next(); // pop if
 
   /* evaluate expression */
   parse_check_and_pop("(");
@@ -415,7 +421,9 @@ IfStmt *Parser::parse_if_stmt() {
   parse_check_and_pop("{");
 
   while (true) {
-    if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) { break; }
+    if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) {
+      break;
+    }
     Stmt *stmt = parse_stmt();
     if (stmt) {
       if (dynamic_cast<ClassStmt *>(stmt)) {
@@ -430,11 +438,13 @@ IfStmt *Parser::parse_if_stmt() {
   parse_check_and_pop("}");
 
   if (tbuff.lookahead(0).get_type() == ELSE) {
-    tbuff.get_next();  // pop else
+    tbuff.get_next(); // pop else
     parse_check_and_pop("{");
 
     while (true) {
-      if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) { break; }
+      if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) {
+        break;
+      }
       Stmt *stmt = parse_stmt();
       if (stmt) {
         if (dynamic_cast<ClassStmt *>(stmt)) {
@@ -460,7 +470,7 @@ WhileStmt *Parser::parse_while_stmt() {
   ExprStmt *pred;
   StmtList stmt_list;
 
-  tbuff.get_next();  // pop 'while'
+  tbuff.get_next(); // pop 'while'
 
   /* evaluate expression */
   parse_check_and_pop("(");
@@ -473,7 +483,9 @@ WhileStmt *Parser::parse_while_stmt() {
   parse_check_and_pop("{");
 
   while (true) {
-    if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) { break; }
+    if (tbuff.lookahead(0).get_str() == "}" || tbuff.lookahead(0).get_type() == EMPTY) {
+      break;
+    }
     Stmt *stmt = parse_stmt();
     if (stmt) {
       if (dynamic_cast<ClassStmt *>(stmt)) {
@@ -541,7 +553,9 @@ bool Parser::build_expr_tq(string s) {
     i++;
     Token t = tbuff.lookahead(0);
     /* regardless of S, expr cannot include ';' */
-    if (t.get_type() == EMPTY || t.get_str() == ";") { break; }
+    if (t.get_type() == EMPTY || t.get_str() == ";") {
+      break;
+    }
 
     /* sometimes the expression ends with a ')' and expression contains parens
      */
@@ -606,7 +620,8 @@ bool Parser::build_expr_tq(string s) {
 ExprStmt *Parser::parse_exprstmt() {
   debug_msg("BEGIN: parse_exprstmt()");
 
-  if (expr_tq.tq.empty()) return NULL;
+  if (expr_tq.tq.empty())
+    return NULL;
 
   calibrate_expr_tq();
 
@@ -689,10 +704,13 @@ ExprList Parser::parse_comma_separated_exprlist() {
     else if (t.get_str() == ")" || t.get_str() == "]")
       stack--;
     else if (t.get_str() == "," && stack == 0) {
-      if (original.tq.empty()) { error_blank(t.get_lineno(), "Error: expected expression after ','"); }
+      if (original.tq.empty()) {
+        error_blank(t.get_lineno(), "Error: expected expression after ','");
+      }
 
       ExprStmt *expr = parse_exprstmt();
-      if (expr) exprlist.push_back(expr);
+      if (expr)
+        exprlist.push_back(expr);
       continue;
     }
 
@@ -702,7 +720,8 @@ ExprList Parser::parse_comma_separated_exprlist() {
   /* for the spill over*/
   if (!expr_tq.tq.empty()) {
     ExprStmt *expr = parse_exprstmt();
-    if (expr) exprlist.push_back(expr);
+    if (expr)
+      exprlist.push_back(expr);
   }
 
   return exprlist;
@@ -723,7 +742,9 @@ ListConstExpr *Parser::parse_list_const_expr() {
   expr_tq.tq.pop_front();
   expr_tq.tq.pop_back();
 
-  if (!expr_tq.tq.empty()) { exprlist = parse_comma_separated_exprlist(); }
+  if (!expr_tq.tq.empty()) {
+    exprlist = parse_comma_separated_exprlist();
+  }
 
   ListConstExpr *list_const_expr = new ListConstExpr(exprlist);
   list_const_expr->lineno        = lineno;
@@ -737,17 +758,21 @@ SublistExpr *Parser::parse_sublist_expr(int colon_idx, ExprStmt *list_name) {
 
   ExprTQ original = expr_tq;
   expr_tq.tq.clear();
-  for (int i = 0; i < colon_idx; i++) { expr_tq.tq.push_back(original.tq[i]); }
+  for (int i = 0; i < colon_idx; i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
   if (!expr_tq.tq.empty())
     st_idx = parse_exprstmt();
-  else  // need to be set to NULL because they are optional
+  else // need to be set to NULL because they are optional
     st_idx = NULL;
 
   expr_tq.tq.clear();
-  for (int i = colon_idx + 1; i < (int)original.tq.size(); i++) { expr_tq.tq.push_back(original.tq[i]); }
+  for (int i = colon_idx + 1; i < (int)original.tq.size(); i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
   if (!expr_tq.tq.empty())
     end_idx = parse_exprstmt();
-  else  // need to be set to NULL because they are optional
+  else // need to be set to NULL because they are optional
     end_idx = NULL;
 
   SublistExpr *sle = new SublistExpr(list_name, st_idx, end_idx);
@@ -764,13 +789,15 @@ ListElemRef *Parser::parse_list_elem_ref_expr() {
   int open_brack_idx = get_str_idx_expr_tq("[");
   ExprTQ original    = expr_tq;
   expr_tq.tq.clear();
-  for (int i = 0; i < (int)open_brack_idx; i++) { expr_tq.tq.push_back(original.tq[i]); }
+  for (int i = 0; i < (int)open_brack_idx; i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
   list_name = parse_exprstmt();
 
   assert(expr_tq.tq.empty());
 
   // also need to check for ":" in case it's SublistExpr
-  int stk              = -1;  // starts at -1 because the first char is '['
+  int stk              = -1; // starts at -1 because the first char is '['
   bool is_sublist_expr = false;
   int colon_idx        = -1;
   for (int i = open_brack_idx; i < (int)original.tq.size(); i++) {
@@ -839,12 +866,16 @@ DispatchExpr *Parser::parse_dispexpr() {
   int dot_index   = get_str_idx_expr_tq(".");
   ExprTQ original = expr_tq;
   expr_tq.tq.clear();
-  for (int i = 0; i < dot_index; i++) { expr_tq.tq.push_back(original.tq[i]); }
+  for (int i = 0; i < dot_index; i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
   /* parse on tokens from 0 to dot_index */
   calling_class = parse_exprstmt();
   assert(expr_tq.tq.empty());
 
-  for (int i = dot_index + 1; i < original.tq.size(); i++) { expr_tq.tq.push_back(original.tq[i]); }
+  for (int i = dot_index + 1; i < original.tq.size(); i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
 
   name = expr_tq.tq[0].get_str();
   expr_tq.tq.pop_front();
@@ -855,7 +886,8 @@ DispatchExpr *Parser::parse_dispexpr() {
   expr_tq.tq.pop_front();
   expr_tq.tq.pop_back();
 
-  if (!expr_tq.tq.empty()) args = parse_comma_separated_exprlist();
+  if (!expr_tq.tq.empty())
+    args = parse_comma_separated_exprlist();
 
   DispatchExpr *disp_expr = new DispatchExpr(calling_class, name, args);
   disp_expr->lineno       = lineno;
@@ -886,7 +918,7 @@ KillExpr *Parser::parse_killexpr() {
 
   assert(expr_tq.tq.front().get_type() == KILL);
 
-  expr_tq.tq.pop_front();  // pop 'kill'
+  expr_tq.tq.pop_front(); // pop 'kill'
   calibrate_expr_tq();
   expr               = parse_exprstmt();
   KillExpr *killexpr = new KillExpr(expr);
@@ -932,12 +964,16 @@ BinopExpr *Parser::parse_binopexpr() {
 
   /* create lhs expr_tq */
   expr_tq.tq.clear();
-  for (int i = 0; i < original.binop_index; i++) { expr_tq.tq.push_back(original.tq[i]); }
+  for (int i = 0; i < original.binop_index; i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
   lhs = parse_exprstmt();
 
   /* create rhs expr_tq */
   expr_tq.tq.clear();
-  for (int i = original.binop_index + 1; i < original.tq.size(); i++) { expr_tq.tq.push_back(original.tq[i]); }
+  for (int i = original.binop_index + 1; i < original.tq.size(); i++) {
+    expr_tq.tq.push_back(original.tq[i]);
+  }
   rhs = parse_exprstmt();
 
   BinopExpr *binop = new BinopExpr(lhs, op, rhs);
@@ -1013,8 +1049,12 @@ Stmt *Parser::parse_stmt() {
   } else {
     if (!build_expr_tq(";"))
       stmt = NULL;
-    else { stmt = parse_exprstmt(); }
-    if (parse_check_and_pop(";") == -1) { return NULL; }
+    else {
+      stmt = parse_exprstmt();
+    }
+    if (parse_check_and_pop(";") == -1) {
+      return NULL;
+    }
   }
   debug_msg("END parse_stmt()");
   return stmt;
@@ -1024,7 +1064,8 @@ Program Parser::parse_program() {
   Program program;
   while (tbuff.has_next()) {
     Stmt *stmt = parse_stmt();
-    if (stmt != NULL) program.add_stmt(stmt);
+    if (stmt != NULL)
+      program.add_stmt(stmt);
   }
   return program;
 }
@@ -1041,7 +1082,9 @@ void Parser::token_dump() {
   if (tbuff.has_errors) {
     while (tbuff.has_next()) {
       Token t = tbuff.get_next();
-      if (t.get_type() == ERROR) { error_blank(t.get_lineno(), t.get_str()); }
+      if (t.get_type() == ERROR) {
+        error_blank(t.get_lineno(), t.get_str());
+      }
     }
   } else {
     while (tbuff.has_next()) {
@@ -1052,5 +1095,6 @@ void Parser::token_dump() {
 }
 
 void Parser::debug_msg(string s) {
-  if (debug) cout << s << endl;
+  if (debug)
+    cout << s << endl;
 }
