@@ -144,22 +144,26 @@ An **expression** is a type of statement, but can be any one of the following:
 
 ## Integer Constant
 An **int** expression is any integer. The **int** is stored as a C++ **long**, with minimum value of -2^(32 - 1) and maximum value of 2^32 - 1.
+
 *Example*:
 `int i = 200;`
 
 ## String Constant
 A **string** expression is represented as characters inside double quotes. 
+
 *Example:*
 `string s = "Hello, World!";`. 
 The maximum number of characters is 1024.
 
 ## Bool Constant
 A **bool** expression is represented as a C++ **int**, but can only be set via the keywords **true** and **false**.
+
 *Example*:
 `bool b = true;`
 
 ## Character Constant
-A **char** can only be one character, and is enclosed in single quotes. 
+A **char** can only be one character, and is enclosed in single quotes.
+
 *Example*:
 `char c = 't';`
 
