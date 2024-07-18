@@ -1,5 +1,6 @@
 # KrutC
 (pronounced 'kroot-see')
+(README.md is incomplete, but I'm working on it!)
 ## Forward 
 In my last quarter at Stanford University, I had the opportunity to take a compilers class with Professor Fredrik Kjolstad. Surprisingly, I gained a large affinity towards compilers and their complex, yet beautiful design. Mainly, though, I found their study a relaxing break from the challenges of OS design/implementation I had embarked upon in the quarters prior. Compilers need not worry about multithreaded programming, as correctness is vital over performance. I became so fascinated by them, I purchased the optional Compilers textbook (the purple dragon) and began reading it like a novel. At the same time, I heard a Lex Fridman podcast with Chris Lattner, the founder of Modulo, a company whose main goal was to create a compiled Python language called Mojo while allowing for backwards compatibility. I was hooked. I spoke with Kjolstad and asked him what I can do to begin my journey as a SWE who has an interest in compilers, because I looked online and all compiler jobs require 3+ years of experience. He suggested that I create a simple compiler with the help of LLVM to get my name out there. Within the following pages, is my best attempt at creating a compiler.
 
