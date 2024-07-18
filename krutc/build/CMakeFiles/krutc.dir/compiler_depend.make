@@ -1638,6 +1638,7 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: /Users/nolankrutonog/Desktop/workspace
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/codegen.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/constants.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/error.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
@@ -2465,6 +2466,7 @@ CMakeFiles/krutc.dir/frontend/parser.cpp.o: /Users/nolankrutonog/Desktop/workspa
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/constants.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/error.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
@@ -3291,6 +3293,7 @@ CMakeFiles/krutc.dir/frontend/scopetable.cpp.o: /Users/nolankrutonog/Desktop/wor
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/constants.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/error.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
@@ -4915,6 +4918,7 @@ CMakeFiles/krutc.dir/frontend/typechecker.cpp.o: /Users/nolankrutonog/Desktop/wo
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/constants.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/error.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/inheritance-graph.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
@@ -5375,6 +5379,8 @@ CMakeFiles/krutc.dir/frontend/typechecker.cpp.o: /Users/nolankrutonog/Desktop/wo
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__type_traits/is_final.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__type_traits/is_empty.h:
+
+/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/error.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/sys/_types/_useconds_t.h:
 

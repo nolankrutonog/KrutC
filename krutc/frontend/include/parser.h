@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 #include "constants.h"
+#include "error.h"
 #include "tokenbuffer.h"
 #include "tree.h"
 
@@ -19,9 +20,9 @@ static int get_op_precedence(std::string op) { return BINOP_PRECEDENCE[op]; }
 */
 class ExprTQ {
  public:
-  int lineno      = 0;
+  int lineno = 0;
   int binop_index = -1;
-  int binop_prec  = -1;
+  int binop_prec = -1;
   // int paren_stack = 0;
   std::deque<Token> tq;
 
@@ -40,7 +41,7 @@ class ExprTQ {
 class Parser {
  public:
   int parser_errors = 0;
-  bool debug        = false;
+  bool debug = false;
 
   Parser(std::string filename, bool debug, bool token_dump)
       : tbuff(filename, token_dump), debug(debug), filename(filename) {}
@@ -53,13 +54,14 @@ class Parser {
   std::string filename;
 
   void panic_recover(std::set<std::string> ss);
+  void panic_recover_nest(std::string s, std::string comp, bool show);
   void debug_msg(std::string);
 
   Stmt *parse_stmt();
 
   Feature *parse_feature();
-  AttrStmt *parse_attrstmt(Type_ *type);
-  MethodStmt *parse_methodstmt(Type_ *type);
+  AttrStmt *parse_attrstmt(Type_ *type, std::string name);
+  MethodStmt *parse_methodstmt(Type_ *type, std::string name);
   Type_ *parse_typeexpr();
 
   FormalList parse_formallist();
@@ -95,34 +97,9 @@ class Parser {
   KillExpr *parse_killexpr();
   ObjectIdExpr *parse_objectid_expr();
 
-  /* Print errors */
-  void print_error(int lineno, const std::string &err_msg) {
-    parser_errors++;
-    std::cerr << filename << ":" << lineno << ": " << err_msg << std::endl;
-  }
-  void error_expected_token(int lineno, std::string tok) {
-    std::string err_msg = "Error: Expected '" + tok + "'.";
-    print_error(lineno, err_msg);
-  }
-  void error_unexpected_token(int lineno, std::string tok) {
-    std::string err_msg = "Error: Unexpected '" + tok + "'.";
-    print_error(lineno, err_msg);
-  }
-
-  void error_blank(int lineno, std::string err_msg) { print_error(lineno, err_msg); }
-
-  void error_wrong_stmt_type(int lineno) {
-    std::string err_msg = "Error: wrong stmt type.";
-    print_error(lineno, err_msg);
-  }
-  void error_wrong_stmt_type_in_formal(int lineno) {
-    std::string err_msg = "Error: wrong stmt type in formal.";
-    print_error(lineno, err_msg);
-  }
-  void error_formal_init_not_null(int lineno) {
-    std::string err_msg = "Error: Formal initialized to value.";
-    print_error(lineno, err_msg);
-  }
+  void parser_error(int lineno, std::string &err_msg);
+  void parser_warning(int lineno, std::string &warn_msg);
+  void lexer_error(int lineno, std::string err_msg);
 };
 
 #endif  // PARSER_H

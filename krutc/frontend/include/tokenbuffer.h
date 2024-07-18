@@ -7,32 +7,6 @@
 #include "lexer.h"
 
 class TokenBuffer {
- public:
-  int has_errors = 0;
-
-  TokenBuffer(const std::string filepath, bool token_dump) : lexer(filepath), token_dump(token_dump) { fill_buffer(); }
-
-  bool has_next() { return buffer.size(); }
-
-  Token get_next() {
-    if (buffer.empty()) { return Token(EMPTY); }
-    Token t = buffer.front();
-    if (token_dump) t.dump();
-    buffer.pop_front();
-    // curr_lineno = t.get_lineno();
-    return t;
-  }
-
-  Token lookahead(int n) {
-    if (n >= buffer.size()) { return Token(EMPTY); }
-    return buffer[n];
-  }
-
-  // int get_lineno() {
-  //   return curr_lineno;
-  // }
-
- private:
   Lexer lexer;
   std::deque<Token> buffer;
   bool token_dump;
@@ -46,11 +20,45 @@ class TokenBuffer {
         has_errors++;
         continue;
       }
-      if (t.get_type() == EMPTY) { continue; }
+      if (t.get_type() == EMPTY) {
+        continue;
+      }
       // t.dump();
       buffer.push_back(t);
     }
   }
+
+ public:
+  int has_errors = 0;
+
+  TokenBuffer(const std::string filepath, bool token_dump)
+      : lexer(filepath), token_dump(token_dump) {
+    fill_buffer();
+  }
+
+  bool has_next() { return buffer.size(); }
+
+  Token get_next() {
+    if (buffer.empty()) {
+      return Token(EMPTY);
+    }
+    Token t = buffer.front();
+    if (token_dump) t.dump();
+    buffer.pop_front();
+    // curr_lineno = t.get_lineno();
+    return t;
+  }
+
+  Token lookahead(int n) {
+    if (n >= buffer.size()) {
+      return Token(EMPTY);
+    }
+    return buffer[n];
+  }
+
+  // int get_lineno() {
+  //   return curr_lineno;
+  // }
 };
 
 #endif  // TOKEN_BUFFER_H

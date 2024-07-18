@@ -85,9 +85,9 @@ class Type_;
 class Stmt {
  public:
   virtual StmtType get_stmttype() = 0;
-  int lineno                      = 0;
-  virtual ~Stmt()                 = default;
-  virtual void dump(int indent)   = 0;
+  int lineno = 0;
+  virtual ~Stmt() = default;
+  virtual void dump(int indent) = 0;
   virtual std::string classname() { return "Stmt"; };
   virtual Type_ *typecheck() = 0;
   // virtual Value *codegen() = 0;
@@ -126,7 +126,8 @@ class ClassStmt : public Stmt {
   FeatureList feature_list;
 
  public:
-  ClassStmt(std::string name, std::vector<std::string> parents, FeatureList feature_list)
+  ClassStmt(std::string name, std::vector<std::string> parents,
+            FeatureList feature_list)
       : name(name), parents(parents), feature_list(feature_list) {}
 
   StmtType get_stmttype() { return CLASS_STMT; }
@@ -151,7 +152,8 @@ class AttrStmt : public Feature {
   ExprStmt *init;
 
  public:
-  AttrStmt(Type_ *type, std::string name, ExprStmt *init) : type(type), name(name), init(init) {}
+  AttrStmt(Type_ *type, std::string name, ExprStmt *init)
+      : type(type), name(name), init(init) {}
   StmtType get_stmttype() { return ATTR_STMT; }
   void dump(int indent);
   bool is_method() { return false; }
@@ -184,8 +186,12 @@ class MethodStmt : public Feature {
   StmtList stmt_list;
 
  public:
-  MethodStmt(Type_ *ret_type, std::string name, FormalList formal_list, StmtList stmt)
-      : ret_type(ret_type), name(name), formal_list(formal_list), stmt_list(stmt) {}
+  MethodStmt(Type_ *ret_type, std::string name, FormalList formal_list,
+             StmtList stmt)
+      : ret_type(ret_type),
+        name(name),
+        formal_list(formal_list),
+        stmt_list(stmt) {}
   StmtType get_stmttype() { return METHOD_STMT; }
   std::string classname() { return "MethodStmt"; }
   void dump(int indent);
@@ -242,7 +248,8 @@ class WhileStmt : public Stmt {
   StmtList stmt_list;
 
  public:
-  WhileStmt(ExprStmt *pred, StmtList stmt_list) : pred(pred), stmt_list(stmt_list) {}
+  WhileStmt(ExprStmt *pred, StmtList stmt_list)
+      : pred(pred), stmt_list(stmt_list) {}
   StmtType get_stmttype() { return WHILE_STMT; }
   void dump(int indent);
   std::string classname() { return "WhileStmt"; }
@@ -267,7 +274,8 @@ class BinopExpr : public ExprStmt {
   ExprStmt *rhs;
 
  public:
-  BinopExpr(ExprStmt *lhs, std::string op, ExprStmt *rhs) : lhs(lhs), op(op), rhs(rhs) {}
+  BinopExpr(ExprStmt *lhs, std::string op, ExprStmt *rhs)
+      : lhs(lhs), op(op), rhs(rhs) {}
   StmtType get_stmttype() { return BINOP_EXPR; }
   std::string classname() { return "BinopExpr"; }
   void dump(int indent);
@@ -396,7 +404,8 @@ class ListElemRef : public ExprStmt {
   ExprStmt *index;
 
  public:
-  ListElemRef(ExprStmt *list_name, ExprStmt *index) : list_name(list_name), index(index) {}
+  ListElemRef(ExprStmt *list_name, ExprStmt *index)
+      : list_name(list_name), index(index) {}
   StmtType get_stmttype() { return LIST_ELEM_REF; }
   void dump(int indent);
   std::string classname() { return "ListElemRef"; }
@@ -501,7 +510,8 @@ class Type_ {
 
  public:
   int lineno;
-  Type_(std::string name, Type_ *nested_type) : name(name), nested_type(nested_type) {}
+  Type_(std::string name, Type_ *nested_type)
+      : name(name), nested_type(nested_type) {}
   void dump(int indent);
   std::string to_str();
 

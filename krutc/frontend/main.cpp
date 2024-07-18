@@ -12,16 +12,17 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   string filename = argv[1];
-  string suffix   = ".krut";
+  string suffix = ".krut";
 
-  if (filename.compare(filename.size() - suffix.size(), suffix.size(), suffix) != 0) {
+  if (filename.compare(filename.size() - suffix.size(), suffix.size(),
+                       suffix) != 0) {
     cerr << "Error: file must be of type" + suffix << endl;
     return -1;
   }
 
   bool token_dump = false;
-  bool debug      = false;
-  bool tree       = false;
+  bool debug = false;
+  bool tree = false;
   if (argc >= 3) {
     for (int i = 2; i < argc; i++) {
       string flag = argv[i];
@@ -40,7 +41,9 @@ int main(int argc, char *argv[]) {
 
   Parser parser = Parser(filename, debug, token_dump);
 
-  if (!parser.check_lexer_errors()) { return -1; }
+  if (!parser.check_lexer_errors()) {
+    return -1;
+  }
 
   Program program = parser.parse_program();
 
@@ -53,9 +56,13 @@ int main(int argc, char *argv[]) {
 
   int semant_errors = typechecker.typecheck();
 
-  if (semant_errors) { return -1; }
+  if (semant_errors) {
+    return -1;
+  }
 
-  if (tree) { program.dump(); }
+  if (tree) {
+    program.dump();
+  }
 
   // CodeGen cgen = CodeGen(program, filename);
 

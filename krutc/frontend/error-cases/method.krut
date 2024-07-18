@@ -1,0 +1,16 @@
+/*
+error-cases/method.krut
+
+Contains list (but not exhaustive list) of error cases, and their 
+expected outputs above them
+*/
+
+-- Expected a name for the method
+void (int i, int j, set<int> s) {}
+
+-- Class can only be defined in outer scope
+void method1() {
+  class Nolan {
+
+  };
+}

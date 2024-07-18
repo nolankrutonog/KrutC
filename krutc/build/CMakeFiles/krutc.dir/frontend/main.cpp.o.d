@@ -798,6 +798,7 @@ CMakeFiles/krutc.dir/frontend/main.cpp.o: \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/constants.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/unordered_set \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/error.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tokenbuffer.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/deque \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \

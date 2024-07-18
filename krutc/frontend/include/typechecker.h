@@ -10,7 +10,8 @@ class TypeChecker {
 
  public:
   bool debug = false;
-  TypeChecker(Program program, bool debug, std::string filename) : program(program), debug(debug), filename(filename) {}
+  TypeChecker(Program program, bool debug, std::string filename)
+      : program(program), debug(debug), filename(filename) {}
 
   int typecheck();
   void initialize_basic_classes();
@@ -22,6 +23,9 @@ class TypeChecker {
   bool check_inheritance_cycles();
   void populate_feature_tables();
   bool check_global_features();
+
+  // void typechecker_error(int lineno, std::string err_msg);
+  // void typechecker_warning(int lineno, std::string warn_msg);
 };
 
 #endif  // TYPECHECKER_H

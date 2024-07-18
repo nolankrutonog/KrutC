@@ -1,0 +1,22 @@
+/*
+error-cases/attribute.krut
+
+Contains list (but not exhaustive list) of error cases, and their 
+expected outputs above them
+*/
+
+-- Expected name after type declaration
+int for (int i = 0; i < 5; i+=1) {};
+int = 2;
+
+/*
+<type> <name> (<formal_list>) {}
+
+or 
+
+<type> <name>;
+
+or 
+
+<type> <name> = <definition>;
+*/

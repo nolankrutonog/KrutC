@@ -1,0 +1,25 @@
+/*
+error-cases/formal.krut
+
+Contains list (but not exhaustive list) of error cases, and their 
+expected outputs above them
+*/
+
+
+-- Expected type in formal definition
+void method(a) {}
+
+-- Paramter definition missing name
+void method2(int) {}
+
+-- WARNING Expected another formal definition
+void method3(int a, ) {}
+
+-- WARNING Expected ',' between formal definitions
+void method4(int a int b) {}
+
+-- Expected either ',' or closing ')' in formal definition. Instead got:
+void method5(int a for (int i = 0; i < 5; i += 1) {}) {}
+
+
+  
