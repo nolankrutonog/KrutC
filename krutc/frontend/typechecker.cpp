@@ -1045,6 +1045,9 @@ Type_ *SublistExpr::typecheck() {
    list<int> my_list = [1, 2, 3];
    my_list.push_back("string");
 
+   this function returns a new MethodStmt *, where the argument would be
+   of type `int`, so that a `string` would result in an error
+
 */
 MethodStmt *update_cmp_meth(Type_ *calling_type, MethodStmt *orig) {
   Type_ *ret_type;
@@ -1092,8 +1095,8 @@ Type_ *DispatchExpr::typecheck() {
       }
     }
     if (!exists) {
-      string err_msg = "Class " + class_type[class_name]->to_str() +
-                       " has no method " + name;
+      string err_msg = "Class `" + class_type[class_name]->to_str() +
+                       "` has no method " + name + "`";
       error(lineno, err_msg);
     }
   } else {
@@ -1106,7 +1109,7 @@ Type_ *DispatchExpr::typecheck() {
       }
     }
     if (!exists) {
-      string err_msg = "Method " + name + " does not exist";
+      string err_msg = "Method `" + name + "` does not exist";
       error(lineno, err_msg);
     }
   }
@@ -1117,35 +1120,45 @@ Type_ *DispatchExpr::typecheck() {
 
     FormalList fl = cmp_meth->get_formal_list();
 
-    for (int i = 0; i < (int)args.size(); i++) {
-      ExprStmt *arg = args[i];
-      Type_ *arg_type = arg->typecheck();
-      if (i > (int)fl.size() - 1) {
-        string warn_msg = "Method " + cmp_meth->get_name() + " has " +
-                          to_string(fl.size()) +
-                          " arguments, so any more will be ignored.";
-        warning(lineno, warn_msg);
-      } else if (!conforms(arg_type, fl[i]->get_type())) {
-        string suffix;
-        switch ((i + 1) % 10) {
-          case 1:
-            suffix = i == 11 ? "th" : "st";
-            break;
-          case 2:
-            suffix = i == 12 ? "th" : "nd";
-            break;
-          case 3:
-            suffix = i == 13 ? "th" : "rd";
-            break;
-          default:
-            suffix = "th";
-            break;
+    /* check num args and num params are equal */
+    if (args.size() != cmp_meth->get_formal_list().size()) {
+      string err_msg = "Dispatch of method `" + name + "` requires " +
+                       to_string(cmp_meth->get_formal_list().size()) +
+                       " arg(s), you provided " + to_string(args.size()) +
+                       " arg(s)";
+      error(lineno, err_msg);
+    } else {
+      for (int i = 0; i < (int)args.size(); i++) {
+        ExprStmt *arg = args[i];
+        Type_ *arg_type = arg->typecheck();
+        if (i > (int)fl.size() - 1) {
+          string warn_msg = "Method " + cmp_meth->get_name() + " has " +
+                            to_string(fl.size()) +
+                            " arguments, so any more will be ignored.";
+          warning(lineno, warn_msg);
+        } else if (!conforms(arg_type, fl[i]->get_type())) {
+          string suffix;
+          switch ((i + 1) % 10) {
+            case 1:
+              suffix = i == 11 ? "th" : "st";
+              break;
+            case 2:
+              suffix = i == 12 ? "th" : "nd";
+              break;
+            case 3:
+              suffix = i == 13 ? "th" : "rd";
+              break;
+            default:
+              suffix = "th";
+              break;
+          }
+          string err_msg = "The " + to_string(i + 1) + suffix +
+                           " argument of function call `" + name +
+                           "()` needs to be of type `" +
+                           fl[i]->get_type()->to_str() + "` instead of type `" +
+                           arg_type->to_str() + "`";
+          error(lineno, err_msg);
         }
-        string err_msg = "The " + to_string(i + 1) + suffix +
-                         " argument of function call " + name +
-                         " needs to be of type " + fl[i]->get_type()->to_str() +
-                         " instead of type " + arg_type->to_str();
-        error(lineno, err_msg);
       }
     }
   }

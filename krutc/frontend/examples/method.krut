@@ -12,6 +12,9 @@ int method1() {
   if (a) {
     return 1; 
   }
+  return 2;
 }
 
+list<string> my_list;
 
+my_list.push_back();
