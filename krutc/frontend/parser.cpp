@@ -712,8 +712,6 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_returnexpr();
   } else if (t.get_type() == NEW) {
     expr = parse_newexpr();
-  } else if (t.get_type() == KILL) {
-    expr = parse_killexpr();
   } else if (t.get_type() == INT_CONST) {
     expr = parse_int_const_expr();
   } else if (t.get_type() == BOOL_CONST) {
@@ -722,13 +720,6 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_str_const_expr();
   } else if (t.get_type() == CHAR_CONST) {
     expr = parse_char_const_expr();
-  } else if (t.get_type() == CONTINUE) {
-    /* TODO: ensure works after cont/break that nothing follows */
-    expr = new ContExpr();
-    expr_tq.tq.pop_front();
-  } else if (t.get_type() == BREAK) {
-    expr = new BreakExpr();
-    expr_tq.tq.pop_front();
   } else if (t.get_type() == OBJECTID && expr_tq.tq.size() == 1) {
     expr = parse_objectid_expr();
   } else if (t.get_str() == "[" && expr_tq.tq.back().get_str() == "]") {
@@ -741,6 +732,8 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_dispexpr();
   } else if (expr_tq.tq.back().get_str() == "]") {
     expr = parse_list_elem_ref_expr();
+  } else if (t.get_str() == "{" && expr_tq.tq.back().get_str() == "}") {
+    expr = parse_set_const_expr();
   }
 
   if (!expr_tq.tq.empty()) {
@@ -796,6 +789,36 @@ ExprList Parser::parse_comma_separated_exprlist() {
   }
 
   return exprlist;
+}
+
+SetConstExpr *Parser::parse_set_const_expr() {
+  debug_msg("BEGIN parse_set_const_expr()");
+  ExprSet exprset;
+  int lineno = expr_tq.tq[0].get_lineno();
+  assert(expr_tq.tq.front().get_str() == "{");
+  assert(expr_tq.tq.back().get_str() == "}");
+
+  if (expr_tq.tq.empty()) {
+    /* this is allowed. ex: set s = {}; */
+    return NULL;
+  }
+
+  expr_tq.tq.pop_front();
+  expr_tq.tq.pop_back();
+
+  ExprList exprlist;
+  if (!expr_tq.tq.empty()) {
+    exprlist = parse_comma_separated_exprlist();
+  }
+
+  for (ExprStmt *e : exprlist) {
+    exprset.insert(e);
+  }
+
+  SetConstExpr *scex = new SetConstExpr(exprset);
+  scex->lineno = lineno;
+  debug_msg("END parse_set_const_expr()");
+  return scex;
 }
 
 ListConstExpr *Parser::parse_list_const_expr() {
@@ -982,22 +1005,6 @@ ReturnExpr *Parser::parse_returnexpr() {
   return retexpr;
 }
 
-KillExpr *Parser::parse_killexpr() {
-  debug_msg("BEGIN parse_killexpr()");
-  int lineno = expr_tq.tq[0].get_lineno();
-  ExprStmt *expr;
-
-  assert(expr_tq.tq.front().get_type() == KILL);
-
-  expr_tq.tq.pop_front();  // pop 'kill'
-  calibrate_expr_tq();
-  expr = parse_exprstmt();
-  KillExpr *killexpr = new KillExpr(expr);
-  killexpr->lineno = lineno;
-  debug_msg("END parse_killexpr()");
-  return killexpr;
-}
-
 NewExpr *Parser::parse_newexpr() {
   debug_msg("BEGIN parse_newexpr()");
   int lineno = expr_tq.tq[0].get_lineno();
@@ -1117,6 +1124,14 @@ Stmt *Parser::parse_stmt() {
     stmt = parse_if_stmt();
   } else if (t.get_type() == WHILE) {
     stmt = parse_while_stmt();
+  } else if (t.get_type() == BREAK) {
+    stmt = new BreakStmt();
+    tbuff.get_next();  // pop 'break';
+    parse_check_and_pop(";");
+  } else if (t.get_type() == CONTINUE) {
+    stmt = new ContStmt();
+    tbuff.get_next();  // pop 'continue'
+    parse_check_and_pop(";");
   } else {
     if (!build_expr_tq(";"))
       stmt = NULL;

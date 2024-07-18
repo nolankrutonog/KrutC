@@ -5,7 +5,9 @@
 using namespace std;
 
 void indent(int n) {
-  for (int i = 0; i < n; i++) { cout << " "; }
+  for (int i = 0; i < n; i++) {
+    cout << " ";
+  }
 }
 
 void Program::dump() {
@@ -23,10 +25,14 @@ void ClassStmt::dump(int n) {
   if (parents.size() > 0) {
     indent(n + 2);
     cout << "inherits: ";
-    for (string viber : parents) { cout << viber + " "; }
+    for (string viber : parents) {
+      cout << viber + " ";
+    }
     cout << endl;
   }
-  for (Feature *f : feature_list) { f->dump(n + 2); }
+  for (Feature *f : feature_list) {
+    f->dump(n + 2);
+  }
 }
 
 void AttrStmt::dump(int n) {
@@ -50,17 +56,21 @@ void MethodStmt::dump(int n) {
   if (formal_list.size()) {
     indent(n + 1);
     cout << "formals -> ";
-    for (FormalStmt *formal : formal_list) { formal->dump(n + 2); }
+    for (FormalStmt *formal : formal_list) {
+      formal->dump(n + 2);
+    }
     cout << endl;
   }
-  for (Stmt *stmt : stmt_list) { stmt->dump(n + 2); }
+  for (Stmt *stmt : stmt_list) {
+    stmt->dump(n + 2);
+  }
 }
 
-void ContExpr::dump(int n) {
+void ContStmt::dump(int n) {
   indent(n);
   cout << name << endl;
 }
-void BreakExpr::dump(int n) {
+void BreakStmt::dump(int n) {
   indent(n);
   cout << name << endl;
 }
@@ -84,14 +94,22 @@ void CharConstExpr::dump(int n) {
   cout << c << endl;
 }
 
-// void SetConstExpr::dump(int n) {
-
-// }
+void SetConstExpr::dump(int n) {
+  indent(n);
+  cout << "{" << endl;
+  for (ExprStmt *e : exprset) {
+    e->dump(n + 1);
+  }
+  indent(n);
+  cout << "}" << endl;
+}
 
 void ListConstExpr::dump(int n) {
   indent(n);
   cout << "[" << endl;
-  for (ExprStmt *e : exprlist) { e->dump(n + 1); }
+  for (ExprStmt *e : exprlist) {
+    e->dump(n + 1);
+  }
   indent(n);
   cout << "]" << endl;
 }
@@ -113,17 +131,23 @@ void WhileStmt::dump(int n) {
   indent(n);
   cout << "while" << endl;
   pred->dump(n + 1);
-  for (Stmt *s : stmt_list) { s->dump(n + 1); }
+  for (Stmt *s : stmt_list) {
+    s->dump(n + 1);
+  }
 }
 void IfStmt::dump(int n) {
   indent(n);
   cout << "if" << endl;
   pred->dump(n + 1);
-  for (Stmt *s : then_branch) { s->dump(n + 1); }
+  for (Stmt *s : then_branch) {
+    s->dump(n + 1);
+  }
   if (else_branch.size()) {
     indent(n);
     cout << "else" << endl;
-    for (Stmt *s : else_branch) { s->dump(n + 1); }
+    for (Stmt *s : else_branch) {
+      s->dump(n + 1);
+    }
   }
 }
 void ForStmt::dump(int n) {
@@ -134,7 +158,9 @@ void ForStmt::dump(int n) {
   if (cond) cond->dump(n + 1);
   if (repeat) repeat->dump(n + 1);
 
-  for (Stmt *s : stmt_list) { s->dump(n + 2); }
+  for (Stmt *s : stmt_list) {
+    s->dump(n + 2);
+  }
 }
 void DispatchExpr::dump(int n) {
   if (calling_expr) {
@@ -146,7 +172,9 @@ void DispatchExpr::dump(int n) {
   }
   cout << name + "(";
 
-  for (ExprStmt *a : args) { a->dump(n + 1); }
+  for (ExprStmt *a : args) {
+    a->dump(n + 1);
+  }
 
   cout << ")" << endl;
 }
@@ -177,12 +205,16 @@ void ObjectIdExpr::dump(int n) {
 }
 
 void BinopExpr::dump(int n) {
-  if (lhs) { lhs->dump(n + 1); }
+  if (lhs) {
+    lhs->dump(n + 1);
+  }
   if (op != "") {
     indent(n + 1);
     cout << op << endl;
   }
-  if (rhs) { rhs->dump(n + 1); }
+  if (rhs) {
+    rhs->dump(n + 1);
+  }
 }
 
 void SublistExpr::dump(int n) {
@@ -194,13 +226,7 @@ void SublistExpr::dump(int n) {
   cout << "]" << endl;
 }
 
-// void NoneExpr::dump(int n) {}
 void NewExpr::dump(int n) {
   indent(n);
   cout << "new " + newclass << endl;
-}
-void KillExpr::dump(int n) {
-  indent(n);
-  cout << "kill: " << endl;
-  expr->dump(n + 1);
 }

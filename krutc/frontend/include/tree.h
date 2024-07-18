@@ -54,6 +54,8 @@ typedef std::vector<FormalStmt *> FormalList;
 class ForStmt;
 class IfStmt;
 class WhileStmt;
+class BreakStmt;
+class ContStmt;
 
 class ExprStmt;
 typedef std::vector<ExprStmt *> ExprList;
@@ -71,9 +73,7 @@ class SublistExpr;
 class ObjectIdExpr;
 class DispatchExpr;
 class BinopExpr;
-class ContExpr;
-class BreakExpr;
-class KillExpr;
+// class KillExpr;
 
 class Type_;
 
@@ -112,6 +112,25 @@ class ExprStmt : public Stmt {
   virtual std::string classname() { return "ExprStmt"; }
   virtual void dump(int indent);
 };
+
+// class ExprVisitor {
+//  public:
+//   virtual void visit(const ReturnExpr *) = 0;
+//   virtual void visit(const IntConstExpr *) = 0;
+//   virtual void visit(const StrConstExpr *) = 0;
+//   virtual void visit(const CharConstExpr *) = 0;
+//   virtual void visit(const BoolConstExpr *) = 0;
+//   virtual void visit(const SetConstExpr *) = 0;
+//   virtual void visit(const ListConstExpr *) = 0;
+//   virtual void visit(const ListElemRef *) = 0;
+//   virtual void visit(const SublistExpr *) = 0;
+//   virtual void visit(const ObjectIdExpr *) = 0;
+//   virtual void visit(const DispatchExpr *) = 0;
+//   virtual void visit(const BinopExpr *) = 0;
+//   virtual void visit(const ContExpr *) = 0;
+//   virtual void visit(const BreakExpr *) = 0;
+//   virtual void visit(const KillExpr *) = 0;
+// };
 
 ////////////////////////////////////////////////////////////
 //
@@ -259,6 +278,27 @@ class WhileStmt : public Stmt {
   StmtList get_stmt_list() { return stmt_list; }
   Type_ *typecheck();
 };
+class BreakStmt : public Stmt {
+  std::string name = "BREAK";
+
+ public:
+  BreakStmt() {}
+  StmtType get_stmttype() { return BREAK_EXPR; }
+  std::string classname() { return "BreakExpr"; }
+  void dump(int indent);
+  Type_ *typecheck();
+};
+
+class ContStmt : public Stmt {
+  std::string name = "CONTINUE";
+
+ public:
+  ContStmt() {}
+  StmtType get_stmttype() { return CONT_EXPR; }
+  std::string classname() { return "ContExpr"; }
+  void dump(int indent);
+  Type_ *typecheck();
+};
 
 ////////////////////////////////////////////////////////////
 //
@@ -379,7 +419,7 @@ class SetConstExpr : public ExprStmt {
  public:
   SetConstExpr(ExprSet exprset) : exprset(exprset) {}
   StmtType get_stmttype() { return SET_CONST_EXPR; }
-  void dump(int indent) {}
+  void dump(int indent);
   std::string classname() { return "SetConstExpr"; }
 
   ExprSet get_exprset() { return exprset; }
@@ -432,28 +472,6 @@ class SublistExpr : public ListElemRef {
   Type_ *typecheck();
 };
 
-class ContExpr : public ExprStmt {
-  std::string name = "CONTINUE";
-
- public:
-  ContExpr() {}
-  StmtType get_stmttype() { return CONT_EXPR; }
-  std::string classname() { return "ContExpr"; }
-  void dump(int indent);
-  Type_ *typecheck();
-};
-
-class BreakExpr : public ExprStmt {
-  std::string name = "BREAK";
-
- public:
-  BreakExpr() {}
-  StmtType get_stmttype() { return BREAK_EXPR; }
-  std::string classname() { return "BreakExpr"; }
-  void dump(int indent);
-  Type_ *typecheck();
-};
-
 class ObjectIdExpr : public ExprStmt {
   std::string name;
 
@@ -478,23 +496,6 @@ class NewExpr : public ExprStmt {
   void dump(int indent);
 
   std::string get_newclass() { return newclass; }
-  Type_ *typecheck();
-};
-
-class KillExpr : public ExprStmt {
-  std::string name = "KILL";
-  ExprStmt *expr;
-
- public:
-  // KillExpr() {}
-  KillExpr(ExprStmt *expr) : expr(expr) {}
-  StmtType get_stmttype() { return KILL_EXPR; }
-  std::string classname() { return "KillExpr"; }
-  void dump(int indent);
-
-  std::string get_name() { return name; }
-  ExprStmt *get_error() { return expr; }
-
   Type_ *typecheck();
 };
 

@@ -275,6 +275,9 @@ void TypeChecker::initialize_builtin_methods() {
       class_type[Int], Min, {new FormalStmt(class_type[List], "l")}, {}));
   global_methods.insert(new MethodStmt(
       class_type[Int], Max, {new FormalStmt(class_type[List], "l")}, {}));
+  global_methods.insert(
+      new MethodStmt(class_type[Void], Kill,
+                     {new FormalStmt(class_type[String], "err_msg")}, {}));
 }
 
 /* Declared classes (of the form class ClassName {...}) can only be decalared in
@@ -931,6 +934,9 @@ Type_ *WhileStmt::typecheck() {
   return NULL;
 }
 
+Type_ *BreakStmt::typecheck() { return NULL; }
+Type_ *ContStmt::typecheck() { return NULL; }
+
 //////////////////////////////////////////////////////////////
 //
 //
@@ -1121,11 +1127,10 @@ Type_ *DispatchExpr::typecheck() {
     FormalList fl = cmp_meth->get_formal_list();
 
     /* check num args and num params are equal */
-    if (args.size() != cmp_meth->get_formal_list().size()) {
+    if (args.size() != fl.size()) {
       string err_msg = "Dispatch of method `" + name + "` requires " +
-                       to_string(cmp_meth->get_formal_list().size()) +
-                       " arg(s), you provided " + to_string(args.size()) +
-                       " arg(s)";
+                       to_string(fl.size()) + " arg(s), you provided " +
+                       to_string(args.size()) + " arg(s)";
       error(lineno, err_msg);
     } else {
       for (int i = 0; i < (int)args.size(); i++) {
@@ -1138,6 +1143,7 @@ Type_ *DispatchExpr::typecheck() {
           warning(lineno, warn_msg);
         } else if (!conforms(arg_type, fl[i]->get_type())) {
           string suffix;
+          /* this is pretty humor lmao */
           switch ((i + 1) % 10) {
             case 1:
               suffix = i == 11 ? "th" : "st";
@@ -1243,17 +1249,6 @@ Type_ *NewExpr::typecheck() {
   return class_type[newclass];
 }
 
-Type_ *ContExpr::typecheck() { return new Type_("continue", NULL); }
-
-Type_ *KillExpr::typecheck() {
-  Type_ *t = expr->typecheck();
-  if (!conforms(t, class_type[String])) {
-    string err_msg = "kill error must be a string";
-    error(lineno, err_msg);
-  }
-  return t;
-}
-
 Type_ *BinopExpr::typecheck() {
   Type_ *lhs_type = lhs->typecheck();
   Type_ *rhs_type = rhs->typecheck();
@@ -1280,5 +1275,3 @@ Type_ *BinopExpr::typecheck() {
 
   return lhs_type;
 }
-
-Type_ *BreakExpr::typecheck() { return new Type_("break", NULL); }

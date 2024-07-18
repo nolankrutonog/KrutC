@@ -80,6 +80,7 @@ class Parser {
   ExprStmt *parse_exprstmt();
   BinopExpr *parse_binopexpr();
 
+  SetConstExpr *parse_set_const_expr();
   ListConstExpr *parse_list_const_expr();
   ExprList parse_comma_separated_exprlist();
   DispatchExpr *parse_dispexpr();
@@ -94,7 +95,6 @@ class Parser {
   CharConstExpr *parse_char_const_expr();
   ReturnExpr *parse_returnexpr();
   NewExpr *parse_newexpr();
-  KillExpr *parse_killexpr();
   ObjectIdExpr *parse_objectid_expr();
 
   void parser_error(int lineno, std::string &err_msg);

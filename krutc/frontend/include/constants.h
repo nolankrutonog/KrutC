@@ -36,12 +36,10 @@ const std::string Return = "RETURN";
 const std::string Continue = "CONTINUE";
 const std::string Break = "BREAK";
 const std::string New = "NEW";
-const std::string Kill = "KILL";
 
 inline bool is_uppercase_keyword(std::string &k) {
   return k == Class || k == Inherits || k == For || k == If || k == Else ||
-         k == While || k == Return || k == Continue || k == Break || k == New ||
-         k == Kill;
+         k == While || k == Return || k == Continue || k == Break || k == New;
 }
 
 const std::string OpenP = "(";
@@ -118,6 +116,7 @@ const std::string Sum = "Sum";
 const std::string Min = "min";
 const std::string Max = "max";
 const std::string Input = "input";
+const std::string Kill = "kill";
 }  // namespace typechecking
 
 enum TokenType {
@@ -138,7 +137,6 @@ enum TokenType {
   CONTINUE = 287,
   BREAK = 288,
   NONE = 289,
-  KILL = 290,
   NEW = 291,
   CHAR_CONST = 292,
 
@@ -164,7 +162,6 @@ static std::unordered_map<TokenType, std::string> TOKEN_TYPE_TO_STR = {
     {CONTINUE, "CONTINUE"},
     {BREAK, "BREAK"},
     {NONE, "NONE"},
-    {KILL, "KILL"},
     {NEW, "NEW"},
 
     {EMPTY, "EMPTY"},
@@ -173,15 +170,12 @@ static std::unordered_map<TokenType, std::string> TOKEN_TYPE_TO_STR = {
 };
 
 static std::unordered_map<std::string, TokenType> KEYWORDS_STR_TO_TTYPE{
-    {"CLASS", CLASS},   {"INHERITS", INHERITS}, {"FOR", FOR},
-    {"IF", IF},         {"ELSE", ELSE},         {"WHILE", WHILE},
-    {"RETURN", RETURN}, {"CONTINUE", CONTINUE}, {"BREAK", BREAK},
-    {"NONE", NONE},     {"NEW", NEW},           {"KILL", KILL}};
-
-// static std::set<TokenType> KEYWORDS_TTYPE{
-//     CLASS, INHERITS, FOR,    /* START, END, STEP,*/ IF,
-//     ELSE,  WHILE,    RETURN, // THIS
-// };
+    {"CLASS", CLASS},   {"INHERITS", INHERITS},
+    {"FOR", FOR},       {"IF", IF},
+    {"ELSE", ELSE},     {"WHILE", WHILE},
+    {"RETURN", RETURN}, {"CONTINUE", CONTINUE},
+    {"BREAK", BREAK},   {"NONE", NONE},
+    {"NEW", NEW}};
 
 static std::unordered_map<std::string, int> BINOP_PRECEDENCE = {
     {"+", 0},  {"-", 0},  {"*", 1},  {"/", 1},
