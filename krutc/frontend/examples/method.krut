@@ -1,5 +1,9 @@
-int m2() {
-  return 1;
+
+int method() {
+  return "";
+  if (true) {
+    return ;
+  }
 }
 
-kill "haha";
+

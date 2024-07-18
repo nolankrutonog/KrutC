@@ -23,9 +23,6 @@ class TypeChecker {
   bool check_inheritance_cycles();
   void populate_feature_tables();
   bool check_global_features();
-
-  // void typechecker_error(int lineno, std::string err_msg);
-  // void typechecker_warning(int lineno, std::string warn_msg);
 };
 
 #endif  // TYPECHECKER_H

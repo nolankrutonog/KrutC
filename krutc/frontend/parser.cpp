@@ -1107,9 +1107,7 @@ Stmt *Parser::parse_stmt() {
   debug_msg("BEGIN parse_stmt()");
   Stmt *stmt;
   Token t = tbuff.lookahead(0);
-  if (t.get_type() == TYPEID
-      // && tbuff.lookahead(1).get_str() != "("
-  ) {
+  if (t.get_type() == TYPEID) {
     stmt = parse_feature();
   } else if (t.get_type() == FOR) {
     stmt = parse_for_stmt();
