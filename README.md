@@ -1,18 +1,16 @@
 # KrutC
-## Origin
-In my last quarter at Stanford University, I had the opportunity to take a compilers class with Professor Fredrik Kjolstad. Surprisingly, I gained a large affinity towards compilers and their complex, yet beautiful design. Mainly, though, I found their study a relaxing break from the challenges of OS design and implementation I had embarked upon in the quarters prior. Compilers need not worry about multithreaded programming, as correctness is vital over performance. I became so fascinated by them, I purchased the optional Compilers textbook (the purple dragon) and began reading it like a novel. At the same time, I heard a Lex Fridman podcast with Chris Lattner, the founder of Modulo, a company whose main goal was to create a compiled Python language called Mojo. I spoke with Kjolstad and asked him what I can do to begin my journey as a SWE who specializes in compilers, because I looked online and all compiler jobs require 3+ years of experience. He suggested that I create a simple compiler with the help of LLVM to get my name out there. Within the following pages, is my best attempt at creating a compiler.
+(pronounced 'kroot-see')
+## Forward 
+In my last quarter at Stanford University, I had the opportunity to take a compilers class with Professor Fredrik Kjolstad. Surprisingly, I gained a large affinity towards compilers and their complex, yet beautiful design. Mainly, though, I found their study a relaxing break from the challenges of OS design/implementation I had embarked upon in the quarters prior. Compilers need not worry about multithreaded programming, as correctness is vital over performance. I became so fascinated by them, I purchased the optional Compilers textbook (the purple dragon) and began reading it like a novel. At the same time, I heard a Lex Fridman podcast with Chris Lattner, the founder of Modulo, a company whose main goal was to create a compiled Python language called Mojo while allowing for backwards compatibility. I was hooked. I spoke with Kjolstad and asked him what I can do to begin my journey as a SWE who has an interest in compilers, because I looked online and all compiler jobs require 3+ years of experience. He suggested that I create a simple compiler with the help of LLVM to get my name out there. Within the following pages, is my best attempt at creating a compiler.
 
 ## Purpose
 What makes Python a beautiful language for beginners is two fold: its syntax and its scripted nature. As the projects become more advanced, the package managing and deplyoing becomes really useful. 
 
-KrutC is designed to be a scripted language, like Python, but with C-style syntax. It is also typed and object oriented. In my first year of programming, after enrolling in courses taught in C and C++, the typed system just made sense. However, I knew little regarding Makefiles, cmake, clang, gcc, etc. and it proved challenging to write my own code in C or C++ without the provided repository of the current class I was taking. I found this annoying. Why couldn't I write my own C++ scripts like I can do in Python?
+KrutC is designed to be a scripted language, like Python, but with C-style syntax. It is also typed and object oriented. In my first year of programming, after enrolling in courses taught in C and C++, the typed system just made sense. However, I knew little regarding Makefiles, cmake, clang, gcc, etc. and it proved challenging to write my own code in C or C++ without the provided repository of the class I was enrolled in. I found this annoying. Why couldn't I write my own C++ scripts like I can do in Python?
 
 I decided to do something about it. 
 
 KrutC is a language for programmers who wish to learn how to program in type-safe and object-oriented languages. It combines some C++ syntax, functionality, and basic objects with Python's ease of writing. 
-
-# Introduction
-This manual describes the programming language **KrutC** (*KrutonogC*). A KrutC program is a set of *statements*. 
 
 # Statements
 All code in a KrutC file (`.krut`) is organized into one **statement list**. Every **statement** must be one of the following types:
