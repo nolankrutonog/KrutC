@@ -1,8 +1,16 @@
-
+bool a;
 int method() {
-  return "";
-  if (true) {
-    return ;
+  if (a) {
+    return 1;
+  } else {
+    return 2; 
+  } 
+}
+
+bool a;
+int method1() {
+  if (a) {
+    return 1; 
   }
 }
 

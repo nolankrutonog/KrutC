@@ -14,12 +14,10 @@ using namespace std;
 using namespace basic_classes;
 using namespace typechecking;
 
-static string curr_filename;   /* current filename */
-static bool in_method = false; /* to ensure ReturnExpr* only occur in methods */
-static MethodStmt *curr_method; /* used for checking return value */
-static int semant_errors = 0;   /* semant errors */
-static int warnings = 0;        /* warnings */
-static ScopeTable scopetable;   /* scope table */
+static string curr_filename;  /* current filename */
+static int semant_errors = 0; /* semant errors */
+static int warnings = 0;      /* warnings */
+static ScopeTable scopetable; /* scope table */
 
 static vector<string> class_names;                /* vector of class names */
 static map<string, Type_ *> class_type;           /* class to Type_* */
@@ -28,11 +26,10 @@ static map<string, vector<string>> class_parents; /* class to parents */
 static map<string, set<string>> class_ancestors;  /* class to all ancestors */
 static map<string, set<MethodStmt *>> class_methods; /* class to methods */
 static map<string, set<AttrStmt *>> class_attrs;     /* class to attrs */
-static map<string, set<MethodStmt *>>
-    parent_methods; /* intermediate map from class name to parent meths */
-static map<string, set<AttrStmt *>>
-    parent_attrs; /* intermediate map from class name to its parent attrs */
-
+/* intermediate map from class name to parent meths */
+static map<string, set<MethodStmt *>> parent_methods;
+/* intermediate map from class name to its parent attrs */
+static map<string, set<AttrStmt *>> parent_attrs;
 static set<MethodStmt *> global_methods; /* set of global methods */
 
 static bool conforms(Type_ *a, Type_ *b);
@@ -749,36 +746,9 @@ Type_ *FormalStmt::typecheck() {
   return NULL;
 }
 
-/* this checks the declared return type with the actual return type */
-void check_rex(Type_ *given_ret_type, int lineno) {
-  assert(in_method);
-  if (conforms(curr_method->get_ret_type(), class_type[Void])) {
-    // if return type of method is void
-    if (!conforms(given_ret_type, class_type[Void])) {
-      // if return value is not void
-      string warn_msg = "Void method `" + curr_method->get_name() +
-                        "` may return `" + given_ret_type->to_str() + "`";
-      warning(lineno, warn_msg);
-    }
-  } else {
-    // return type is not void
-    if (!given_ret_type) {
-      // but returning void value
-      string err_msg = "method `" + curr_method->get_name() +
-                       "` has return type of " +
-                       curr_method->get_ret_type()->to_str() +
-                       " and is returning a `void` value";
-      error(lineno, err_msg);
-    } else if (!conforms(given_ret_type, curr_method->get_ret_type())) {
-      // returning wrong type
-      string err_msg = "method `" + curr_method->get_name() +
-                       "` is returning a `" + given_ret_type->to_str() +
-                       "` when its declared return type is `" +
-                       curr_method->get_ret_type()->to_str() + "`";
-      error(lineno, err_msg);
-    }
-  }
-}
+static bool in_method = false; /* to ensure ReturnExpr* only occur in methods */
+static MethodStmt *curr_method; /* the current method being typechecked */
+static int curr_method_num_nested_rex = 0;
 
 Type_ *MethodStmt::typecheck() {
   scopetable.push_scope();
@@ -789,18 +759,63 @@ Type_ *MethodStmt::typecheck() {
     f->typecheck();
   }
 
+  /*
+  for return expressions in methods:
+
+    if a method's return value is `void`:
+      * it does not need to return on any control flow paths
+      * it can return using expression like this: `return;`
+      * if it returns a value other than void, a warning is generated
+
+    if a method's return value is not `void`:
+      * it must return on all control flow paths:
+        a method contains a statement list
+        either:
+          one of those statements is a return expression
+        or:
+          if none of them are, then there must be a return statement
+          nested in all of the statements
+  */
+  bool contains_ret_expr = false;
   for (int i = 0; i < (int)stmt_list.size(); i++) {
     Stmt *s = stmt_list[i];
-    MethodStmt *m = dynamic_cast<MethodStmt *>(s);
-    if (m) {
+
+    if (contains_ret_expr) {
+      string warn_msg = "Any code after return expression is dead code";
+      warning(s->lineno, warn_msg);
+      /* no need to keep typechecking */
+      break;
+    }
+
+    if (dynamic_cast<MethodStmt *>(s)) {
       string err_msg = "Cannot nest method definitions";
       error(s->lineno, err_msg);
       continue;
     }
+
     s->typecheck();
+
+    if (dynamic_cast<IfStmt *>(s)) {
+      curr_method_num_nested_rex--;
+    }
+
+    if (dynamic_cast<ReturnExpr *>(s)) {
+      contains_ret_expr = true;
+    }
+  }
+
+  if (!contains_ret_expr) {
+    if (curr_method_num_nested_rex != stmt_list.size() ||
+        stmt_list.size() == 0) {
+      string err_msg =
+          "Method `" + name + "` does not return in all control paths";
+      error(lineno, err_msg);
+    }
   }
 
   in_method = false;
+  curr_method_num_nested_rex = 0;
+  curr_method = NULL;
   scopetable.pop_scope();
   return NULL;
 }
@@ -916,9 +931,45 @@ Type_ *WhileStmt::typecheck() {
   return NULL;
 }
 
-/*
-  EXPRESSIONS must return their type
-*/
+//////////////////////////////////////////////////////////////
+//
+//
+// Expression Typechecking
+//
+//
+//////////////////////////////////////////////////////////////
+
+/* this checks the declared return type with the actual return type */
+void check_rex(Type_ *ret_type_actual, int lineno) {
+  assert(in_method);
+  Type_ *ret_type_decl = curr_method->get_ret_type();
+  if (conforms(ret_type_decl, class_type[Void])) {
+    // if return type of method is void
+    if (!conforms(ret_type_actual, class_type[Void])) {
+      // if return value is not void
+      string warn_msg = "Void method `" + curr_method->get_name() +
+                        "` may return `" + ret_type_actual->to_str() + "`";
+      warning(lineno, warn_msg);
+    }
+  } else {
+    // return type is not void
+    if (!ret_type_actual) {
+      // but returning void value
+      string err_msg = "method `" + curr_method->get_name() +
+                       "` has return type of " + ret_type_decl->to_str() +
+                       " and is returning a `void` value";
+      error(lineno, err_msg);
+    } else if (!conforms(ret_type_actual, ret_type_decl)) {
+      // returning wrong type
+      string err_msg = "method `" + curr_method->get_name() +
+                       "` is returning a `" + ret_type_actual->to_str() +
+                       "` when its declared return type is `" +
+                       ret_type_decl->to_str() + "`";
+      error(lineno, err_msg);
+    }
+  }
+}
+
 Type_ *ReturnExpr::typecheck() {
   Type_ *t = NULL;
   if (expr) t = expr->typecheck();
@@ -928,6 +979,7 @@ Type_ *ReturnExpr::typecheck() {
     warning(lineno, warn_msg);
   } else {
     check_rex(t, lineno);
+    curr_method_num_nested_rex++;
   }
   /* possible that RETURN has no expression */
   return t;
