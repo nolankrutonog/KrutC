@@ -714,6 +714,8 @@ ExprStmt *Parser::parse_exprstmt() {
     expr = parse_newexpr();
   } else if (t.get_type() == INT_CONST) {
     expr = parse_int_const_expr();
+  } else if (t.get_type() == DECI_CONST) {
+    expr = parse_deci_const_expr();
   } else if (t.get_type() == BOOL_CONST) {
     expr = parse_bool_const_expr();
   } else if (t.get_type() == STR_CONST) {
@@ -1071,6 +1073,19 @@ IntConstExpr *Parser::parse_int_const_expr() {
   debug_msg("END: parse_int_const_expr()");
   return icstmt;
 }
+
+DeciConstExpr *Parser::parse_deci_const_expr() {
+  debug_msg("BEGIN: parse_deci_const_expr()");
+  Token t = expr_tq.tq.front();
+  expr_tq.tq.pop_front();
+  int lineno = t.get_lineno();
+  double val = stod(t.get_str());
+  DeciConstExpr *dex = new DeciConstExpr(val);
+  dex->lineno = lineno;
+  debug_msg("END: parse_deci_const_expr()");
+  return dex;
+}
+
 BoolConstExpr *Parser::parse_bool_const_expr() {
   Token t = expr_tq.tq.front();
   expr_tq.tq.pop_front();

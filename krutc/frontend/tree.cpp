@@ -80,6 +80,11 @@ void IntConstExpr::dump(int n) {
   indent(n);
   cout << to_string(val) + " ";
 }
+
+void DeciConstExpr::dump(int n) {
+  indent(n);
+  cout << to_string(val) + " ";
+}
 void BoolConstExpr::dump(int n) {
   string out = val == 1 ? "true" : "false";
   indent(n);

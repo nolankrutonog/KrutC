@@ -90,6 +90,7 @@ class Parser {
   int get_str_idx_expr_tq(std::string);
 
   IntConstExpr *parse_int_const_expr();
+  DeciConstExpr *parse_deci_const_expr();
   BoolConstExpr *parse_bool_const_expr();
   StrConstExpr *parse_str_const_expr();
   CharConstExpr *parse_char_const_expr();

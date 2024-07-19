@@ -17,6 +17,7 @@ enum StmtType {
   EXPR_EXPR = 600,
   RETURN_EXPR,
   INT_CONST_EXPR,
+  DECI_CONST_EXPR,
   STRING_CONST_EXPR,
   LIST_CONST_EXPR,
   OBJECTID_EXPR,
@@ -370,6 +371,19 @@ class IntConstExpr : public ExprStmt {
   std::string classname() { return "IntConstExpr"; }
 
   long get_val() { return val; }
+  Type_ *typecheck();
+};
+
+class DeciConstExpr : public ExprStmt {
+  double val;
+
+ public:
+  DeciConstExpr(double val) : val(val) {}
+  StmtType get_stmttype() { return DECI_CONST_EXPR; }
+  void dump(int indent);
+  std::string classname() { return "DeciConstExpr"; }
+
+  double get_val() { return val; }
   Type_ *typecheck();
 };
 

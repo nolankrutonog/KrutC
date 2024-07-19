@@ -1,2 +1,7 @@
 
 deci d = 1.23;
+int i = 123;
+
+deci x = i + d;
+deci z = i * d;
+int y = i + d;

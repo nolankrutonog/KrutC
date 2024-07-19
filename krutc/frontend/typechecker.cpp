@@ -88,6 +88,16 @@ void TypeChecker::initialize_basic_classes() {
   classes[Int] = new ClassStmt(Int, {Object}, {});
 
   /*
+  deci ->
+    parent: object
+    no member attr/methods
+  */
+  class_type[Deci] = new Type_(Deci, NULL);
+  class_parents[Deci].push_back(Object);
+  class_names.push_back(Deci);
+  classes[Deci] = new ClassStmt(Deci, {Object}, {});
+
+  /*
   bool ->
     parent: object
     no member attrs/methods
@@ -1173,6 +1183,8 @@ Type_ *DispatchExpr::typecheck() {
 
 Type_ *IntConstExpr::typecheck() { return class_type[Int]; }
 
+Type_ *DeciConstExpr::typecheck() { return class_type[Deci]; }
+
 Type_ *ObjectIdExpr::typecheck() {
   Type_ *type_ = scopetable.lookup(name);
   if (!type_) {
@@ -1254,6 +1266,7 @@ Type_ *BinopExpr::typecheck() {
   Type_ *rhs_type = rhs->typecheck();
 
   if (BINOP_PRECEDENCE[op] >= 4) {
+    /* ensuring that any +=, -=, *=, /=, = ops are done on ObjectIdExpr */
     ObjectIdExpr *lval = dynamic_cast<ObjectIdExpr *>(lhs);
     if (!lval) {
       string err_msg =
@@ -1263,13 +1276,27 @@ Type_ *BinopExpr::typecheck() {
   }
 
   if (!conforms(lhs_type, rhs_type)) {
-    string err_msg =
-        "Left side type (" + lhs_type->to_str() + ") of operator `" + op +
-        "` is not the same as right side type (" + rhs_type->to_str() + ")";
-    error(lineno, err_msg);
+    /* if int and deci in same operation ==> deci */
+    if (((conforms(lhs_type, class_type[Int]) &&
+          conforms(rhs_type, class_type[Deci]))) ||
+        (conforms(lhs_type, class_type[Deci]) &&
+         conforms(rhs_type, class_type[Int]))) {
+      string warn_msg = "Operation `" + op +
+                        "` done on `int` and `deci` will evaluate to `deci`";
+      warning(lineno, warn_msg);
+      lhs_type = class_type[Deci]; /* setting the return type */
+    } else {
+      string err_msg =
+          "Left side type (" + lhs_type->to_str() + ") of operator `" + op +
+          "` is not the same as right side type (" + rhs_type->to_str() + ")";
+      error(lineno, err_msg);
+    }
   }
 
   if (BINOP_PRECEDENCE[op] == 2 || BINOP_PRECEDENCE[op] == 3) {
+    /* any of the comparing operators:
+      <, >, <=, >=, ==, !=, &&, ||
+    */
     return class_type[Bool];
   }
 
