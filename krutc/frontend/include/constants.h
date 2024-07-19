@@ -14,6 +14,7 @@ const std::string Char = "char";
 const std::string String = "string";
 const std::string List = "list";
 
+// TODO:
 const std::string Set = "set";
 const std::string Deci = "deci";
 const std::string Dict = "dict";
@@ -139,6 +140,7 @@ enum TokenType {
   NONE = 289,
   NEW = 291,
   CHAR_CONST = 292,
+  DECI_CONST = 293,
 
   EMPTY = 468,
   ERROR = 469

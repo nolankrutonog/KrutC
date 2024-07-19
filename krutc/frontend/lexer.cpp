@@ -161,12 +161,24 @@ Token Lexer::get_next_token() {
       break;
     }
 
-    // Handle INT_CONST
+    // Handle INT_CONST or DECI_CONST
     if (isnumber(curr[0])) {
+      bool is_deci = false;
       while (isnumber(buff.lookahead(0))) {
         curr += buff.get_next();
       }
-      t = Token(curr_lineno, INT_CONST, curr);
+      if (buff.lookahead(0) == '.') {
+        is_deci = true;
+        curr += buff.get_next();
+        while (isnumber(buff.lookahead(0))) {
+          curr += buff.get_next();
+        }
+      }
+      if (is_deci) {
+        t = Token(curr_lineno, DECI_CONST, curr);
+      } else {
+        t = Token(curr_lineno, INT_CONST, curr);
+      }
       break;
     }
 
