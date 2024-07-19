@@ -14,7 +14,7 @@ I decided to do something about it.
 
 KrutC is a language for programmers who wish to learn how to program in type-safe and object-oriented languages. It combines some C++ syntax, functionality, and basic objects with Python's ease of writing. 
 
-# Statements
+# Introduction 
 All code in a KrutC file (`.krut`) is organized into one **statement list**. Every **statement** must be one of the following types:
 - **class**
 - **feature**
