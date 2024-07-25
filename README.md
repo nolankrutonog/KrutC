@@ -12,7 +12,7 @@ KrutC is designed to be a scripted language, like Python, but with C-style synta
 
 I decided to do something about it. 
 
-KrutC is a language for programmers who wish to learn how to program in type-safe and object-oriented languages. It combines some C++ syntax, functionality, and basic objects with Python's ease of writing. 
+KrutC is a language for programmers who wish to learn how to program in type-safe and object-oriented languages. Hopefully, it combines some C++ syntax, functionality, and basic objects with Python's ease of writing. 
 
 # Introduction 
 All code in a KrutC file (`.krut`) is organized into one **statement list**. Every **statement** must be one of the following types:
@@ -66,10 +66,14 @@ A method is a statement of the form:
 }
 ```
 
-In the code above, a **method** with name *name* and return type of *type* is being declared in the current scope. The **statement_list** is a list of statements which are executed when the **method** *name* is called (dispatched). Each **method** contains a **formal_list**, which will be defined in a later section.
+In the pseudocode above, a **method** with name *name* and return type of *type* is being declared in the current scope. The **statement_list** is a list of statements which are executed when the **method** *name* is called (dispatched). Each **method** contains a **formal_list**, which will be defined in a later section.
 
 #### Requirements
 * Naming: each **method** must have their name begin with a lowercase letter, and must be a unique **method** name in the current scope.
+
+* Return Type: if a method's declared return type is **void**, then it does not return any value. If the declared return type is void and a method returns a non-void value, then a warning is generated. The compiler will assume that the return type is void.
+
+If a method's return type is <T> (s.t. <T> != **void**), then it must return a value of type <T> in all control flow paths. Failure to do so will result in a compiler generated error. 
 
 ### Attribute
 An attribute is a statement of the form:
@@ -128,6 +132,7 @@ Where **type** is a basic or user defined type, and id is an object id. A **form
 # Expressions
 An **expression** is a type of statement, but can be any one of the following:
 - **int_const**
+- **deci_const**
 - **string_const**
 - **bool_const**
 - **char_const**
@@ -138,15 +143,18 @@ An **expression** is a type of statement, but can be any one of the following:
 - **objectid**
 - **dispatch**
 - **binop**
-- **continue**
-- **break**
-- **kill**
 
 ## Integer Constant
 An **int** expression is any integer. The **int** is stored as a C++ **long**, with minimum value of -2^(32 - 1) and maximum value of 2^32 - 1.
 
 *Example*:
 `int i = 200;`
+
+## Decimal Constant
+A **deci** expression is any decimal. The **deci** is stored as a C++ **double**.
+
+*Example*:
+`deci d = 1.23;`
 
 ## String Constant
 A **string** expression is represented as characters inside double quotes. 
@@ -189,6 +197,23 @@ Runtime errors occur when:
 - `m` > `my_list.length()`
 
 The **int**s `n, m` are optional. If `n` is not used, then `n` is given a value of 0. If `m` is unused, then `m` is given a value of `my_list.length()`.
+
+## Return
+A **return** expression can only be executed within a **method**. The type returned by a **return** expression must match the declared return type of the method.
+
+*Example*:
+```
+int m(bool a) {
+  ...
+  if (a) {
+    int z = 1;
+    return z;
+  } else {
+    return 2;
+  }
+}
+```
+In the above example, the declared return type is **int**, so the method **m** must return an **int_const** or any expression whose type evaluates to **int**. 
 
 
 

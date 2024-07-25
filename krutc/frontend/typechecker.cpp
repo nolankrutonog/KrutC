@@ -1266,11 +1266,12 @@ Type_ *BinopExpr::typecheck() {
   Type_ *rhs_type = rhs->typecheck();
 
   if (BINOP_PRECEDENCE[op] >= 4) {
-    /* ensuring that any +=, -=, *=, /=, = ops are done on ObjectIdExpr */
-    ObjectIdExpr *lval = dynamic_cast<ObjectIdExpr *>(lhs);
-    if (!lval) {
+    /* ensuring that any +=, -=, *=, /=, = ops
+       cannot be done on any const expr */
+    string classname = lhs->classname();
+    if (classname.find("Const") != std::string::npos) {
       string err_msg =
-          "Left side of operator `" + op + "` must be a variable name";
+          "Left side of operator `" + op + "` cannot be a constant value";
       error(lineno, err_msg);
     }
   }

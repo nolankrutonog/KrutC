@@ -1,7 +1,20 @@
 
+/*
 deci d = 1.23;
 int i = 123;
 
 deci x = i + d;
 deci z = i * d;
-int y = i + d;
+deci y = i + d;
+*/
+
+class A {}
+
+A a = new A;
+
+list<string> my_list = ["ho"];
+
+-- getting error when shouldn't here
+-- Left side of operator `=` must be a variable name
+my_list[0] = "hey";
+

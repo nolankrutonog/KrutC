@@ -74,7 +74,6 @@ class SublistExpr;
 class ObjectIdExpr;
 class DispatchExpr;
 class BinopExpr;
-// class KillExpr;
 
 class Type_;
 
@@ -113,25 +112,6 @@ class ExprStmt : public Stmt {
   virtual std::string classname() { return "ExprStmt"; }
   virtual void dump(int indent);
 };
-
-// class ExprVisitor {
-//  public:
-//   virtual void visit(const ReturnExpr *) = 0;
-//   virtual void visit(const IntConstExpr *) = 0;
-//   virtual void visit(const StrConstExpr *) = 0;
-//   virtual void visit(const CharConstExpr *) = 0;
-//   virtual void visit(const BoolConstExpr *) = 0;
-//   virtual void visit(const SetConstExpr *) = 0;
-//   virtual void visit(const ListConstExpr *) = 0;
-//   virtual void visit(const ListElemRef *) = 0;
-//   virtual void visit(const SublistExpr *) = 0;
-//   virtual void visit(const ObjectIdExpr *) = 0;
-//   virtual void visit(const DispatchExpr *) = 0;
-//   virtual void visit(const BinopExpr *) = 0;
-//   virtual void visit(const ContExpr *) = 0;
-//   virtual void visit(const BreakExpr *) = 0;
-//   virtual void visit(const KillExpr *) = 0;
-// };
 
 ////////////////////////////////////////////////////////////
 //
