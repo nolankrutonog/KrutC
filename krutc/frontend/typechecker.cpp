@@ -526,6 +526,8 @@ void TypeChecker::populate_class_ancestors() {
   }
 }
 
+/* First populates all the parents feature tables, then populates/checks
+   the childs feature tables */
 void TypeChecker::populate_feature_tables() {
   map<string, bool> visited;
   for (pair<string, vector<string>> entry : class_parents) {

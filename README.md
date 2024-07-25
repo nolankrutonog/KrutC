@@ -14,8 +14,24 @@ I decided to do something about it.
 
 KrutC is a language for programmers who wish to learn how to program in type-safe and object-oriented languages. Hopefully, it combines some C++ syntax, functionality, and basic objects with Python's ease of writing. 
 
+# Table of Contents
+1. Introduction
+2. Statements
+3. Expressions
+4. Builtin Methods
+5. Type System
+
 # Introduction 
-All code in a KrutC file (`.krut`) is organized into one **statement list**. Every **statement** must be one of the following types:
+All code in a KrutC file (`.krut`) is organized into one **statement list**. The code is executed from top to bottom. 
+
+## Notation
+* `[...]` -- optional elements
+* `<...>` -- user-defined values
+* `?` -- preceding element can appear zero or one times
+* `*` -- preceding element can appear zero or more times
+
+# Statements
+Every **statement** must be one of the following types:
 - **class**
 - **feature**
 - **for**
@@ -27,91 +43,110 @@ All code in a KrutC file (`.krut`) is organized into one **statement list**. Eve
 The code in a `.krutc` file is executed from top to bottom. 
 
 ## Class
-A *Class* is a statement of the form: 
+A *Class* is defined as: 
 ```
 class <type_1> [inherits <type_2> [, <type_n>]*]? {
 	[feature_list]
 }
 ```
-In the following sections, I will be using different notations:
-* `[...]` -- anything within square brackets is optional
-* `<...>` -- anything within carets is a user-defined value
-* `?` -- anything before it can appear zero or one times
-* `*` -- anything before it can appear zero or more times
-
-
-In the code above, a **class** is being declared with the name **type_1**. It can either inherit no other **class**es, one **class** of name **type_2**, or a comma-separated list of **class**es. When a **class `<A>` inherits** one or more **class**es, it has access to the intersection of each inheritee's **attributes** and **methods**.
-
-Each **class** contains a **feature_list**, which will be defined in a later section. 
 
 ### Requirements
-- Naming: each **class** must have their name begin with a capital letter, and must be a unique name among declared classes.
-- Inheriting: multiple inheritance is allowed; however, classes cannot inherit in cycles. For example, the following code would not be allowed:
-```
-class A inherits C {}
-class B inherits A {}
-class C inherits B {}
-```
-- Features: All **attributes** defined in a **class** are private, and all **method**s defined in a **class** are public.
-- All **class**es must be defined in the outer scope.
+* Class names must begin with a capital letter and be unique.
+* Multiple inheritance is allowed, but cyclic inheritance is prohibited.
+* All attributes are private, and all methods are public.
+* Classes must be defined in the outer scope.
 
+### Single Inheritance
+```
+class Vehicle {
+	int model_year;
+	string owner;
+	void accelerate() {...}
+	void brake() {...}
+	void fillup(int size) {...}
+	...
+}
+
+class Car inherits Vehicle {
+	int gas_level;
+	void fillup(int gallons) {...}
+	...
+}
+
+class ElectricCar inherits Vehicle {
+	int charge_level;
+	void fillup(int megawatts) {...}
+	...
+}
+```
+ElectricCar and Car both inherit Vehicle, which means they have the attributes *model_year* and *owner*. They also have the methods *accelerate, brake, and fillup*. Methods in inherited classes can be redefined as long as the method name, return type, and formal list are the same. ElectricCar will use megawatts to *fillup()*, and Car will use gallons to *fillup()*.
+
+### Multiple Inheritance
+```
+class A {
+	int a1;
+	int m1() {
+		return 1
+	}
+}
+
+class B {
+	int a2;
+	int m1() {
+		return 2;
+	}
+}
+
+class C inherits A, B {}
+
+C my_c = new C;
+int i = my_c.m1();
+print(to_string(i)); // returns 1
+```
+Class **C** has access to attributes *a1* and *a2*. However, it only has one method *m1()* which it inherits from class **A** because **A** is listed first in the inherited list.
 ## Feature
-A **feature** can be one of two types: **method** or **attribute**. 
+Features can be either methods or attributes. 
 
 ### Method
-A method is a statement of the form:
 ```
 <type> <name>(<formal_list>) {
 	[statement_list]
 }
 ```
 
-In the pseudocode above, a **method** with name *name* and return type of *type* is being declared in the current scope. The **statement_list** is a list of statements which are executed when the **method** *name* is called (dispatched). Each **method** contains a **formal_list**, which will be defined in a later section.
-
 #### Requirements
-* Naming: each **method** must have their name begin with a lowercase letter, and must be a unique **method** name in the current scope.
-
-* Return Type: if a method's declared return type is **void**, then it does not return any value. If the declared return type is void and a method returns a non-void value, then a warning is generated. The compiler will assume that the return type is void.
-
-If a method's return type is <T> (s.t. <T> != **void**), then it must return a value of type <T> in all control flow paths. Failure to do so will result in a compiler generated error. 
+* Method names must begin with lowercase letters and be unique within their scope
+* Return type must be consistent with method's implementation
 
 ### Attribute
-An attribute is a statement of the form:
 ```
 <type> <name> [= <expression>]?;
 ```
-In the code above, an **attribute** with name *name* of type *type* is being declared in the current scope. Optionally, it can be defined with value *expression*. 
 
 ## For
-A **for** loop is a statment of the form:
 ```
 for ([statement]; [condition]; [repeat]) {
 	[statement_list]
 }
 ```
-A **for** loop is made up of four components. The **statement** is executed once at the start of the **for** loop. The **condition**, which is an expression of type bool, is checked before every iteration of the loop. If the **condition** returns false, then the loop returns. The **repeat** is an expression that is executed after every loop. The **statement_list** is a list of statements executed in every loop. 
-
-Execution order of the **for** loop is as follows:
-```
-1. statement;
-2. every statement in statment_list;
-3. if condition = false --> break;
-4. repeat;
-5. goto 2;
-```
+* **statement**: executed once
+* **condition**: a bool, which if evaluated to false will break the loop
+* **repeat**: a statement executed every loop
 
 
 ## While
-A **while** loop is a statment of the form:
+
 ```
 while (condition) {
 	[statment_list]
 }
 ```
-A **while** loop is made up of 2 components. The **condition** is an expression of type bool, and is checked before every iteration of the loop. If **condition** returns false, the loop breaks. The **statement_list** is executed on every iteration.
+* **condition**: bool, which if evaluated to false will break the loop
+
+For and while loops can be broken via keyword **break**.
+For and while loops can be sent to the next iteration via keyword **continue**.
 
 ## If
-An **if** statement is a statement of the form:
 ```
 if (condition) {
 	[then statment_list]
@@ -119,14 +154,14 @@ if (condition) {
 	[else statement_list]
 }]
 ```
-An **if** statement is has a conditional. If the condition evaluates to true, the **then** branch is executed. Otherwise the **else** branch is executed. The **else** branch is optional.
+The else branch is optional.
 
 ## Formal
 A **formal** is a statement of the form:
 ```
 <type> <id>
 ```
-Where **type** is a basic or user defined type, and id is an object id. A **formal** is used in a **method** when expressing the arguments required to call the method. All the **formal**s used as arguments result in the method's **formal_list**.
+Formal list -- a comma separated list of formals used in method definition.
 
 
 # Expressions
@@ -136,84 +171,117 @@ An **expression** is a type of statement, but can be any one of the following:
 - **string_const**
 - **bool_const**
 - **char_const**
-- **list_const**
-- **list_elem_ref**
-- **sublist_expr**
-- **return**
-- **objectid**
+- **list**
 - **dispatch**
-- **binop**
+- **binary operator**
+- **new**
 
-## Integer Constant
-An **int** expression is any integer. The **int** is stored as a C++ **long**, with minimum value of -2^(32 - 1) and maximum value of 2^32 - 1.
+## Constants
+* **Integer**: stored as C++ long (ex: `int i = 200;`)
+* **Decimal**: stored as C++ double (ex: `deci i = 1.23;`)
+* **String**: maximum 1024 characters (ex: `string s = "Hello, world!";`)
+* **Boolean**: can only be `true` or `false` (ex: `bool b = true;`)
+* **Character**: one character, only in single quotes (ex: `char c = 'c';`)
 
-*Example*:
-`int i = 200;`
-
-## Decimal Constant
-A **deci** expression is any decimal. The **deci** is stored as a C++ **double**.
-
-*Example*:
-`deci d = 1.23;`
-
-## String Constant
-A **string** expression is represented as characters inside double quotes. 
-
-*Example:*
-`string s = "Hello, World!";`. 
-The maximum number of characters is 1024.
-
-## Bool Constant
-A **bool** expression is represented as a C++ **int**, but can only be set via the keywords **true** and **false**.
-
-*Example*:
-`bool b = true;`
-
-## Character Constant
-A **char** can only be one character, and is enclosed in single quotes.
-
-*Example*:
-`char c = 't';`
-
-## List Constant
+## List
 A **list** expression is made up of comma-separated values, surrounded by brackets.
 *Example*:
 `list<int> my_list = [1, 2, 3, 4, 5];`
-
-## Sublist
-A **sublist** expression is made up of the original list's name, and two **int** types (will discuss typing in the future), separated by a colon.
-*Example*:
+### List Methods
+* syntax: `my_list.method();`
 ```
-int n = ...;
-int m = ...;
-list<int> my_list = [1, 2, 3, 4, 5];
-list<int> sublist = my_list[n:m];
+int length() // returns number of elements in the list
+void clear() // empties the list
+bool is_empty() // returns true is list is empty, false otherwise
+void push_back(object o) // appends an element to the end of the list
+void push_front(object o) // appends an element to the front of the list
+void pop_back() // removes last element from list
+void pop_front() // removes first element from list
+		// runtime errors occur if list is empty
+object front() // returns the object at the front of the list
+object back() // returns the object at the back of the list
+int contains(object o) // if o is in list, returns the index of o, else -1
 ```
-A sublist `sublist` of list `my_list` contains the all values in `my_list` starting inclusive from index `n` until index `m` exclusive. In this example, `sublist = [3, 4, 5]`. 
-
-Runtime errors occur when:
-- `n` < 0
-- `n` > `m`
-- `m` > `my_list.length()`
+### Bracket Operations
+`my_list[n]...` -- the nth element in the list (runtime errors if list.length() < n)
+`my_list[n:m]...` -- returns a sublist starting at index `n` until index `m`. (n & m are both optional)
 
 The **int**s `n, m` are optional. If `n` is not used, then `n` is given a value of 0. If `m` is unused, then `m` is given a value of `my_list.length()`.
 
-## Return
-A **return** expression can only be executed within a **method**. The type returned by a **return** expression must match the declared return type of the method.
+## Dispatch
+Calling a method
+```
+int method() {...}
 
-*Example*:
+int i = method();
 ```
-int m(bool a) {
-  ...
-  if (a) {
-    int z = 1;
-    return z;
-  } else {
-    return 2;
-  }
-}
+
+## Binary Operators
+
+### Assigning Operators
+* `=, +=, -=, *=, /=`
+The left hand side of these binary operators must be in reference to a variable, and the left and right hand sides must be of the same type, evaluating to the type of the left hand side
+
+### Boolean Operators
+* `<, >, <=, >=, ==, !=, &&, ||`
+The left and right hand sides of these operators must be of the same type, and the entire expression will evaluate to a bool
+
+### Arithmetic Operators
+* `+, -, *, /`
+The left and right hand sides must be of the same type, and the entire expression will evaluate to the type of the left hand side. 
+
+### Special Cases
+* `int 'op' deci;` will result in a compiler warning, turning the int into type deci
+* `string1 + string2; string1 += string2;` are the only operators allowed on strings, and will append `string2` to the end of `string1`
+
+## New
+Creating an instance of a class
 ```
-In the above example, the declared return type is **int**, so the method **m** must return an **int_const** or any expression whose type evaluates to **int**. 
+class A {...}
+A a = new A;
+```
+
+# Builtin Methods
+`int main(list<string> argv) {...}`
+* The *main* method is an optional method. It must return an int and have one argument `list<string> argv`.
+* When a `KrutC` program is called, the entire file is executed top to bottom, then the *main* method is invoked if *main* is present.
+
+`void print(string s)`
+* input must be a string, and will print to console
+
+`string input()`
+* awaits string input from the console
+
+`string to_string(object o)`
+* turns any basic object into its string representation
+
+`object type_of(object o)`
+* returns the type of `o`
+
+`deci abs(deci d)`
+* returns the absolute value of d
+
+`deci sum(list<deci> l)`
+* returns the sum of `l`
+
+`deci min(list<deci> l)`
+* returns the min value of `l`
+
+`deci max(list<deci> l)`
+* returns the max value of `l`
+
+`void kill(string err)`
+* immediately kills the program, printing `err` to the console
+
+# Type System
+## Basic Types:
+* `int`
+* `deci`
+* `string`
+* `bool`
+* `char`
+* `list<object>`
+
 
 
 
