@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "include/parser.h"
-#include "include/typechecker.h"
+#include "parser.h"
+#include "typechecker.h"
 
 using namespace std;
 

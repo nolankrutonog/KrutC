@@ -1,4 +1,4 @@
-#include "include/scopetable.h"
+#include "scopetable.h"
 
 #include <cassert>
 #include <iostream>
@@ -10,12 +10,15 @@ Type_* ScopeTable::lookup(string s) {
   assert(table.size());
   for (int i = (int)table.size() - 1; i >= 0; i--) {
     map<string, Type_*>& scope = table[i];
-    if (scope.find(s) != scope.end()) { return scope[s]; }
+    if (scope.find(s) != scope.end()) {
+      return scope[s];
+    }
   }
   return NULL;
 }
 
-/* Given id s, returns a ptr to S's Type_ if S is defined in the current scope */
+/* Given id s, returns a ptr to S's Type_ if S is defined in the current scope
+ */
 Type_* ScopeTable::check_current_scope(string s) {
   assert(table.size());
   map<string, Type_*>& scope = table[table.size() - 1];

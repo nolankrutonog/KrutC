@@ -56,7 +56,8 @@ separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS_LIST})
 
 # Include project source directories
-include_directories(${CMAKE_SOURCE_DIR}/src/frontend)
+include_directories(${CMAKE_SOURCE_DIR}/src/frontend
+                    ${CMAKE_SOURCE_DIR}/src/frontend/include)
 
 # Define source files
 set(SOURCES src/main.cpp 

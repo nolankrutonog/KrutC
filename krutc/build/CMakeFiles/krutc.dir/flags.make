@@ -4,7 +4,7 @@
 # compile CXX with /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 CXX_DEFINES = -D__STDC_CONSTANT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
 
-CXX_INCLUDES = -I/opt/homebrew/Cellar/llvm/18.1.5/include -I/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend -isystem /opt/homebrew/include
+CXX_INCLUDES = -I/opt/homebrew/Cellar/llvm/18.1.5/include -I/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend -I/Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include -isystem /opt/homebrew/include
 
 CXX_FLAGSarm64 = -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.5
 

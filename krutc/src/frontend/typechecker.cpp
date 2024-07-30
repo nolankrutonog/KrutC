@@ -5,10 +5,10 @@
 #include <map>
 #include <set>
 
-#include "include/constants.h"
-#include "include/error.h"
-#include "include/inheritance-graph.h"
-#include "include/scopetable.h"
+#include "constants.h"
+#include "error.h"
+#include "inheritance-graph.h"
+#include "scopetable.h"
 
 using namespace std;
 using namespace basic_classes;
