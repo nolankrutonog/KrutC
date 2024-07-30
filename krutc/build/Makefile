@@ -181,149 +181,173 @@ krutc/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/build
 .PHONY : krutc/fast
 
-frontend/lexer.o: frontend/lexer.cpp.o
-.PHONY : frontend/lexer.o
+src/backend/codegen.o: src/backend/codegen.cpp.o
+.PHONY : src/backend/codegen.o
 
 # target to build an object file
-frontend/lexer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/lexer.cpp.o
-.PHONY : frontend/lexer.cpp.o
+src/backend/codegen.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/backend/codegen.cpp.o
+.PHONY : src/backend/codegen.cpp.o
 
-frontend/lexer.i: frontend/lexer.cpp.i
-.PHONY : frontend/lexer.i
+src/backend/codegen.i: src/backend/codegen.cpp.i
+.PHONY : src/backend/codegen.i
 
 # target to preprocess a source file
-frontend/lexer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/lexer.cpp.i
-.PHONY : frontend/lexer.cpp.i
+src/backend/codegen.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/backend/codegen.cpp.i
+.PHONY : src/backend/codegen.cpp.i
 
-frontend/lexer.s: frontend/lexer.cpp.s
-.PHONY : frontend/lexer.s
+src/backend/codegen.s: src/backend/codegen.cpp.s
+.PHONY : src/backend/codegen.s
 
 # target to generate assembly for a file
-frontend/lexer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/lexer.cpp.s
-.PHONY : frontend/lexer.cpp.s
+src/backend/codegen.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/backend/codegen.cpp.s
+.PHONY : src/backend/codegen.cpp.s
 
-frontend/main.o: frontend/main.cpp.o
-.PHONY : frontend/main.o
+src/frontend/lexer.o: src/frontend/lexer.cpp.o
+.PHONY : src/frontend/lexer.o
 
 # target to build an object file
-frontend/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/main.cpp.o
-.PHONY : frontend/main.cpp.o
+src/frontend/lexer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/lexer.cpp.o
+.PHONY : src/frontend/lexer.cpp.o
 
-frontend/main.i: frontend/main.cpp.i
-.PHONY : frontend/main.i
+src/frontend/lexer.i: src/frontend/lexer.cpp.i
+.PHONY : src/frontend/lexer.i
 
 # target to preprocess a source file
-frontend/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/main.cpp.i
-.PHONY : frontend/main.cpp.i
+src/frontend/lexer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/lexer.cpp.i
+.PHONY : src/frontend/lexer.cpp.i
 
-frontend/main.s: frontend/main.cpp.s
-.PHONY : frontend/main.s
+src/frontend/lexer.s: src/frontend/lexer.cpp.s
+.PHONY : src/frontend/lexer.s
 
 # target to generate assembly for a file
-frontend/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/main.cpp.s
-.PHONY : frontend/main.cpp.s
+src/frontend/lexer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/lexer.cpp.s
+.PHONY : src/frontend/lexer.cpp.s
 
-frontend/parser.o: frontend/parser.cpp.o
-.PHONY : frontend/parser.o
+src/frontend/parser.o: src/frontend/parser.cpp.o
+.PHONY : src/frontend/parser.o
 
 # target to build an object file
-frontend/parser.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/parser.cpp.o
-.PHONY : frontend/parser.cpp.o
+src/frontend/parser.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/parser.cpp.o
+.PHONY : src/frontend/parser.cpp.o
 
-frontend/parser.i: frontend/parser.cpp.i
-.PHONY : frontend/parser.i
+src/frontend/parser.i: src/frontend/parser.cpp.i
+.PHONY : src/frontend/parser.i
 
 # target to preprocess a source file
-frontend/parser.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/parser.cpp.i
-.PHONY : frontend/parser.cpp.i
+src/frontend/parser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/parser.cpp.i
+.PHONY : src/frontend/parser.cpp.i
 
-frontend/parser.s: frontend/parser.cpp.s
-.PHONY : frontend/parser.s
+src/frontend/parser.s: src/frontend/parser.cpp.s
+.PHONY : src/frontend/parser.s
 
 # target to generate assembly for a file
-frontend/parser.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/parser.cpp.s
-.PHONY : frontend/parser.cpp.s
+src/frontend/parser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/parser.cpp.s
+.PHONY : src/frontend/parser.cpp.s
 
-frontend/scopetable.o: frontend/scopetable.cpp.o
-.PHONY : frontend/scopetable.o
+src/frontend/scopetable.o: src/frontend/scopetable.cpp.o
+.PHONY : src/frontend/scopetable.o
 
 # target to build an object file
-frontend/scopetable.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/scopetable.cpp.o
-.PHONY : frontend/scopetable.cpp.o
+src/frontend/scopetable.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/scopetable.cpp.o
+.PHONY : src/frontend/scopetable.cpp.o
 
-frontend/scopetable.i: frontend/scopetable.cpp.i
-.PHONY : frontend/scopetable.i
+src/frontend/scopetable.i: src/frontend/scopetable.cpp.i
+.PHONY : src/frontend/scopetable.i
 
 # target to preprocess a source file
-frontend/scopetable.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/scopetable.cpp.i
-.PHONY : frontend/scopetable.cpp.i
+src/frontend/scopetable.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/scopetable.cpp.i
+.PHONY : src/frontend/scopetable.cpp.i
 
-frontend/scopetable.s: frontend/scopetable.cpp.s
-.PHONY : frontend/scopetable.s
+src/frontend/scopetable.s: src/frontend/scopetable.cpp.s
+.PHONY : src/frontend/scopetable.s
 
 # target to generate assembly for a file
-frontend/scopetable.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/scopetable.cpp.s
-.PHONY : frontend/scopetable.cpp.s
+src/frontend/scopetable.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/scopetable.cpp.s
+.PHONY : src/frontend/scopetable.cpp.s
 
-frontend/tree.o: frontend/tree.cpp.o
-.PHONY : frontend/tree.o
+src/frontend/tree.o: src/frontend/tree.cpp.o
+.PHONY : src/frontend/tree.o
 
 # target to build an object file
-frontend/tree.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/tree.cpp.o
-.PHONY : frontend/tree.cpp.o
+src/frontend/tree.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/tree.cpp.o
+.PHONY : src/frontend/tree.cpp.o
 
-frontend/tree.i: frontend/tree.cpp.i
-.PHONY : frontend/tree.i
+src/frontend/tree.i: src/frontend/tree.cpp.i
+.PHONY : src/frontend/tree.i
 
 # target to preprocess a source file
-frontend/tree.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/tree.cpp.i
-.PHONY : frontend/tree.cpp.i
+src/frontend/tree.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/tree.cpp.i
+.PHONY : src/frontend/tree.cpp.i
 
-frontend/tree.s: frontend/tree.cpp.s
-.PHONY : frontend/tree.s
+src/frontend/tree.s: src/frontend/tree.cpp.s
+.PHONY : src/frontend/tree.s
 
 # target to generate assembly for a file
-frontend/tree.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/tree.cpp.s
-.PHONY : frontend/tree.cpp.s
+src/frontend/tree.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/tree.cpp.s
+.PHONY : src/frontend/tree.cpp.s
 
-frontend/typechecker.o: frontend/typechecker.cpp.o
-.PHONY : frontend/typechecker.o
+src/frontend/typechecker.o: src/frontend/typechecker.cpp.o
+.PHONY : src/frontend/typechecker.o
 
 # target to build an object file
-frontend/typechecker.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/typechecker.cpp.o
-.PHONY : frontend/typechecker.cpp.o
+src/frontend/typechecker.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/typechecker.cpp.o
+.PHONY : src/frontend/typechecker.cpp.o
 
-frontend/typechecker.i: frontend/typechecker.cpp.i
-.PHONY : frontend/typechecker.i
+src/frontend/typechecker.i: src/frontend/typechecker.cpp.i
+.PHONY : src/frontend/typechecker.i
 
 # target to preprocess a source file
-frontend/typechecker.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/typechecker.cpp.i
-.PHONY : frontend/typechecker.cpp.i
+src/frontend/typechecker.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/typechecker.cpp.i
+.PHONY : src/frontend/typechecker.cpp.i
 
-frontend/typechecker.s: frontend/typechecker.cpp.s
-.PHONY : frontend/typechecker.s
+src/frontend/typechecker.s: src/frontend/typechecker.cpp.s
+.PHONY : src/frontend/typechecker.s
 
 # target to generate assembly for a file
-frontend/typechecker.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/frontend/typechecker.cpp.s
-.PHONY : frontend/typechecker.cpp.s
+src/frontend/typechecker.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/frontend/typechecker.cpp.s
+.PHONY : src/frontend/typechecker.cpp.s
+
+src/main.o: src/main.cpp.o
+.PHONY : src/main.o
+
+# target to build an object file
+src/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
+
+src/main.i: src/main.cpp.i
+.PHONY : src/main.i
+
+# target to preprocess a source file
+src/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
+
+src/main.s: src/main.cpp.s
+.PHONY : src/main.s
+
+# target to generate assembly for a file
+src/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/krutc.dir/build.make CMakeFiles/krutc.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
 
 # Help Target
 help:
@@ -338,24 +362,27 @@ help:
 	@echo "... intrinsics_gen"
 	@echo "... omp_gen"
 	@echo "... krutc"
-	@echo "... frontend/lexer.o"
-	@echo "... frontend/lexer.i"
-	@echo "... frontend/lexer.s"
-	@echo "... frontend/main.o"
-	@echo "... frontend/main.i"
-	@echo "... frontend/main.s"
-	@echo "... frontend/parser.o"
-	@echo "... frontend/parser.i"
-	@echo "... frontend/parser.s"
-	@echo "... frontend/scopetable.o"
-	@echo "... frontend/scopetable.i"
-	@echo "... frontend/scopetable.s"
-	@echo "... frontend/tree.o"
-	@echo "... frontend/tree.i"
-	@echo "... frontend/tree.s"
-	@echo "... frontend/typechecker.o"
-	@echo "... frontend/typechecker.i"
-	@echo "... frontend/typechecker.s"
+	@echo "... src/backend/codegen.o"
+	@echo "... src/backend/codegen.i"
+	@echo "... src/backend/codegen.s"
+	@echo "... src/frontend/lexer.o"
+	@echo "... src/frontend/lexer.i"
+	@echo "... src/frontend/lexer.s"
+	@echo "... src/frontend/parser.o"
+	@echo "... src/frontend/parser.i"
+	@echo "... src/frontend/parser.s"
+	@echo "... src/frontend/scopetable.o"
+	@echo "... src/frontend/scopetable.i"
+	@echo "... src/frontend/scopetable.s"
+	@echo "... src/frontend/tree.o"
+	@echo "... src/frontend/tree.i"
+	@echo "... src/frontend/tree.s"
+	@echo "... src/frontend/typechecker.o"
+	@echo "... src/frontend/typechecker.i"
+	@echo "... src/frontend/typechecker.s"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 

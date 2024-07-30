@@ -1,6 +1,6 @@
-CMakeFiles/krutc.dir/frontend/scopetable.cpp.o: \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/scopetable.cpp \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/scopetable.h \
+CMakeFiles/krutc.dir/src/frontend/scopetable.cpp.o: \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/scopetable.cpp \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/scopetable.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/map \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__algorithm/equal.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__algorithm/comp.h \
@@ -736,7 +736,7 @@ CMakeFiles/krutc.dir/frontend/scopetable.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__functional/pointer_to_binary_function.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__functional/pointer_to_unary_function.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__functional/unary_negate.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/parser.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/parser.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/iostream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/ios \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__ios/fpos.h \
@@ -796,13 +796,13 @@ CMakeFiles/krutc.dir/frontend/scopetable.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__bsd_locale_defaults.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cstdarg \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/set \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/constants.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/constants.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/unordered_set \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/error.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tokenbuffer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/error.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/tokenbuffer.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/deque \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/lexer.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/filestreambuffer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/lexer.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/filestreambuffer.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/fstream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/filesystem \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/copy_options.h \
@@ -822,7 +822,7 @@ CMakeFiles/krutc.dir/frontend/scopetable.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/path_iterator.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/recursive_directory_iterator.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/u8path.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/token.h \
-  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/frontend/include/tree.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/token.h \
+  /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/tree.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cassert \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/assert.h

@@ -1,36 +1,42 @@
 # cmake_minimum_required(VERSION 3.29.3)
 
-# # Set the project name
 # project(krutc)
 
-# # Specify the C++ standard
 # set(CMAKE_CXX_STANDARD 17)
 # set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# # Use llvm-config to find LLVM
-# execute_process(
-#     COMMAND /opt/homebrew/opt/llvm/bin/llvm-config --prefix
-#     OUTPUT_VARIABLE LLVM_INSTALL_DIR
-#     OUTPUT_STRIP_TRAILING_WHITESPACE
-# )
+# find_package(LLVM REQUIRED CONFIG)
+# message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+# message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
-# find_package(LLVM REQUIRED CONFIG PATHS ${LLVM_INSTALL_DIR}/lib/cmake/llvm NO_DEFAULT_PATH)
-
-
-# # Include the LLVM headers
 # include_directories(${LLVM_INCLUDE_DIRS})
-# add_definitions(${LLVM_DEFINITIONS})
+# separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+# add_definitions(${LLVM_DEFINITIONS_LIST})
 
-# # Source files
-# set(SOURCES frontend/main.cpp frontend/lexer.cpp frontend/parser.cpp 
-#             frontend/tree.cpp frontend/typechecker.cpp frontend/scopetable.cpp)
+# include_directories(${CMAKE_SOURCE_DIR}/src)
 
-# # Add the executable
+# set(SOURCES src/frontend/main.cpp 
+#             src/frontend/lexer.cpp 
+#             src/frontend/parser.cpp 
+#             src/frontend/tree.cpp 
+#             src/frontend/typechecker.cpp 
+#             src/frontend/scopetable.cpp
+#             src/backend/codegen.cpp
+#             )
+
 # add_executable(krutc ${SOURCES})
 
-# # Link LLVM libraries
-# llvm_map_components_to_libnames(LLVM_LIBS support core irreader)
-# target_link_libraries(krutc ${LLVM_LIBS})
+# llvm_map_components_to_libnames(llvm_libs
+#   support
+#   core
+#   irreader
+#   executionengine
+#   mcjit
+#   native
+#   orcjit
+# )
+# target_link_libraries(krutc ${llvm_libs})
+
 
 cmake_minimum_required(VERSION 3.29.3)
 
@@ -39,19 +45,32 @@ project(krutc)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Find LLVM package
 find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
+# Include LLVM directories
 include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS_LIST})
 
-set(SOURCES frontend/main.cpp frontend/lexer.cpp frontend/parser.cpp 
-            frontend/tree.cpp frontend/typechecker.cpp frontend/scopetable.cpp)
+# Include project source directories
+include_directories(${CMAKE_SOURCE_DIR}/src/frontend)
 
+# Define source files
+set(SOURCES src/main.cpp 
+            src/frontend/lexer.cpp 
+            src/frontend/parser.cpp 
+            src/frontend/tree.cpp 
+            src/frontend/typechecker.cpp 
+            src/frontend/scopetable.cpp
+            src/backend/codegen.cpp)
+
+# Add executable target
 add_executable(krutc ${SOURCES})
 
+# Link LLVM libraries to the target
 llvm_map_components_to_libnames(llvm_libs
   support
   core
@@ -62,3 +81,7 @@ llvm_map_components_to_libnames(llvm_libs
   orcjit
 )
 target_link_libraries(krutc ${llvm_libs})
+
+# Ensure the LLVM libraries are found
+target_include_directories(krutc PRIVATE ${LLVM_INCLUDE_DIRS})
+target_compile_definitions(krutc PRIVATE ${LLVM_DEFINITIONS})
