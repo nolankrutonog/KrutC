@@ -1,43 +1,3 @@
-# cmake_minimum_required(VERSION 3.29.3)
-
-# project(krutc)
-
-# set(CMAKE_CXX_STANDARD 17)
-# set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-# find_package(LLVM REQUIRED CONFIG)
-# message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-# message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-
-# include_directories(${LLVM_INCLUDE_DIRS})
-# separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
-# add_definitions(${LLVM_DEFINITIONS_LIST})
-
-# include_directories(${CMAKE_SOURCE_DIR}/src)
-
-# set(SOURCES src/frontend/main.cpp 
-#             src/frontend/lexer.cpp 
-#             src/frontend/parser.cpp 
-#             src/frontend/tree.cpp 
-#             src/frontend/typechecker.cpp 
-#             src/frontend/scopetable.cpp
-#             src/backend/codegen.cpp
-#             )
-
-# add_executable(krutc ${SOURCES})
-
-# llvm_map_components_to_libnames(llvm_libs
-#   support
-#   core
-#   irreader
-#   executionengine
-#   mcjit
-#   native
-#   orcjit
-# )
-# target_link_libraries(krutc ${llvm_libs})
-
-
 cmake_minimum_required(VERSION 3.29.3)
 
 project(krutc)
@@ -52,6 +12,7 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
 # Include LLVM directories
 include_directories(${LLVM_INCLUDE_DIRS})
+# include_directories(${CMAKE_SOURCE_DIR}/../../llvm-project/llvm/lib)
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS_LIST})
 
@@ -73,13 +34,13 @@ add_executable(krutc ${SOURCES})
 
 # Link LLVM libraries to the target
 llvm_map_components_to_libnames(llvm_libs
-  support
-  core
-  irreader
-  executionengine
-  mcjit
-  native
-  orcjit
+                                support
+                                core
+                                irreader
+                                executionengine
+                                mcjit
+                                native
+                                orcjit
 )
 target_link_libraries(krutc ${llvm_libs})
 

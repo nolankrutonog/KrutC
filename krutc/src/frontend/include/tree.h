@@ -1,9 +1,21 @@
+/*
+  tree.h
+  Defines the KrutC language. A program is represented as a list (vector) of
+  stmts. Every stmt can be broken up into smaller parts.
+*/
+
 #ifndef TREE_H
 #define TREE_H
 
 #include <iostream>
 #include <set>
 #include <vector>
+
+// #include "llvm/IR/IRBuilder.h"
+// #include "llvm/IR/LLVMContext.h"
+// #include "llvm/IR/Module.h"
+// #include "llvm/IR/Function.h"
+#include "llvm/IR/Value.h"
 
 enum StmtType {
   STMT = 500,
@@ -39,6 +51,7 @@ enum StmtType {
 class Program;
 class Stmt;
 typedef std::vector<Stmt *> StmtList;
+class ExprStmt;
 
 class ClassStmt;
 class Feature;
@@ -55,12 +68,12 @@ class WhileStmt;
 class BreakStmt;
 class ContStmt;
 
-class ExprStmt;
 typedef std::vector<ExprStmt *> ExprList;
 typedef std::set<ExprStmt *> ExprSet;
 
 class ReturnExpr;
 class IntConstExpr;
+class DeciConstExpr;
 class StrConstExpr;
 class CharConstExpr;
 class BoolConstExpr;
@@ -71,24 +84,9 @@ class SublistExpr;
 class ObjectIdExpr;
 class DispatchExpr;
 class BinopExpr;
+class NewExpr;
 
 class Type_;
-
-/*
-  tree.h
-  Defines the KrutC language. A program is represented as a list (vector) of
-  stmts. Every stmt can be broken up into smaller parts.
-*/
-class Stmt {
- public:
-  virtual StmtType get_stmttype() = 0;
-  int lineno = 0;
-  virtual ~Stmt() = default;
-  virtual void dump(int indent) = 0;
-  virtual std::string classname() { return "Stmt"; };
-  virtual Type_ *typecheck() = 0;
-  // virtual Value *codegen() = 0;
-};
 
 class Program {
   StmtList stmt_list;
@@ -101,6 +99,16 @@ class Program {
   void dump();
   StmtList get_stmt_list() { return stmt_list; }
 };
+class Stmt {
+ public:
+  virtual StmtType get_stmttype() = 0;
+  int lineno = 0;
+  virtual ~Stmt() = default;
+  virtual void dump(int indent) = 0;
+  virtual std::string classname() { return "Stmt"; };
+  virtual Type_ *typecheck() = 0;
+  virtual llvm::Value *codegen() = 0;
+};
 
 class ExprStmt : public Stmt {
  public:
@@ -108,7 +116,7 @@ class ExprStmt : public Stmt {
   int lineno = 0;
   virtual std::string classname() { return "ExprStmt"; }
   virtual void dump(int indent);
-  // virtual Value *codegen();
+  virtual llvm::Value *codegen();
 };
 
 ////////////////////////////////////////////////////////////
@@ -131,7 +139,7 @@ class ClassStmt : public Stmt {
   StmtType get_stmttype() { return CLASS_STMT; }
   std::string classname() { return "ClassStmt"; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
 
   std::string get_name() { return name; }
   std::vector<std::string> get_parents() { return parents; }
@@ -155,7 +163,7 @@ class AttrStmt : public Feature {
       : type(type), name(name), init(init) {}
   StmtType get_stmttype() { return ATTR_STMT; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
 
   bool is_method() { return false; }
   std::string classname() { return "AttrStmt"; }
@@ -173,7 +181,7 @@ class FormalStmt : public Stmt {
   FormalStmt(Type_ *type, std::string name) : type(type), name(name) {}
   StmtType get_stmttype() { return FORMAL_STMT; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
 
   std::string classname() { return "FORMAL_STMT"; }
   std::string get_name() { return name; }
@@ -198,7 +206,7 @@ class MethodStmt : public Feature {
   StmtType get_stmttype() { return METHOD_STMT; }
   std::string classname() { return "MethodStmt"; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
 
   bool is_method() { return true; }
   std::string get_name() { return name; }
@@ -219,7 +227,7 @@ class ForStmt : public Stmt {
       : stmt(stmt), cond(cond), repeat(repeat), stmt_list(stmt_list) {}
   StmtType get_stmttype() { return FOR_STMT; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "ForStmt"; }
 
   Stmt *get_formal() { return stmt; }
@@ -239,7 +247,7 @@ class IfStmt : public Stmt {
       : pred(pred), then_branch(then_branch), else_branch(else_branch) {}
   StmtType get_stmttype() { return IF_STMT; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "IfStmt"; }
   // std::string get_name() { return "IfStmt"; }
 
@@ -259,7 +267,7 @@ class WhileStmt : public Stmt {
   StmtType get_stmttype() { return WHILE_STMT; }
   void dump(int indent);
   std::string classname() { return "WhileStmt"; }
-  // Value *codegen();
+  llvm::Value *codegen();
   // std::string get_name() { return "WhileStmt"; }
 
   ExprStmt *get_pred() { return pred; }
@@ -274,7 +282,7 @@ class BreakStmt : public Stmt {
   StmtType get_stmttype() { return BREAK_EXPR; }
   std::string classname() { return "BreakExpr"; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   Type_ *typecheck();
 };
 
@@ -287,7 +295,7 @@ class ContStmt : public Stmt {
   std::string classname() { return "ContExpr"; }
   void dump(int indent);
   Type_ *typecheck();
-  // Value *codegen();
+  llvm::Value *codegen();
 };
 
 ////////////////////////////////////////////////////////////
@@ -309,7 +317,7 @@ class BinopExpr : public ExprStmt {
   StmtType get_stmttype() { return BINOP_EXPR; }
   std::string classname() { return "BinopExpr"; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
 
   ExprStmt *get_lhs() { return lhs; }
   std::string get_op() { return op; }
@@ -328,7 +336,7 @@ class DispatchExpr : public ExprStmt {
       : calling_expr(calling_expr), name(name), args(args) {}
   StmtType get_stmttype() { return DISPATCH_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "DispatchExpr"; }
 
   ExprStmt *get_calling_expr() { return calling_expr; }
@@ -346,7 +354,7 @@ class ReturnExpr : public ExprStmt {
   // ReturnExpr() {}
   StmtType get_stmttype() { return RETURN_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "ReturnExpr"; }
 
   ExprStmt *get_expr() { return expr; }
@@ -360,7 +368,7 @@ class IntConstExpr : public ExprStmt {
   IntConstExpr(long val) : val(val) {}
   StmtType get_stmttype() { return INT_CONST_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "IntConstExpr"; }
 
   long get_val() { return val; }
@@ -374,7 +382,7 @@ class DeciConstExpr : public ExprStmt {
   DeciConstExpr(double val) : val(val) {}
   StmtType get_stmttype() { return DECI_CONST_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "DeciConstExpr"; }
 
   double get_val() { return val; }
@@ -388,7 +396,7 @@ class StrConstExpr : public ExprStmt {
   StrConstExpr(std::string str) : str(str) {}
   StmtType get_stmttype() { return STRING_CONST_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "StrConstExpr"; }
 
   std::string get_str() { return str; }
@@ -402,7 +410,7 @@ class CharConstExpr : public ExprStmt {
   CharConstExpr(std::string c) : c(c) {}
   StmtType get_stmttype() { return CHAR_CONST_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "CharConstExpr"; }
 
   std::string get_str() { return c; }
@@ -416,7 +424,7 @@ class BoolConstExpr : public ExprStmt {
   BoolConstExpr(std::string bool_val) { val = bool_val == "true" ? 1 : 0; }
   StmtType get_stmttype() { return BOOL_CONST_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "BoolConstExpr"; }
 
   int get_val() { return val; }
@@ -431,7 +439,7 @@ class SetConstExpr : public ExprStmt {
   SetConstExpr(ExprSet exprset) : exprset(exprset) {}
   StmtType get_stmttype() { return SET_CONST_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "SetConstExpr"; }
 
   ExprSet get_exprset() { return exprset; }
@@ -445,7 +453,7 @@ class ListConstExpr : public ExprStmt {
   ListConstExpr(ExprList exprlist) : exprlist(exprlist) {}
   StmtType get_stmttype() { return LIST_CONST_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "ListConstExpr"; }
 
   ExprList get_exprlist() { return exprlist; }
@@ -461,7 +469,7 @@ class ListElemRef : public ExprStmt {
       : list_name(list_name), index(index) {}
   StmtType get_stmttype() { return LIST_ELEM_REF; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "ListElemRef"; }
 
   ExprStmt *get_list_name() { return list_name; }
@@ -478,7 +486,7 @@ class SublistExpr : public ListElemRef {
       : ListElemRef(list_name, start_idx), end_idx(end_idx) {}
   StmtType get_stmttype() { return SUBLIST_EXPR; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
   std::string classname() { return "SublistExpr"; }
 
   ExprStmt *get_st_idx() { return get_index(); }
@@ -495,7 +503,7 @@ class ObjectIdExpr : public ExprStmt {
   StmtType get_stmttype() { return OBJECTID_EXPR; }
   std::string classname() { return "ObjectIdStmt"; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
 
   std::string get_name() { return name; }
   Type_ *typecheck();
@@ -510,7 +518,7 @@ class NewExpr : public ExprStmt {
   StmtType get_stmttype() { return NEW_EXPR; }
   std::string classname() { return "NewExpr"; }
   void dump(int indent);
-  // Value *codegen();
+  llvm::Value *codegen();
 
   std::string get_newclass() { return newclass; }
   Type_ *typecheck();

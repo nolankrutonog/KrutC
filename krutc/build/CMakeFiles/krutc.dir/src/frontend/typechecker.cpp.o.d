@@ -798,6 +798,25 @@ CMakeFiles/krutc.dir/src/frontend/typechecker.cpp.o: \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/constants.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/unordered_set \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/error.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/raw_ostream.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/SmallVector.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/Compiler.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Config/llvm-config.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/type_traits.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cassert \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/assert.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/StringRef.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/DenseMapInfo.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/STLFunctionalExtras.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/STLForwardCompat.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/iterator_range.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/ADL.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/DataTypes.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm-c/DataTypes.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/inttypes.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/inttypes.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/inttypes.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/xlocale/_inttypes.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/tokenbuffer.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/deque \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/lexer.h \
@@ -823,8 +842,22 @@ CMakeFiles/krutc.dir/src/frontend/typechecker.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/u8path.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/token.h \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/tree.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cassert \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/assert.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/IR/Value.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm-c/Types.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm-c/ExternC.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/STLExtras.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/Hashing.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/ErrorHandling.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/SwapByteOrder.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/bit.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/ADT/iterator.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Config/abi-breaking.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/IR/Use.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/CBindingWrapping.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/Casting.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/Alignment.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/Support/MathExtras.h \
+  /opt/homebrew/Cellar/llvm/18.1.5/include/llvm/IR/Value.def \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/map \
   /Users/nolankrutonog/Desktop/workspace/KrutC/krutc/src/frontend/include/inheritance-graph.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/stack \

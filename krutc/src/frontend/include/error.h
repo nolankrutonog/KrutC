@@ -4,9 +4,11 @@
 #include <iostream>
 #include <vector>
 
-#define RESET "\033[0m"
-#define RED "\033[31m"
-#define MAGENTA "\033[35m"
+#include "llvm/Support/raw_ostream.h"
+
+// #define RESET "\033[0m"
+// #define RED "\033[31m"
+// #define MAGENTA "\033[35m"
 
 enum ErrorType { LEXER_ERROR, SYNTAX_ERROR, SEMANTIC_ERROR };
 
@@ -28,8 +30,9 @@ class Error {
         err_msg(err_msg) {}
 
   virtual void print() {
-    std::cerr << RED << "ERROR " << RESET << ErrorTypeStrings[err_type] << ":"
-              << filename << ":" << lineno << ": " << err_msg << std::endl;
+    llvm::errs().changeColor(llvm::raw_ostream::RED, true) << "ERROR ";
+    llvm::errs().resetColor() << ErrorTypeStrings[err_type] << ":" << filename
+                              << ":" << lineno << ": " << err_msg << "\n";
   }
 
   virtual ~Error() = default;
@@ -42,10 +45,10 @@ class Warning : public Error {
       : Error(err_type, filename, lineno, warn_msg) {}
 
   void print() override {
-    std::cerr << MAGENTA << "WARNING " << RESET << ErrorTypeStrings[err_type]
-              << ":" << filename << ":" << lineno << ": " << err_msg
-              << std::endl;
+    llvm::errs().changeColor(llvm::raw_ostream::MAGENTA, true) << "WARNING ";
+    llvm::errs().resetColor() << ErrorTypeStrings[err_type] << ":" << filename
+                              << ":" << lineno << ": " << err_msg << "\n";
   }
 };
 
-#endif // ERROR_H
+#endif  // ERROR_H

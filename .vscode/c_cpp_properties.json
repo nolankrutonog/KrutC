@@ -3,7 +3,8 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/llvm-project/llvm/include"
             ],
             "defines": [],
             "macFrameworkPath": [
@@ -11,7 +12,8 @@
             ],
             "compilerPath": "/opt/homebrew/opt/llvm/bin/clang",
             "cppStandard": "c++17",
-            "intelliSenseMode": "macos-clang-arm64"
+            "intelliSenseMode": "macos-clang-arm64",
+            "cStandard": "c23"
         }
     ],
     "version": 4
